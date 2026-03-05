@@ -2,1741 +2,673 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Törü — Türk’ün Töresi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TÜRKÜN TÖRESİ — Törü Satranç</title>
+  <meta name="description" content="Turkuntoresi.com — Törü temalı satranç. Tek dosya ile GitHub Pages." />
+
+  <!-- Basit, temiz stil -->
   <style>
     :root{
-      --bg:#070b16;
-      --stroke:rgba(255,255,255,.10);
-      --txt:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.68);
-      --acc:#4aa3ff;
-      --good:#2ee59d;
-      --bad:#ff5b7a;
-      --light:#f3d8b8;
-      --dark:#b98563;
-      --sq: clamp(38px, 9.2vw, 64px);
+      --bg:#0b1220;
+      --card:#101a2f;
+      --card2:#0f1a33;
+      --text:#e8eefc;
+      --muted:#a9b4d6;
+      --accent:#ff4d4d;
+      --accent2:#ffb84d;
+      --good:#25d366;
+      --bad:#ff4d4d;
+
+      /* klasik satranç renkleri */
+      --light:#f0d9b5;
+      --dark:#b58863;
+
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+      --radius: 18px;
     }
+
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 600px at 50% 0%, #132351 0%, var(--bg) 52%, #050711 100%);
-      color:var(--txt);
-      padding:16px 12px 48px;
-      display:flex;
-      justify-content:center;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 600px at 20% 10%, rgba(255,77,77,.20), transparent 60%),
+        radial-gradient(900px 500px at 80% 25%, rgba(255,184,77,.18), transparent 55%),
+        radial-gradient(1100px 700px at 50% 90%, rgba(37,211,102,.10), transparent 60%),
+        var(--bg);
+      color:var(--text);
     }
-    .wrap{width:min(1100px, 100%);}
 
-    .hero{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid var(--stroke);
-      border-radius:18px;
-      padding:16px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+    a{color:inherit}
+    .wrap{
+      max-width:1100px;
+      margin:0 auto;
+      padding:24px 16px 40px;
     }
-    .hrow{display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;}
-    h1{margin:0; font-size:28px; letter-spacing:.3px;}
-    .sub{color:var(--muted); margin-top:4px; line-height:1.35}
 
-    .pillrow{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    .pill{
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.18);
-      color:var(--muted);
-      padding:8px 10px;
-      border-radius:999px;
-      font-size:13px;
+    header{
       display:flex;
-      gap:8px;
       align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .logo{
+      width:44px;height:44px;border-radius:14px;
+      background: linear-gradient(135deg, rgba(255,77,77,.95), rgba(255,184,77,.95));
+      box-shadow: var(--shadow);
+      display:grid;place-items:center;
+      font-weight:900;
+      letter-spacing:.5px;
+    }
+    .brand h1{
+      margin:0;
+      font-size:18px;
+      line-height:1.1;
+    }
+    .brand p{
+      margin:2px 0 0;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .pill{
+      padding:10px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      display:flex;gap:10px;align-items:center;
+      color:var(--muted);
+      font-size:12px;
       user-select:none;
     }
-
-    .btnrow{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
-    button, select, input{
-      appearance:none;
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.06);
-      color:var(--txt);
-      padding:10px 12px;
-      border-radius:12px;
-      font-weight:700;
-      cursor:pointer;
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: rgba(255,255,255,.22);
+      box-shadow: 0 0 0 4px rgba(255,255,255,.05);
     }
-    input{cursor:text; font-weight:600; width:min(520px,100%);}
-    button.primary{background: rgba(74,163,255,.18); border-color: rgba(74,163,255,.45)}
-    button.danger{background: rgba(255,91,122,.16); border-color: rgba(255,91,122,.45)}
-    button:active{transform: translateY(1px)}
-    select{font-weight:700}
+    .dot.ok{ background: var(--good); box-shadow:0 0 0 4px rgba(37,211,102,.15); }
 
-    .grid{margin-top:12px; display:grid; gap:12px; grid-template-columns: 1fr;}
-    @media (min-width: 980px){ .grid{grid-template-columns: 520px 1fr;} }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:18px;
+    }
+
+    @media (max-width: 920px){
+      .grid{ grid-template-columns: 1fr; }
+    }
 
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid var(--stroke);
-      border-radius:18px;
-      padding:14px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.35);
-    }
-
-    .boardWrap{display:flex; justify-content:center;}
-    .boardLayer{ position:relative; display:inline-block; }
-    #arrowCanvas{ position:absolute; inset:0; pointer-events:none; }
-
-    .board{
-      width: calc(var(--sq) * 8);
-      height: calc(var(--sq) * 8);
-      display:grid;
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(8, 1fr);
-      border-radius:16px;
+      background: rgba(16,26,47,.75);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       overflow:hidden;
-      border:1px solid rgba(255,255,255,.14);
-      box-shadow: 0 18px 40px rgba(0,0,0,.45);
-      background:#000;
-      touch-action: manipulation;
-      user-select:none;
     }
-    .sq{
+    .card .hd{
+      padding:16px 16px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: rgba(15,26,51,.55);
       display:flex;
       align-items:center;
-      justify-content:center;
-      font-size: calc(var(--sq) * .74);
-      line-height:1;
-      position:relative;
-    }
-    .light{background:var(--light)}
-    .dark{background:var(--dark)}
-    .sq::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      border:1px solid rgba(0,0,0,.05);
-      pointer-events:none;
-    }
-    .sq.sel{outline: 4px solid rgba(74,163,255,.9); outline-offset:-4px; z-index:2;}
-    .sq.hint{outline: 4px solid rgba(46,229,157,.85); outline-offset:-4px; z-index:1;}
-    .sq.last{box-shadow: inset 0 0 0 5px rgba(255, 215, 0, .35);}
-    .sq.check{box-shadow: inset 0 0 0 6px rgba(255, 91, 122, .45);}
-
-    .piece{font-weight:900;}
-    @media (min-width: 980px){
-      .piece{filter: drop-shadow(0 2px 1px rgba(0,0,0,.35));}
-    }
-    .w{color:#f7f7f7; text-shadow: 0 1px 0 rgba(0,0,0,.35), 0 0 10px rgba(255,255,255,.18);}
-    .b{color:#141414; text-shadow: 0 1px 0 rgba(255,255,255,.10), 0 0 10px rgba(0,0,0,.12);}
-
-    .statusline{
-      display:flex;
       justify-content:space-between;
       gap:10px;
-      flex-wrap:wrap;
-      margin-top:10px;
-      color:var(--muted);
-      font-size:13px;
     }
-    .statusline b{color:var(--txt)}
-    .note{margin-top:10px; color:var(--muted); line-height:1.45}
-    .sectionTitle{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 10px;}
-    .sectionTitle h2{margin:0; font-size:18px; letter-spacing:.2px;}
+    .card .hd h2{
+      margin:0;
+      font-size:14px;
+      color:#f3f6ff;
+      letter-spacing:.2px;
+    }
+    .card .bd{ padding:16px; }
 
-    .bubble{
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.22);
-      border-radius:16px;
-      padding:12px;
-      margin-top:10px;
+    .btnrow{ display:flex; gap:10px; flex-wrap:wrap; }
+    button{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      transition: transform .05s ease, background .15s ease, border-color .15s ease;
+    }
+    button:hover{ background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.22); }
+    button:active{ transform: translateY(1px); }
+    button.primary{
+      background: linear-gradient(135deg, rgba(255,77,77,.95), rgba(255,184,77,.85));
+      border-color: rgba(255,255,255,.16);
+      color: #1a0f0f;
+    }
+    button.primary:hover{ filter: brightness(1.03); }
+    button.good{
+      background: rgba(37,211,102,.14);
+      border-color: rgba(37,211,102,.30);
+    }
+    button.bad{
+      background: rgba(255,77,77,.14);
+      border-color: rgba(255,77,77,.28);
+    }
+
+    .small{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    /* SATRANÇ TAHTASI */
+    .boardWrap{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+
+    .board{
+      width:min(520px, 100%);
+      aspect-ratio:1/1;
+      border-radius: 16px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow: 0 18px 50px rgba(0,0,0,.35);
+      background: #000;
+      user-select:none;
+      margin: 0 auto;
+    }
+    .squares{
+      display:grid;
+      grid-template-columns: repeat(8, 1fr);
+      width:100%;height:100%;
+      position:relative;
+    }
+    .sq{
+      display:grid;
+      place-items:center;
+      font-size: clamp(26px, 5vw, 42px);
+      cursor:pointer;
+      position:relative;
+    }
+    .sq.light{ background: var(--light); }
+    .sq.dark{ background: var(--dark); }
+
+    .sq.hl::after{
+      content:"";
+      position:absolute; inset:0;
+      background: rgba(37,211,102,.18);
+      outline: 2px solid rgba(37,211,102,.45);
+      outline-offset:-2px;
+    }
+    .sq.sel::after{
+      content:"";
+      position:absolute; inset:0;
+      background: rgba(255,184,77,.22);
+      outline: 2px solid rgba(255,184,77,.55);
+      outline-offset:-2px;
+    }
+    .sq.cap::after{
+      content:"";
+      position:absolute; inset:0;
+      background: rgba(255,77,77,.18);
+      outline: 2px solid rgba(255,77,77,.45);
+      outline-offset:-2px;
+    }
+
+    .legend{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
     }
     .tag{
-      display:inline-flex; gap:8px; align-items:center;
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.05);
-      padding:6px 10px;
-      border-radius:999px;
-      font-weight:800;
-      font-size:13px;
-      color:var(--muted);
-      margin-bottom:8px;
+      font-size:12px;
+      color: var(--muted);
+      padding:8px 10px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 999px;
     }
-    .chat{display:grid; gap:10px;}
-    .msg{
-      border:1px solid var(--stroke);
-      background: rgba(0,0,0,.22);
-      border-radius:16px;
-      padding:12px;
-    }
-    .msg .who{
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      border:1px solid var(--stroke);
-      background: rgba(255,255,255,.05);
-      padding:6px 10px;
-      border-radius:999px;
-      font-weight:900;
-      font-size:13px;
-      color:var(--muted);
-      margin-bottom:8px;
-    }
-    .msg .txt{line-height:1.55; color:var(--txt)}
-    .small{font-size:12.5px; color:var(--muted); line-height:1.45}
 
-    .intro{
-      position:fixed;
-      inset:0;
-      background: radial-gradient(900px 500px at 50% 20%, rgba(74,163,255,.18), rgba(0,0,0,.92));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-      padding:18px;
+    .status{
+      padding:10px 12px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
     }
-    .introBox{
-      width:min(760px, 100%);
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.45);
-      border-radius:22px;
-      padding:20px 18px;
-      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+    .status b{ color: var(--text); }
+
+    .sep{ height:1px; background: rgba(255,255,255,.08); margin:12px 0; }
+
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size: 12px;
+      color: rgba(232,238,252,.85);
+      background: rgba(0,0,0,.20);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      padding:10px 12px;
+      overflow:auto;
     }
-    .introTitle{font-size:20px; font-weight:900; margin:0 0 10px}
-    .runes{
-      font-size: clamp(18px, 3.6vw, 28px);
-      letter-spacing: .08em;
-      line-height:1.7;
-      white-space:pre-wrap;
-      font-weight:800;
-    }
-    .fadeOut{animation: fadeOut .7s ease forwards;}
-    @keyframes fadeOut{to{opacity:0; transform: translateY(-6px)}}
   </style>
+
+  <!-- chess.js (kurallı hamle için) -->
+  <script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0-beta.8/dist/chess.min.js"></script>
 </head>
 
 <body>
-<div class="wrap">
-
-  <div class="hero">
-    <div class="hrow">
-      <div>
-        <h1>Törü — Türk’ün Töresi</h1>
-        <div class="sub">Kurallı Satranç · <b>Kağan 𐰴𐰍𐰣</b> · <b>Dede 𐱅𐰑𐰀</b> · Donmayan AI (Worker)</div>
-      </div>
-
-      <div class="btnrow">
-        <select id="aiLevel" title="AI">
-          <option value="off" selected>AI: Kapalı (2 Kişi)</option>
-          <option value="l1">AI: Seviye 1 (Başlangıç)</option>
-          <option value="l2">AI: Seviye 2 (Kolay)</option>
-          <option value="l3">AI: Seviye 3 (Orta-)</option>
-          <option value="l4">AI: Seviye 4 (Orta)</option>
-          <option value="l5">AI: Seviye 5 (Orta+)</option>
-          <option value="l6">AI: Seviye 6 (Zor)</option>
-          <option value="l7">AI: Seviye 7 (Usta)</option>
-          <option value="l8">AI: Seviye 8 (Çok Zor)</option>
-        </select>
-        <button id="flipBtn">Tahtayı Çevir</button>
-        <button id="resetBtn" class="danger">Yeniden Başlat</button>
-      </div>
-    </div>
-
-    <div class="statusline">
-      <div class="pill">Durum: <b id="status">Hazır</b></div>
-      <div class="pill">Sıra: <b id="turn">Beyaz</b></div>
-      <div class="pill">Değerlendirme: <b id="eval">+0.0</b></div>
-      <div class="pill">Son Hamle: <b id="lastMove">-</b></div>
-      <div class="pill">Açılış: <b id="opening">-</b></div>
-    </div>
-
-    <div class="note">
-      ✅ Standart kurallar: Rok / En passant / Terfi / Mat-Pat. <br/>
-      ✅ Tahta rengi doğru: <b>h1 açık</b>, <b>a8 açık</b>. Vezirler <b>d sütununda</b>.
-    </div>
-  </div>
-
-  <div class="grid">
-    <div class="card">
-      <div class="sectionTitle">
-        <h2>Tahta</h2>
-        <div class="pillrow">
-          <div class="pill">Kağan 𐰴𐰍𐰣</div>
-          <div class="pill">Dede 𐱅𐰑𐰀</div>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">TÖ</div>
+        <div>
+          <h1>TÜRKÜN TÖRESİ • Törü Satranç</h1>
+          <p>Tek HTML dosyası • GitHub Pages + Domain (turkuntoresi.com)</p>
         </div>
       </div>
 
-      <div class="boardWrap">
-        <div class="boardLayer">
-          <div id="board" class="board" aria-label="Satranç tahtası"></div>
-          <canvas id="arrowCanvas"></canvas>
-        </div>
+      <div class="pill" id="dnsPill" title="DNS oturunca otomatik yeşil olur.">
+        <span class="dot" id="dnsDot"></span>
+        <span id="dnsText">Durum: kontrol ediliyor…</span>
       </div>
+    </header>
 
-      <div class="note small" style="margin-top:12px">
-        Not: Telefonda YouTube sesini başlatmak için ilk kez “ÇAL”a dokunman gerekir (tarayıcı kuralı).
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="sectionTitle">
-        <h2>Kağan & Dede</h2>
-        <div class="pillrow">
-          <div class="pill">Kağan 𐰴𐰍𐰣: <b id="kaganMini">-</b></div>
-          <div class="pill">Dede 𐱅𐰑𐰀: <b id="dedeMini">-</b></div>
-        </div>
-      </div>
-
-      <div class="bubble" style="margin-top:0">
-        <div class="tag">Öneri (Kağan)</div>
-        <div class="small">
-          İstediğinde aç/kapa. Öneri hesapları Worker’da çalışır (donmaz).
-        </div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px">
-          <label class="pill"><input type="checkbox" id="hintEnabled" checked style="transform:scale(1.1); margin-right:8px;"> Öneri Açık</label>
-          <label class="pill"><input type="checkbox" id="showArrow" checked style="transform:scale(1.1); margin-right:8px;"> Ok Göster</label>
-          <label class="pill"><input type="checkbox" id="autoHint" checked style="transform:scale(1.1); margin-right:8px;"> Sıra bende iken otomatik</label>
-          <button id="hintBtn" class="primary">Kağan’dan Öneri Al</button>
-        </div>
-        <div class="small" style="margin-top:8px" id="hintStatus">Öneri: hazır</div>
-      </div>
-
-      <div class="bubble">
-        <div class="tag">Dede Öğreti Modu</div>
-        <div class="small">Dede bir eğitmen: tarihçe, taşlar, açılışlar, oyun sonu, taktik, mat planı…</div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px">
-          <select id="dedeMode">
-            <option value="off">Kapalı</option>
-            <option value="history">Tarihçe (genel)</option>
-            <option value="pieces">Taşlar (tanıma & değer)</option>
-            <option value="basic">Temel (açılış töresi)</option>
-            <option value="openings">Açılışlar (bilinen/az bilinen)</option>
-            <option value="endgames">Oyun sonu (teknikler)</option>
-            <option value="tactics">Taktik (çatal/açmaz/şiş)</option>
-            <option value="mate">Mat planı (temalar)</option>
-          </select>
-          <button id="dedeLessonBtn">Dede’den Ders</button>
-        </div>
-        <div class="small" style="margin-top:8px" id="dedeLessonText"></div>
-      </div>
-
-      <div class="chat" id="chat">
-        <div class="msg">
-          <div class="who">Kağan 𐰴𐰍𐰣</div>
-          <div class="txt" id="kaganText">Er meydanı kuruldu. Törü bozulmaz. İlk hamleni yap.</div>
-        </div>
-        <div class="msg">
-          <div class="who">Dede 𐱅𐰑𐰀</div>
-          <div class="txt" id="dedeText">Yiğit, hamleni beklerim. Hamle gelince sözüm de gelir.</div>
-        </div>
-      </div>
-
-      <div class="bubble">
-        <div class="tag">Müzik (YouTube — sadece bizim liste)</div>
-        <div class="small" style="margin-bottom:8px">
-          ✅ Playlist/search yok. Sadece <b>video ID</b> ile çalar (başka şeye kaymaz). <br/>
-          ✅ YouTube Music linki de olur: <b>watch?v=</b> içinden ID çıkarır.
+    <div class="grid">
+      <!-- SOL: OYUN -->
+      <section class="card">
+        <div class="hd">
+          <h2>♟️ Törü Satranç (Kurallı + Basit AI)</h2>
+          <div class="btnrow">
+            <button class="primary" id="btnNew">Yeni Oyun</button>
+            <button class="good" id="btnFlip">Tahtayı Çevir</button>
+            <button class="bad" id="btnUndo">Geri Al</button>
+          </div>
         </div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-          <select id="songSelect" style="min-width:min(520px,100%);"></select>
-          <button id="playBtn" class="primary">ÇAL</button>
-          <button id="pauseBtn">DURAKLAT</button>
-          <button id="nextBtn">SONRAKİ</button>
+        <div class="bd boardWrap">
+          <div class="board">
+            <div class="squares" id="board"></div>
+          </div>
+
+          <div class="legend">
+            <span class="tag">Seç → hedef kare</span>
+            <span class="tag">Yeşil: hamle</span>
+            <span class="tag">Kırmızı: alma</span>
+            <span class="tag">AI: siyah oynar</span>
+          </div>
+
+          <div class="status" id="statusBox">
+            <b>Hazır.</b> Beyaz sizsiniz. Bir taş seçin ve hamle yapın.
+          </div>
         </div>
+      </section>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px;">
-          <input id="songUrl" placeholder="YouTube / YouTube Music linkini yapıştır (watch?v=...)" />
-          <button id="addBtn">Listeye Ekle</button>
+      <!-- SAĞ: BİLGİ / KURULUM -->
+      <aside class="card">
+        <div class="hd">
+          <h2>⚙️ Kurulum Notları</h2>
         </div>
+        <div class="bd">
+          <div class="small">
+            ✅ Bu sayfa <b>index.html</b> olduğu için ana adres açıldığında otomatik yüklenir.<br/>
+            ✅ Repo adı: <b>toru</b> olabilir, domain: <b>turkuntoresi.com</b> olabilir — sorun değil.
+          </div>
 
-        <div class="small" style="margin-top:8px" id="ytStatus">Durum: Player yükleniyor…</div>
-        <div id="yt" style="width:0;height:0;overflow:hidden;"></div>
-      </div>
+          <div class="sep"></div>
 
-      <div class="bubble">
-        <div class="tag">Günlük Hedef</div>
-        <div class="small">Hedefi sen belirlersin (1–10.000). Günlük başarı/başarısızlık + gelişim analizi.</div>
+          <div class="small">
+            <b>CNAME dosyası nedir?</b><br/>
+            GitHub Pages’e “bu repo şu domain ile çalışsın” demek için GitHub otomatik/manuel olarak
+            repo köküne <b>CNAME</b> dosyası koyar. İçinde sadece şunun gibi bir satır olur:
+          </div>
+          <div class="mono">turkuntoresi.com</div>
 
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px">
-          <label class="pill">Hedef: <b><span id="goalNum">5</span></b> oyun</label>
-          <button id="goalMinus">-</button>
-          <button id="goalPlus">+</button>
-          <label class="pill">Bugün: <b><span id="todayCount">0</span></b></label>
-          <label class="pill">Oran: <b><span id="goalPct">0%</span></b></label>
+          <div class="sep"></div>
+
+          <div class="small">
+            <b>Şu an 404 görürsen:</b><br/>
+            1) Sayfa linki doğru mu? → kök adresi aç: <span class="mono">/</span><br/>
+            2) DNS oturması 10 dk – birkaç saat sürebilir (bazen 24 saate uzar).<br/>
+            3) GitHub Pages “Custom domain / DNS check” yeşile dönünce HTTPS seçeneği aktif olur.
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="btnrow">
+            <button id="btnOpenGithub">GitHub Pages’i Aç</button>
+            <button id="btnOpenDomain">Domain’i Aç</button>
+          </div>
+
+          <div class="sep"></div>
+          <div class="small">
+            <b>McAfee “şüpheli” uyarısı</b> bazen yeni yayınlanan sayfalarda yanlış pozitif çıkıyor.
+            Sayfada zararlı bir şey yok; zamanla normale döner. İstersen linki sadece kökten aç:
+            <span class="mono">https://turkuntoresi.com</span>
+          </div>
         </div>
-        <div class="small" style="margin-top:6px" id="goalHint"></div>
-
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,.10); margin:12px 0" />
-        <div class="tag">Günlük Sonuçlar</div>
-        <div class="small" id="todaySummary"></div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px;">
-          <button id="markWin" class="primary">Bugün +1 Galibiyet</button>
-          <button id="markLoss" class="danger">Bugün +1 Mağlubiyet</button>
-          <button id="markDraw">Bugün +1 Berabere</button>
-          <button id="undoLast">Son Kaydı Geri Al</button>
-        </div>
-
-        <div class="small" style="margin-top:10px"><b>Gün Gün Geçmiş (son 14 gün):</b></div>
-        <div id="historyList" class="small" style="margin-top:6px; white-space:pre-wrap"></div>
-
-        <div class="small" style="margin-top:10px"><b>Gelişim Analizi:</b></div>
-        <div id="progressAnalysis" class="small" style="margin-top:6px; white-space:pre-wrap"></div>
-      </div>
-
+      </aside>
     </div>
   </div>
-</div>
 
-<div id="intro" class="intro" title="Dokununca geçer">
-  <div class="introBox">
-    <div class="introTitle">𐱅𐰇𐰼𐰇 · TÖRÜ — Türk’ün Töresi</div>
-    <div class="runes" id="runeText"></div>
-    <div class="small" style="margin-top:10px">Başlamak için dokun…</div>
-  </div>
-</div>
+  <script>
+    // ============ DNS durum etiketi (basit kontrol) ============
+    // Domain açılıyorsa yeşil yakar (CORS vb. yok; sadece ping amaçlı)
+    const dnsDot = document.getElementById("dnsDot");
+    const dnsText = document.getElementById("dnsText");
+    const customDomain = "https://turkuntoresi.com/";
 
-<script>
-/* =========================
-   0) Helpers
-========================= */
-const $ = (id)=>document.getElementById(id);
-const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
-const nowDayKey = ()=> new Date().toISOString().slice(0,10);
-
-/* =========================
-   1) Göktürkçe intro
-========================= */
-const RUNES = [
-  "𐰴𐰍𐰣: 𐱅𐰇𐰼𐰇 𐰉𐰆𐰔𐰆𐰞𐰢𐰀𐰔",
-  "𐱅𐰑𐰀: 𐰖𐰃𐰏𐰃𐱅 𐰋𐰀𐰽𐰞𐰀𐰑𐰃",
-  "",
-  "Törü — Türk’ün Töresi.",
-  "Düzen, akıl, sabır; zaferin yolu budur.",
-].join("\n");
-
-(function introType(){
-  const el = $("runeText");
-  let i=0;
-  const t = setInterval(()=>{
-    el.textContent = RUNES.slice(0, i++);
-    if(i>RUNES.length){ clearInterval(t); }
-  }, 18);
-})();
-function hideIntro(){
-  const intro = $("intro");
-  if(!intro) return;
-  intro.classList.add("fadeOut");
-  setTimeout(()=> intro.style.display="none", 720);
-}
-$("intro").addEventListener("click", hideIntro, {passive:true});
-setTimeout(hideIntro, 2400);
-
-/* =========================
-   2) Chess UI state + FEN
-   (Rules engine in Worker)
-========================= */
-const PIECE_UNI = {
-  P:"♙", N:"♘", B:"♗", R:"♖", Q:"♕", K:"♔",
-  p:"♟", n:"♞", b:"♝", r:"♜", q:"♛", k:"♚",
-};
-const isWhite = (p)=> p && p===p.toUpperCase();
-const isBlack = (p)=> p && p===p.toLowerCase();
-function sqToRC(sq){ return {r: Math.floor(sq/8), c: sq%8}; }
-function rcToSq(r,c){ return r*8+c; }
-function algebra(sq){
-  const {r,c}=sqToRC(sq);
-  return "abcdefgh"[c] + (8-r);
-}
-
-function initialBoardArray(){
-  const b = Array(64).fill(null);
-  const backBlack = ["r","n","b","q","k","b","n","r"];
-  const backWhite = ["R","N","B","Q","K","B","N","R"];
-  for(let c=0;c<8;c++) b[rcToSq(0,c)] = backBlack[c];
-  for(let c=0;c<8;c++) b[rcToSq(1,c)] = "p";
-  for(let c=0;c<8;c++) b[rcToSq(6,c)] = "P";
-  for(let c=0;c<8;c++) b[rcToSq(7,c)] = backWhite[c];
-  return b;
-}
-
-// Minimal state mirrored in UI; worker is authoritative.
-let S = {
-  board: initialBoardArray(),
-  turn: "w",
-  castling: {K:true,Q:true,k:true,q:true},
-  ep: null,
-  halfmove: 0,
-  fullmove: 1,
-  last: null,
-  result: null,
-  legal: [],
-  inCheck: false,
-  evalCp: 0,
-  opening: "-",
-  sanHistory: [],
-};
-
-function stateToPayload(){
-  // Send plain JSON to worker
-  return {
-    board: S.board,
-    turn: S.turn,
-    castling: S.castling,
-    ep: S.ep,
-    halfmove: S.halfmove,
-    fullmove: S.fullmove,
-    sanHistory: S.sanHistory,
-  };
-}
-
-/* =========================
-   3) Worker (rules + eval + minimax)
-   -> Non-blocking UI
-========================= */
-let engineW = null;
-function makeEngineWorker(){
-  const code = `
-  const PIECE_UNI = {P:"♙",N:"♘",B:"♗",R:"♖",Q:"♕",K:"♔",p:"♟",n:"♞",b:"♝",r:"♜",q:"♛",k:"♚"};
-  const isWhite = (p)=> p && p===p.toUpperCase();
-  const isBlack = (p)=> p && p===p.toLowerCase();
-  const pieceValue = (p)=>{
-    switch(p.toLowerCase()){
-      case "p": return 100;
-      case "n": return 320;
-      case "b": return 330;
-      case "r": return 500;
-      case "q": return 900;
-      case "k": return 0;
-    }
-    return 0;
-  };
-  function sqToRC(sq){ return {r: Math.floor(sq/8), c: sq%8}; }
-  function rcToSq(r,c){ return r*8+c; }
-  function inBoard(r,c){ return r>=0 && r<8 && c>=0 && c<8; }
-  function algebra(sq){
-    const {r,c}=sqToRC(sq);
-    return "abcdefgh"[c] + (8-r);
-  }
-  function cloneState(s){ return JSON.parse(JSON.stringify(s)); }
-
-  function findKing(state, color){
-    const target = color==="w" ? "K" : "k";
-    return state.board.findIndex(x=>x===target);
-  }
-
-  function attackedBy(state, sq, byColor){
-    const b = state.board;
-    const {r,c}=sqToRC(sq);
-
-    // pawns
-    if(byColor==="w"){
-      for(const dc of [-1,1]){
-        const rr=r+1, cc=c+dc;
-        if(inBoard(rr,cc) && b[rcToSq(rr,cc)]==="P") return true;
-      }
-    }else{
-      for(const dc of [-1,1]){
-        const rr=r-1, cc=c+dc;
-        if(inBoard(rr,cc) && b[rcToSq(rr,cc)]==="p") return true;
+    async function checkDNS(){
+      try{
+        // no-cors ile "başarılı mı" kesin anlaşılmaz ama çoğu durumda işe yarar.
+        await fetch(customDomain, { mode:"no-cors", cache:"no-store" });
+        dnsDot.classList.add("ok");
+        dnsText.textContent = "Durum: domain erişilebilir görünüyor";
+      }catch(e){
+        dnsDot.classList.remove("ok");
+        dnsText.textContent = "Durum: DNS/SSL oturuyor olabilir (bekleyin)";
       }
     }
+    checkDNS();
+    setInterval(checkDNS, 30000);
 
-    // knights
-    const kD = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-    for(const [dr,dc] of kD){
-      const rr=r+dr, cc=c+dc;
-      if(!inBoard(rr,cc)) continue;
-      const p=b[rcToSq(rr,cc)];
-      if(!p) continue;
-      if(byColor==="w" && p==="N") return true;
-      if(byColor==="b" && p==="n") return true;
-    }
+    // ============ Satranç ============
+    const boardEl = document.getElementById("board");
+    const statusBox = document.getElementById("statusBox");
+    const btnNew = document.getElementById("btnNew");
+    const btnUndo = document.getElementById("btnUndo");
+    const btnFlip = document.getElementById("btnFlip");
 
-    // bishops/queens
-    const diag = [[-1,-1],[-1,1],[1,-1],[1,1]];
-    for(const [dr,dc] of diag){
-      let rr=r+dr, cc=c+dc;
-      while(inBoard(rr,cc)){
-        const p=b[rcToSq(rr,cc)];
-        if(p){
-          if(byColor==="w" && (p==="B"||p==="Q")) return true;
-          if(byColor==="b" && (p==="b"||p==="q")) return true;
-          break;
-        }
-        rr+=dr; cc+=dc;
-      }
-    }
+    // chess.js
+    const game = new Chess();
 
-    // rooks/queens
-    const line = [[-1,0],[1,0],[0,-1],[0,1]];
-    for(const [dr,dc] of line){
-      let rr=r+dr, cc=c+dc;
-      while(inBoard(rr,cc)){
-        const p=b[rcToSq(rr,cc)];
-        if(p){
-          if(byColor==="w" && (p==="R"||p==="Q")) return true;
-          if(byColor==="b" && (p==="r"||p==="q")) return true;
-          break;
-        }
-        rr+=dr; cc+=dc;
-      }
-    }
-
-    // king
-    for(let dr=-1;dr<=1;dr++){
-      for(let dc=-1;dc<=1;dc++){
-        if(dr===0 && dc===0) continue;
-        const rr=r+dr, cc=c+dc;
-        if(!inBoard(rr,cc)) continue;
-        const p=b[rcToSq(rr,cc)];
-        if(byColor==="w" && p==="K") return true;
-        if(byColor==="b" && p==="k") return true;
-      }
-    }
-    return false;
-  }
-
-  function inCheck(state, color){
-    const ksq=findKing(state, color);
-    const attacker = (color==="w") ? "b" : "w";
-    return attackedBy(state, ksq, attacker);
-  }
-
-  function genPseudoMoves(state){
-    const b=state.board;
-    const moves=[];
-    const us = state.turn;
-    const them = us==="w" ? "b" : "w";
-    const push = (m)=>moves.push(m);
-
-    for(let sq=0;sq<64;sq++){
-      const p=b[sq];
-      if(!p) continue;
-      if(us==="w" && !isWhite(p)) continue;
-      if(us==="b" && !isBlack(p)) continue;
-
-      const {r,c}=sqToRC(sq);
-
-      const addSlide = (dirs)=>{
-        for(const [dr,dc] of dirs){
-          let rr=r+dr, cc=c+dc;
-          while(inBoard(rr,cc)){
-            const to=rcToSq(rr,cc);
-            const tp=b[to];
-            if(!tp){
-              push({from:sq,to, piece:p, cap:null, promo:null, ep:false, castle:false});
-            }else{
-              if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp))){
-                push({from:sq,to, piece:p, cap:tp, promo:null, ep:false, castle:false});
-              }
-              break;
-            }
-            rr+=dr; cc+=dc;
-          }
-        }
-      };
-
-      switch(p.toLowerCase()){
-        case "p":{
-          const dir = (us==="w") ? -1 : 1;
-          const startR = (us==="w") ? 6 : 1;
-          const promoR = (us==="w") ? 0 : 7;
-
-          // forward
-          const rr=r+dir, cc=c;
-          if(inBoard(rr,cc)){
-            const to=rcToSq(rr,cc);
-            if(!b[to]){
-              if(rr===promoR){
-                for(const pr of ["q","r","b","n"]){
-                  const promo = us==="w" ? pr.toUpperCase() : pr;
-                  push({from:sq,to,piece:p,cap:null,promo,ep:false,castle:false});
-                }
-              }else{
-                push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
-                if(r===startR){
-                  const rr2=r+dir*2;
-                  const to2=rcToSq(rr2,cc);
-                  if(!b[to2]){
-                    push({from:sq,to:to2,piece:p,cap:null,promo:null,ep:false,castle:false, dbl:true});
-                  }
-                }
-              }
-            }
-          }
-
-          // captures + en passant
-          for(const dc of [-1,1]){
-            const rrC=r+dir, ccC=c+dc;
-            if(!inBoard(rrC,ccC)) continue;
-            const to=rcToSq(rrC,ccC);
-            const tp=b[to];
-
-            if(tp && ((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))){
-              if(rrC===promoR){
-                for(const pr of ["q","r","b","n"]){
-                  const promo = us==="w" ? pr.toUpperCase() : pr;
-                  push({from:sq,to,piece:p,cap:tp,promo,ep:false,castle:false});
-                }
-              }else{
-                push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
-              }
-            }
-
-            if(state.ep!==null && to===state.ep){
-              const capSq = rcToSq(r, ccC);
-              const capP = b[capSq];
-              if(capP && capP.toLowerCase()==="p" && ((us==="w" && isBlack(capP)) || (us==="b" && isWhite(capP)))){
-                push({from:sq,to,piece:p,cap:capP,promo:null,ep:true,castle:false, capSq});
-              }
-            }
-          }
-          break;
-        }
-        case "n":{
-          const d=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-          for(const [dr,dc] of d){
-            const rr=r+dr, cc=c+dc;
-            if(!inBoard(rr,cc)) continue;
-            const to=rcToSq(rr,cc);
-            const tp=b[to];
-            if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
-            else if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))
-              push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
-          }
-          break;
-        }
-        case "b": addSlide([[-1,-1],[-1,1],[1,-1],[1,1]]); break;
-        case "r": addSlide([[-1,0],[1,0],[0,-1],[0,1]]); break;
-        case "q": addSlide([[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]]); break;
-        case "k":{
-          for(let dr=-1;dr<=1;dr++){
-            for(let dc=-1;dc<=1;dc++){
-              if(dr===0 && dc===0) continue;
-              const rr=r+dr, cc=c+dc;
-              if(!inBoard(rr,cc)) continue;
-              const to=rcToSq(rr,cc);
-              const tp=b[to];
-              if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
-              else if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))
-                push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
-            }
-          }
-
-          // castling
-          const kingHome = us==="w" ? rcToSq(7,4) : rcToSq(0,4);
-          if(sq===kingHome && !inCheck(state, us)){
-            if(us==="w" && state.castling.K){
-              const f1=rcToSq(7,5), g1=rcToSq(7,6), h1=rcToSq(7,7);
-              if(!b[f1] && !b[g1] && b[h1]==="R" && !attackedBy(state,f1,them) && !attackedBy(state,g1,them)){
-                push({from:sq,to:g1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h1, rookTo:f1});
-              }
-            }
-            if(us==="b" && state.castling.k){
-              const f8=rcToSq(0,5), g8=rcToSq(0,6), h8=rcToSq(0,7);
-              if(!b[f8] && !b[g8] && b[h8]==="r" && !attackedBy(state,f8,them) && !attackedBy(state,g8,them)){
-                push({from:sq,to:g8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h8, rookTo:f8});
-              }
-            }
-            if(us==="w" && state.castling.Q){
-              const d1=rcToSq(7,3), c1=rcToSq(7,2), b1=rcToSq(7,1), a1=rcToSq(7,0);
-              if(!b[d1] && !b[c1] && !b[b1] && b[a1]==="R" && !attackedBy(state,d1,them) && !attackedBy(state,c1,them)){
-                push({from:sq,to:c1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a1, rookTo:d1});
-              }
-            }
-            if(us==="b" && state.castling.q){
-              const d8=rcToSq(0,3), c8=rcToSq(0,2), b8=rcToSq(0,1), a8=rcToSq(0,0);
-              if(!b[d8] && !b[c8] && !b[b8] && b[a8]==="r" && !attackedBy(state,d8,them) && !attackedBy(state,c8,them)){
-                push({from:sq,to:c8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a8, rookTo:d8});
-              }
-            }
-          }
-          break;
-        }
-      }
-    }
-    return moves;
-  }
-
-  function makeMove(state, m){
-    const s = cloneState(state);
-    const b = s.board;
-    s.ep = null;
-
-    if(m.piece.toLowerCase()==="p" || m.cap) s.halfmove=0;
-    else s.halfmove++;
-
-    b[m.to] = m.promo ? m.promo : m.piece;
-    b[m.from] = null;
-
-    if(m.ep && m.capSq!=null) b[m.capSq]=null;
-    if(m.castle){
-      b[m.rookTo] = b[m.rookFrom];
-      b[m.rookFrom] = null;
-    }
-    if(m.dbl){
-      const {r:cR,c:cC}=sqToRC(m.to);
-      const epR = (s.turn==="w") ? cR+1 : cR-1;
-      s.ep = rcToSq(epR, cC);
-    }
-
-    const from = m.from, to = m.to;
-    const moved = m.piece;
-    const cap = m.cap;
-    const revoke = (k)=>{ s.castling[k]=false; };
-
-    if(moved==="K"){ revoke("K"); revoke("Q"); }
-    if(moved==="k"){ revoke("k"); revoke("q"); }
-    if(moved==="R"){
-      if(from===rcToSq(7,0)) revoke("Q");
-      if(from===rcToSq(7,7)) revoke("K");
-    }
-    if(moved==="r"){
-      if(from===rcToSq(0,0)) revoke("q");
-      if(from===rcToSq(0,7)) revoke("k");
-    }
-    if(cap==="R"){
-      if(to===rcToSq(7,0)) revoke("Q");
-      if(to===rcToSq(7,7)) revoke("K");
-    }
-    if(cap==="r"){
-      if(to===rcToSq(0,0)) revoke("q");
-      if(to===rcToSq(0,7)) revoke("k");
-    }
-
-    s.turn = (s.turn==="w") ? "b" : "w";
-    if(s.turn==="w") s.fullmove++;
-
-    return s;
-  }
-
-  function legalMoves(state){
-    const pseudo = genPseudoMoves(state);
-    const leg=[];
-    for(const m of pseudo){
-      const s2 = makeMove(state, m);
-      const us = state.turn;
-      if(!inCheck(s2, us)) leg.push(m);
-    }
-    return leg;
-  }
-
-  function gameEnd(state){
-    const moves = legalMoves(state);
-    const us = state.turn;
-    const inC = inCheck(state, us);
-
-    if(moves.length===0){
-      if(inC) return us==="w" ? "0-1" : "1-0";
-      return "1/2-1/2";
-    }
-    if(state.halfmove>=100) return "1/2-1/2";
-    return null;
-  }
-
-  function sanForMove(state, m){
-    if(m.castle){
-      const {c}=sqToRC(m.to);
-      return (c===6) ? "O-O" : "O-O-O";
-    }
-    const piece = m.piece;
-    const isPawn = piece.toLowerCase()==="p";
-    const cap = !!m.cap || m.ep;
-
-    let s = "";
-    if(!isPawn) s += piece.toUpperCase();
-    else if(cap) s += "abcdefgh"[sqToRC(m.from).c];
-
-    if(cap) s += "x";
-    s += algebra(m.to);
-
-    if(m.promo) s += "=" + m.promo.toUpperCase();
-
-    const after = makeMove(state, m);
-    const end = gameEnd(after);
-    const them = after.turn;
-    const check = inCheck(after, them);
-
-    if(end && (end==="1-0"||end==="0-1")) s += "#";
-    else if(check) s += "+";
-    return s;
-  }
-
-  function evalState(state){
-    const b=state.board;
-    let score=0;
-    for(const p of b){
-      if(!p) continue;
-      const v = pieceValue(p);
-      score += isWhite(p) ? v : -v;
-    }
-    score += (state.turn==="w") ? 5 : -5;
-    return score;
-  }
-
-  function minimax(state, depth, alpha, beta){
-    const end = gameEnd(state);
-    if(end){
-      if(end==="1/2-1/2") return {score:0, move:null};
-      if(end==="1-0") return {score: 999999, move:null};
-      if(end==="0-1") return {score: -999999, move:null};
-    }
-    if(depth===0) return {score: evalState(state), move:null};
-
-    const moves = legalMoves(state);
-    moves.sort((a,b)=> (b.cap?1:0)-(a.cap?1:0));
-
-    const maximizing = (state.turn==="w");
-    let bestMove=null;
-
-    if(maximizing){
-      let best=-Infinity;
-      for(const m of moves){
-        const s2=makeMove(state,m);
-        const res=minimax(s2, depth-1, alpha, beta);
-        if(res.score>best){ best=res.score; bestMove=m; }
-        alpha=Math.max(alpha,best);
-        if(beta<=alpha) break;
-      }
-      return {score:best, move:bestMove};
-    }else{
-      let best=Infinity;
-      for(const m of moves){
-        const s2=makeMove(state,m);
-        const res=minimax(s2, depth-1, alpha, beta);
-        if(res.score<best){ best=res.score; bestMove=m; }
-        beta=Math.min(beta,best);
-        if(beta<=alpha) break;
-      }
-      return {score:best, move:bestMove};
-    }
-  }
-
-  const OPENINGS = [
-    {seq:["e4","e5","Nf3","Nc6","Bb5"], name:"İspanyol Açılışı (Ruy Lopez)"},
-    {seq:["e4","c5"], name:"Sicilya Savunması"},
-    {seq:["d4","d5","c4"], name:"Vezir Gambiti"},
-    {seq:["e4","e5","Nf3","Nf6"], name:"Petrov Savunması"},
-    {seq:["d4","Nf6","c4","g6"], name:"Kral Hint Savunması"},
-    {seq:["b4"], name:"Orangutan (Sokolsky)"},
-    {seq:["g4"], name:"Grob Saldırısı"},
-    {seq:["f4"], name:"Kuş Açılışı (Bird)"},
-  ];
-  function openingName(sanList){
-    for(const o of OPENINGS){
-      if(sanList.length < o.seq.length) continue;
-      let ok=true;
-      for(let i=0;i<o.seq.length;i++){
-        if(sanList[i]!==o.seq[i]){ ok=false; break; }
-      }
-      if(ok) return o.name;
-    }
-    return "-";
-  }
-
-  function aiConfig(level){
-    const map = {
-      l1: {depth:2, blunder:0.35},
-      l2: {depth:2, blunder:0.20},
-      l3: {depth:3, blunder:0.12},
-      l4: {depth:3, blunder:0.08},
-      l5: {depth:4, blunder:0.06},
-      l6: {depth:4, blunder:0.03},
-      l7: {depth:5, blunder:0.02},
-      l8: {depth:5, blunder:0.00},
+    // Görsel taşlar (Unicode)
+    const PIECE = {
+      p:"♟", r:"♜", n:"♞", b:"♝", q:"♛", k:"♚",
+      P:"♙", R:"♖", N:"♘", B:"♗", Q:"♕", K:"♔",
     };
-    return map[level] || {depth:3, blunder:0.10};
-  }
-  function pickWeakerMove(state, chance){
-    if(Math.random() > chance) return null;
-    const moves = legalMoves(state);
-    if(moves.length <= 1) return null;
-    const scored = moves.map(m=>{
-      const s2 = makeMove(state, m);
-      return {m, score: evalState(s2)};
+
+    let selected = null;      // "e2" gibi
+    let flip = false;         // tahta yönü
+    let lastHighlights = [];
+
+    function setStatus(html){
+      statusBox.innerHTML = html;
+    }
+
+    function clearHighlights(){
+      lastHighlights.forEach(sq=>{
+        const el = document.querySelector(`[data-sq="${sq}"]`);
+        if(el){
+          el.classList.remove("hl","cap","sel");
+        }
+      });
+      lastHighlights = [];
+    }
+
+    function highlightSquare(sq, cls){
+      const el = document.querySelector(`[data-sq="${sq}"]`);
+      if(!el) return;
+      el.classList.add(cls);
+      lastHighlights.push(sq);
+    }
+
+    function squareColor(file, rank){
+      // a1 koyu mu açık mı? klasik: a1 koyu
+      const files = "abcdefgh";
+      const f = files.indexOf(file)+1;
+      const r = parseInt(rank,10);
+      const dark = (f + r) % 2 === 0; // a1 => 1+1=2 => dark true
+      return dark ? "dark" : "light";
+    }
+
+    function getDisplaySquares(){
+      // Normalde 8->1 rank, a->h file
+      const files = "abcdefgh".split("");
+      const ranks = ["8","7","6","5","4","3","2","1"];
+
+      if(!flip){
+        return { files, ranks };
+      }else{
+        // ters
+        return { files: files.slice().reverse(), ranks: ranks.slice().reverse() };
+      }
+    }
+
+    function render(){
+      boardEl.innerHTML = "";
+      clearHighlights();
+
+      const { files, ranks } = getDisplaySquares();
+      for(const r of ranks){
+        for(const f of files){
+          const sq = f + r;
+          const sqDiv = document.createElement("div");
+          sqDiv.className = `sq ${squareColor(f,r)}`;
+          sqDiv.dataset.sq = sq;
+
+          const piece = game.get(sq);
+          if(piece){
+            const key = piece.color === "w" ? piece.type.toUpperCase() : piece.type;
+            sqDiv.textContent = PIECE[key] || "";
+          }else{
+            sqDiv.textContent = "";
+          }
+
+          sqDiv.addEventListener("click", ()=>onSquareClick(sq));
+          boardEl.appendChild(sqDiv);
+        }
+      }
+
+      // Oyun durumu
+      if(game.isGameOver()){
+        if(game.isCheckmate()){
+          const winner = game.turn()==="w" ? "Siyah" : "Beyaz";
+          setStatus(`<b>Oyun bitti:</b> Şah mat! Kazanan: <b>${winner}</b>`);
+        }else if(game.isDraw()){
+          setStatus(`<b>Oyun bitti:</b> Berabere.`);
+        }else{
+          setStatus(`<b>Oyun bitti.</b>`);
+        }
+        return;
+      }
+
+      const turn = game.turn()==="w" ? "Beyaz (siz)" : "Siyah (AI)";
+      const check = game.inCheck() ? ` <span style="color:var(--accent2);font-weight:800;">(ŞAH!)</span>` : "";
+      setStatus(`<b>Sıra:</b> ${turn}${check} — Hamle yapın.`);
+    }
+
+    function showMoves(from){
+      clearHighlights();
+      selected = from;
+      highlightSquare(from, "sel");
+
+      const moves = game.moves({ square: from, verbose: true });
+      for(const m of moves){
+        if(m.flags.includes("c") || m.flags.includes("e")){
+          highlightSquare(m.to, "cap");
+        }else{
+          highlightSquare(m.to, "hl");
+        }
+      }
+    }
+
+    function tryMove(from, to){
+      const move = game.move({ from, to, promotion: "q" }); // otomatik vezir
+      if(!move) return false;
+
+      selected = null;
+      clearHighlights();
+      render();
+
+      // AI hamlesi
+      if(!game.isGameOver() && game.turn()==="b"){
+        setTimeout(aiMove, 180);
+      }
+      return true;
+    }
+
+    function onSquareClick(sq){
+      // oyun bitti ise tıklama yok
+      if(game.isGameOver()) return;
+
+      // Sadece beyazı kullanıcı oynasın
+      if(game.turn() !== "w"){
+        setStatus(`<b>Bekleyin:</b> Şu an siyah (AI) oynuyor…`);
+        return;
+      }
+
+      const piece = game.get(sq);
+
+      // seçili yoksa ve karede beyaz taş varsa seç
+      if(!selected){
+        if(piece && piece.color==="w"){
+          showMoves(sq);
+        }else{
+          setStatus(`<b>İpucu:</b> Beyaz taşlardan birini seç.`);
+        }
+        return;
+      }
+
+      // seçili varken:
+      if(selected === sq){
+        // aynı kareye tıklayınca iptal
+        selected = null;
+        clearHighlights();
+        render();
+        return;
+      }
+
+      // eğer başka beyaz taşa tıkladıysa, seçimi değiştir
+      if(piece && piece.color==="w"){
+        showMoves(sq);
+        return;
+      }
+
+      // hamle dene
+      const ok = tryMove(selected, sq);
+      if(!ok){
+        setStatus(`<b>Geçersiz hamle.</b> Başka bir hedef kare seç.`);
+      }
+    }
+
+    // ============ Basit AI ============
+    // 1 hamle ileri bakar: materyal kazancı + küçük bonuslar
+    const VAL = { p:100, n:320, b:330, r:500, q:900, k:20000 };
+
+    function evalMaterial(){
+      // Siyah açısından değerlendir (pozitif: siyah iyi)
+      let score = 0;
+      const board = game.board();
+      for(const row of board){
+        for(const p of row){
+          if(!p) continue;
+          const v = VAL[p.type] || 0;
+          score += (p.color==="b" ? v : -v);
+        }
+      }
+      return score;
+    }
+
+    function aiPickMove(){
+      const moves = game.moves({ verbose:true });
+      if(moves.length===0) return null;
+
+      let best = null;
+      let bestScore = -Infinity;
+
+      for(const m of moves){
+        game.move(m);
+
+        // temel skor: materyal
+        let score = evalMaterial();
+
+        // şah çekme bonusu
+        if(game.inCheck()) score += 40;
+
+        // merkez bonusu (e4/d4/e5/d5)
+        if(["e4","d4","e5","d5"].includes(m.to)) score += 10;
+
+        // taş alma bonusu (zaten materyalde var ama biraz daha teşvik)
+        if(m.flags.includes("c") || m.flags.includes("e")) score += 25;
+
+        // şah mat varsa çok büyük
+        if(game.isCheckmate()) score += 99999;
+
+        game.undo();
+
+        if(score > bestScore){
+          bestScore = score;
+          best = m;
+        }
+      }
+      return best;
+    }
+
+    function aiMove(){
+      if(game.isGameOver()) return;
+      if(game.turn()!=="b") return;
+
+      const m = aiPickMove();
+      if(!m){
+        render();
+        return;
+      }
+      game.move(m);
+      render();
+    }
+
+    // ============ Butonlar ============
+    btnNew.addEventListener("click", ()=>{
+      game.reset();
+      selected = null;
+      clearHighlights();
+      render();
+      setStatus(`<b>Yeni oyun başladı.</b> Beyaz sizsiniz.`);
     });
-    // if black, worse is larger (for white) -> pick not best defense; if white, worse is smaller
-    if(state.turn==="b"){
-      scored.sort((a,b)=> b.score - a.score);
-    }else{
-      scored.sort((a,b)=> a.score - b.score);
-    }
-    const idx = Math.min(scored.length-1, 1 + Math.floor(Math.random()*Math.min(5, scored.length-1)));
-    return scored[idx].m;
-  }
 
-  onmessage = (e)=>{
-    const { type, state, level } = e.data;
-    try{
-      const st = cloneState(state);
-      if(type==="legal"){
-        const leg = legalMoves(st);
-        const inC = inCheck(st, st.turn);
-        const end = gameEnd(st);
-        const ev = evalState(st);
-        postMessage({ ok:true, legal: leg, inCheck: inC, result: end, evalCp: ev, opening: openingName(st.sanHistory||[]) });
-        return;
+    btnUndo.addEventListener("click", ()=>{
+      // kullanıcı hamlesini ve AI hamlesini geri alalım (2 hamle)
+      if(game.history().length === 0) return;
+      game.undo();
+      if(game.history().length > 0 && game.turn()==="b"){
+        // eğer sıra siyahta kaldıysa bir hamle daha al
+        game.undo();
       }
-      if(type==="san"){
-        const san = sanForMove(st, e.data.move);
-        postMessage({ ok:true, san });
-        return;
-      }
-      if(type==="apply"){
-        const after = makeMove(st, e.data.move);
-        const san = sanForMove(st, e.data.move);
-        postMessage({ ok:true, after, san });
-        return;
-      }
-      if(type==="hint" || type==="ai"){
-        const cfg = aiConfig(level);
-        const weaker = pickWeakerMove(st, cfg.blunder);
-        let best = weaker;
-        let score = evalState(st);
-        if(!best){
-          const mm = minimax(st, cfg.depth, -Infinity, Infinity);
-          best = mm.move;
-          score = mm.score;
-        }
-        if(!best){
-          postMessage({ ok:true, bestMove:null, score: evalState(st) });
-          return;
-        }
-        const san = sanForMove(st, best);
-        postMessage({ ok:true, bestMove: best, san, score });
-        return;
-      }
-      postMessage({ ok:false, err:"Unknown type" });
-    }catch(err){
-      postMessage({ ok:false, err: String(err) });
-    }
-  };
-  `;
-  const blob = new Blob([code], {type:"application/javascript"});
-  engineW = new Worker(URL.createObjectURL(blob));
-}
-makeEngineWorker();
-
-function wCall(payload){
-  return new Promise((resolve)=>{
-    const handler = (ev)=>{
-      engineW.removeEventListener("message", handler);
-      resolve(ev.data);
-    };
-    engineW.addEventListener("message", handler);
-    engineW.postMessage(payload);
-  });
-}
-
-/* =========================
-   4) Opening + Dede/Kagan text
-========================= */
-const KAGAN_EMIR = [
-  "Törü bozulmaz; düzeni koru.",
-  "Önce merkez, sonra kanat.",
-  "Taşı boşa sürme; her adımın hükmü olsun.",
-  "Düşün, tart, vur; sonra ilerle.",
-  "Zayıf kareyi tut; ok gibi saplan.",
-  "Şahı koru; saldırıyı unutma.",
-  "Gereksiz hamle töreyi yorar.",
-  "Vakit dar ise sadelik kurtarır.",
-  "Güç birliği yap; taşlar yalnız kalmasın.",
-  "Zafer sabırla doğar."
-];
-const DEDE_USLUP = [
-  "Yiğit, taşın gönlünü kırma; doğru yere kondur.",
-  "At gider, iz kalır; hamle gider, hüküm kalır.",
-  "Söz bir, ok bir; hamlen de bir olsun.",
-  "Kurt sürüsü dağılmaz; taşların dağılmasın.",
-  "Düşman uyur sanma; gözün açık olsun.",
-  "Yol uzunsa akıl kısadır; sade oyna, sağlam oyna.",
-  "Bir taşın kıymeti, durduğu yerle ölçülür.",
-  "Sabır kılıçtan keskindir; beklemesini bil.",
-  "Gönül ister saldırı; akıl ister tedbir.",
-  "Yiğit, mat getirmek yiğitliktir; pat düşmek talihsizliktir."
-];
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-function dedePlanText(turn, inCheck){
-  if(inCheck) return "Şah tehdit altında! Önce güvenlik, sonra hücum.";
-  return "Taşlarını geliştir, şahını güvene al, açık hatlardan baskı kur.";
-}
-function dedeComment(san){
-  return `${pick(DEDE_USLUP)}<br><br>Hamle: <b>${san}</b>. ${dedePlanText(S.turn, S.inCheck)}`;
-}
-
-const DEDE_LESSONS = {
-  history: [
-    "Satranç, büyük ihtimalle Hindistan’da (Çaturanga) doğup İran üzerinden dünyaya yayıldı. Kurallar zamanla evrildi; modern satranç bugünkü hızını vezir/fil güçlenince kazandı.",
-    "Eskiden satranç bir savaş temsili sayılırdı: açılış hazırlık, oyun ortası çarpışma, oyun sonu hüküm.",
-    "Farklı coğrafyalar farklı üslup doğurdu: pozisyonel sabır ve taktik saldırı ekolleri."
-  ],
-  pieces: [
-    "Taşlar: Piyon terfi eder; At çatal ustasıdır; Fil çaprazın ruhudur; Kale açık hat sever; Vezir güçlü ama erken gezdirilmez; Şah kaybedilmez.",
-    "Değerler (yaklaşık): P=1, N=3, B=3, R=5, Q=9. Ama aktif taş daha değerlidir.",
-    "Açılış töresi: merkez + gelişim + şah güvenliği."
-  ],
-  basic: [
-    "Merkeze piyon (e4/d4), atları çıkar, filler açılsın, sonra rok. Aynı taşı gereksiz iki kez oynama.",
-    "Şah güvenliği ve tempo: veziri erken çıkarmak çoğu kez tempo kaybettirir.",
-    "Plan: zayıf kareleri hedefle, piyon yapısını oku."
-  ],
-  openings: [
-    "Bilinen: İspanyol, Sicilya, Vezir Gambiti, Kral Hint… Fikir: gelişim + merkez + güvenlik.",
-    "Az bilinen: Orangutan (1.b4), Bird (1.f4), Grob (1.g4). Sürprizdir ama risk taşır.",
-    "Ezber yerine fikir: hangi taş nereye, hangi piyon neden sürülür?"
-  ],
-  endgames: [
-    "Oyun sonu altın kural: Şah savaşçıdır—merkeze yürür. Geçer piyon üret, kaleyi arkadan destekle.",
-    "Kale oyun sonu: ‘Kale piyonun arkasında’ çoğu zaman doğrudur.",
-    "Basit matlar: K+Q vs K, K+R vs K (temel)."
-  ],
-  tactics: [
-    "Çatal: atla iki hedef. Açmaz: taş kıpırdayamaz. Şiş: ön taş kalkarsa arkası düşer.",
-    "Saptırma: savunmacıyı görevinden kopar. Fedayla hat açılır.",
-    "Taktik için ipucu: ‘Asılı taş var mı? Şah güvenliği?’"
-  ],
-  mate: [
-    "Arka sıra matı: piyonlar kaçışı kapatır, kale/vezir son sıraya iner.",
-    "Boğma mat: atla, rakibin kendi taşları şahı boğar.",
-    "Kutu mat: kaçış karelerini tek tek kapat."
-  ]
-};
-$("dedeLessonBtn").addEventListener("click", ()=>{
-  const mode = $("dedeMode").value;
-  if(mode==="off"){
-    $("dedeLessonText").textContent = "Dede susar; yiğit kendi yolunu bulur.";
-    return;
-  }
-  const arr = DEDE_LESSONS[mode] || [];
-  $("dedeLessonText").textContent = arr.length ? arr[Math.floor(Math.random()*arr.length)] : "Ders bulunamadı.";
-});
-
-/* =========================
-   5) Board render + input
-========================= */
-let flipped = false;
-let selected = null;
-const boardEl = $("board");
-
-function render(){
-  $("turn").textContent = (S.turn==="w") ? "Beyaz" : "Siyah";
-  $("status").textContent = S.result ? (S.result==="1/2-1/2" ? "Berabere" : "Oyun bitti") : "Hazır";
-  const ev = (S.evalCp||0)/100;
-  $("eval").textContent = (ev>=0?"+":"") + ev.toFixed(1);
-  $("opening").textContent = S.opening || "-";
-  $("lastMove").textContent = S.last?.san || "-";
-  $("kaganMini").textContent = (S.result ? "Tamam" : "Hazır");
-  $("dedeMini").textContent = (S.result ? "Hüküm" : "Bekler");
-
-  boardEl.innerHTML = "";
-
-  const last = S.last ? {from:S.last.from,to:S.last.to} : null;
-
-  for(let view=0; view<64; view++){
-    const vr = Math.floor(view/8), vc = view%8;
-
-    // doğru eşleme: h1 açık, a8 açık => (r+c)%2==0 açık
-    const r = flipped ? (7 - vr) : vr;
-    const c = flipped ? (7 - vc) : vc;
-    const sq = r*8+c;
-    const isLight = (r + c) % 2 === 0;
-
-    const d = document.createElement("div");
-    d.className = "sq " + (isLight ? "light":"dark");
-    d.dataset.sq = String(sq);
-
-    if(selected===sq) d.classList.add("sel");
-    if(last && (sq===last.from || sq===last.to)) d.classList.add("last");
-    if(S.inCheck){
-      // check highlight only current side king
-      const king = (S.turn==="w") ? "K" : "k";
-      if(S.board[sq]===king) d.classList.add("check");
-    }
-
-    if(selected!=null){
-      for(const m of (S.legal||[])){
-        if(m.from===selected && m.to===sq){ d.classList.add("hint"); break; }
-      }
-    }
-
-    const p = S.board[sq];
-    if(p){
-      const span = document.createElement("span");
-      span.className = "piece " + (isWhite(p) ? "w":"b");
-      span.textContent = PIECE_UNI[p];
-      d.appendChild(span);
-    }
-
-    d.addEventListener("click", onSquareClick, {passive:true});
-    boardEl.appendChild(d);
-  }
-
-  resizeArrowCanvas();
-  if($("hintEnabled").checked) maybeAutoHint();
-}
-
-async function refreshLegal(){
-  const res = await wCall({type:"legal", state: stateToPayload()});
-  if(!res.ok) return;
-  S.legal = res.legal;
-  S.inCheck = !!res.inCheck;
-  S.result = res.result || null;
-  S.evalCp = res.evalCp || 0;
-  S.opening = res.opening || "-";
-}
-
-function findMove(from,to){
-  const cand = (S.legal||[]).filter(m=>m.from===from && m.to===to);
-  if(!cand.length) return null;
-  // prefer queen promotion
-  const q = cand.find(x=>x.promo && x.promo.toLowerCase()==="q");
-  return q || cand[0];
-}
-
-async function applyMove(mv){
-  const res = await wCall({type:"apply", state: stateToPayload(), move: mv});
-  if(!res.ok) return null;
-
-  // update local state with "after"
-  const after = res.after;
-  const san = res.san;
-
-  S.board = after.board;
-  S.turn = after.turn;
-  S.castling = after.castling;
-  S.ep = after.ep;
-  S.halfmove = after.halfmove;
-  S.fullmove = after.fullmove;
-
-  S.last = {from: mv.from, to: mv.to, san};
-
-  // sanitize for opening matcher: remove +/#
-  S.sanHistory.push(san.replace(/[+#]$/,""));
-
-  $("dedeText").innerHTML = dedeComment(san);
-
-  selected = null;
-  currentHint = null;
-  drawArrow(null);
-
-  await refreshLegal();
-  render();
-
-  if(S.result) onGameFinished(S.result);
-
-  // AI reply if enabled and it's black turn
-  setTimeout(()=> maybeAiReply(), 60);
-}
-
-function onSquareClick(e){
-  if(S.result) return;
-  const sq = parseInt(e.currentTarget.dataset.sq, 10);
-  const p = S.board[sq];
-
-  if(selected===null){
-    if(p && ((S.turn==="w" && isWhite(p)) || (S.turn==="b" && isBlack(p)))){
-      selected = sq;
+      selected = null;
+      clearHighlights();
       render();
-    }
-    return;
-  }
-  if(selected===sq){
-    selected = null;
+      setStatus(`<b>Geri alındı.</b>`);
+    });
+
+    btnFlip.addEventListener("click", ()=>{
+      flip = !flip;
+      selected = null;
+      clearHighlights();
+      render();
+    });
+
+    // link butonları
+    document.getElementById("btnOpenGithub").addEventListener("click", ()=>{
+      // repo pages: kullanıcı/ad.github.io/repo/
+      const url = `${location.origin}${location.pathname.replace(/\/$/, "")}/`;
+      window.open(url, "_blank");
+    });
+    document.getElementById("btnOpenDomain").addEventListener("click", ()=>{
+      window.open(customDomain, "_blank");
+    });
+
+    // İlk render
     render();
-    return;
-  }
-
-  const mv = findMove(selected, sq);
-  if(!mv){
-    if(p && ((S.turn==="w" && isWhite(p)) || (S.turn==="b" && isBlack(p)))){
-      selected = sq;
-      render();
-    }
-    return;
-  }
-  applyMove(mv);
-}
-
-/* =========================
-   6) Kağan hint arrow (Worker)
-========================= */
-const arrowCv = document.getElementById("arrowCanvas");
-function resizeArrowCanvas(){
-  const layer = arrowCv.parentElement;
-  const rect = layer.getBoundingClientRect();
-  arrowCv.width = Math.max(1, Math.round(rect.width * devicePixelRatio));
-  arrowCv.height = Math.max(1, Math.round(rect.height * devicePixelRatio));
-  arrowCv.style.width = rect.width + "px";
-  arrowCv.style.height = rect.height + "px";
-}
-window.addEventListener("resize", ()=>{ resizeArrowCanvas(); drawArrow(currentHint); });
-
-function sqCenterOnScreen(sq){
-  const el = boardEl.querySelector(`[data-sq="${sq}"]`);
-  if(!el) return null;
-  const r = el.getBoundingClientRect();
-  const layer = arrowCv.getBoundingClientRect();
-  const cx = (r.left + r.right)/2 - layer.left;
-  const cy = (r.top + r.bottom)/2 - layer.top;
-  return {x:cx, y:cy};
-}
-
-let currentHint = null; // {from,to,san}
-function drawArrow(hint){
-  const ctx = arrowCv.getContext("2d");
-  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-  ctx.clearRect(0,0,arrowCv.width/devicePixelRatio, arrowCv.height/devicePixelRatio);
-  if(!hint || !$("showArrow").checked) return;
-
-  const a = sqCenterOnScreen(hint.from);
-  const b = sqCenterOnScreen(hint.to);
-  if(!a || !b) return;
-
-  ctx.lineWidth = 6;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = "rgba(74,163,255,.92)";
-  ctx.fillStyle = "rgba(74,163,255,.92)";
-
-  ctx.beginPath();
-  ctx.moveTo(a.x, a.y);
-  ctx.lineTo(b.x, b.y);
-  ctx.stroke();
-
-  const ang = Math.atan2(b.y-a.y, b.x-a.x);
-  const headLen = 18;
-  ctx.beginPath();
-  ctx.moveTo(b.x, b.y);
-  ctx.lineTo(b.x - headLen*Math.cos(ang - Math.PI/7), b.y - headLen*Math.sin(ang - Math.PI/7));
-  ctx.lineTo(b.x - headLen*Math.cos(ang + Math.PI/7), b.y - headLen*Math.sin(ang + Math.PI/7));
-  ctx.closePath();
-  ctx.fill();
-}
-
-function setHintStatus(t){ $("hintStatus").textContent = "Öneri: " + t; }
-
-async function requestHint(){
-  if(!$("hintEnabled").checked) return;
-  if(S.result) return;
-  setHintStatus("hesaplanıyor…");
-  const res = await wCall({type:"hint", state: stateToPayload(), level: "l4"});
-  if(!res.ok){ setHintStatus("hata"); return; }
-  if(!res.bestMove){ setHintStatus("bulunamadı"); return; }
-  currentHint = {from: res.bestMove.from, to: res.bestMove.to, san: res.san};
-  $("kaganText").innerHTML = `${pick(KAGAN_EMIR)}<br><br>Buyruk: <b>${currentHint.san}</b> — ${algebra(currentHint.from)} → ${algebra(currentHint.to)}`;
-  resizeArrowCanvas();
-  drawArrow(currentHint);
-  setHintStatus("hazır");
-}
-
-$("hintBtn").addEventListener("click", requestHint);
-
-async function maybeAutoHint(){
-  if(!$("hintEnabled").checked) return;
-  if(!$("autoHint").checked) return;
-  if(S.result) return;
-  if(S.turn !== "w") return; // kullanıcı beyaz varsayım
-  await requestHint();
-}
-
-/* =========================
-   7) Buttons
-========================= */
-$("flipBtn").addEventListener("click", ()=>{ flipped=!flipped; render(); });
-$("resetBtn").addEventListener("click", async ()=>{
-  S = {
-    board: initialBoardArray(),
-    turn: "w",
-    castling: {K:true,Q:true,k:true,q:true},
-    ep: null,
-    halfmove: 0,
-    fullmove: 1,
-    last: null,
-    result: null,
-    legal: [],
-    inCheck: false,
-    evalCp: 0,
-    opening: "-",
-    sanHistory: [],
-  };
-  selected=null;
-  currentHint=null;
-  drawArrow(null);
-  $("kaganText").innerHTML = `Er meydanı kuruldu. Törü bozulmaz. İlk hamleni yap.`;
-  $("dedeText").innerHTML = `Yiğit, hamleni beklerim. Hamle gelince sözüm de gelir.`;
-  await refreshLegal();
-  render();
-});
-$("hintEnabled").addEventListener("change", ()=>{
-  if(!$("hintEnabled").checked){
-    currentHint=null;
-    drawArrow(null);
-    setHintStatus("kapalı");
-  }else{
-    setHintStatus("hazır");
-  }
-});
-
-/* =========================
-   8) AI reply (Worker) - non-blocking
-========================= */
-let aiBusy = false;
-async function maybeAiReply(){
-  const lvl = $("aiLevel").value;
-  if(lvl==="off") return;
-  if(S.result) return;
-  if(S.turn!=="b") return; // AI siyah
-  if(aiBusy) return;
-  aiBusy = true;
-  $("status").textContent = "AI düşünüyor…";
-  const res = await wCall({type:"ai", state: stateToPayload(), level: lvl});
-  aiBusy = false;
-  if(!res.ok || !res.bestMove){ await refreshLegal(); render(); return; }
-  // apply AI move
-  await applyMove(res.bestMove);
-}
-
-/* =========================
-   9) Daily goal + success/fail history (1–10000)
-========================= */
-const LS_GOAL = "toru_goal";
-const LS_TODAY = "toru_today";
-const LS_DAILY = "toru_daily_v1";
-
-function loadGoal(){
-  const g = parseInt(localStorage.getItem(LS_GOAL)||"5",10);
-  return clamp(isNaN(g)?5:g, 1, 10000);
-}
-function saveGoal(g){ localStorage.setItem(LS_GOAL, String(g)); }
-
-function loadToday(){
-  const raw = localStorage.getItem(LS_TODAY);
-  const key = nowDayKey();
-  if(!raw) return {key, count:0};
-  try{
-    const obj = JSON.parse(raw);
-    if(obj.key!==key) return {key, count:0};
-    return obj;
-  }catch{ return {key, count:0}; }
-}
-function saveToday(obj){ localStorage.setItem(LS_TODAY, JSON.stringify(obj)); }
-
-function updateGoalUI(){
-  const g = loadGoal();
-  const t = loadToday();
-  $("goalNum").textContent = g;
-  $("todayCount").textContent = t.count;
-  const pct = Math.floor((t.count / g) * 100);
-  $("goalPct").textContent = clamp(pct,0,999999) + "%";
-}
-$("goalMinus").addEventListener("click", ()=>{
-  const g = clamp(loadGoal()-1,1,10000);
-  saveGoal(g); updateGoalUI(); updateDailyUI();
-});
-$("goalPlus").addEventListener("click", ()=>{
-  const g = clamp(loadGoal()+1,1,10000);
-  saveGoal(g); updateGoalUI(); updateDailyUI();
-});
-
-function loadDaily(){
-  try{ return JSON.parse(localStorage.getItem(LS_DAILY) || "{}") || {}; }
-  catch{ return {}; }
-}
-function saveDaily(obj){ localStorage.setItem(LS_DAILY, JSON.stringify(obj)); }
-function getTodayObj(daily){
-  const key = nowDayKey();
-  daily[key] = daily[key] || { w:0, l:0, d:0, games:[] };
-  return daily[key];
-}
-function lastNDaysKeys(n=14){
-  const out=[];
-  const d=new Date();
-  for(let i=0;i<n;i++){
-    const dd=new Date(d);
-    dd.setDate(d.getDate()-i);
-    out.push(dd.toISOString().slice(0,10));
-  }
-  return out.reverse();
-}
-function winRate(w,l,d){
-  const total=w+l+d;
-  if(total<=0) return 0;
-  return (w + 0.5*d) / total;
-}
-function addResult(resChar, meta={}){
-  const daily = loadDaily();
-  const t = getTodayObj(daily);
-
-  if(resChar==="W") t.w++;
-  else if(resChar==="L") t.l++;
-  else t.d++;
-
-  t.games.push({
-    t: new Date().toISOString(),
-    res: resChar,
-    side: meta.side || "Beyaz",
-    ai: meta.ai || $("aiLevel").value
-  });
-  saveDaily(daily);
-
-  const today = loadToday();
-  today.count = (t.w||0)+(t.l||0)+(t.d||0);
-  saveToday(today);
-
-  updateGoalUI();
-  updateDailyUI();
-}
-function undoLastResult(){
-  const daily = loadDaily();
-  const key = nowDayKey();
-  const t = daily[key];
-  if(!t || !t.games || !t.games.length) return;
-
-  const last = t.games.pop();
-  if(last.res==="W") t.w = Math.max(0, (t.w||0)-1);
-  if(last.res==="L") t.l = Math.max(0, (t.l||0)-1);
-  if(last.res==="D") t.d = Math.max(0, (t.d||0)-1);
-
-  saveDaily(daily);
-
-  const today = loadToday();
-  today.count = (t.w||0)+(t.l||0)+(t.d||0);
-  saveToday(today);
-
-  updateGoalUI();
-  updateDailyUI();
-}
-
-function updateDailyUI(){
-  const daily = loadDaily();
-  const key = nowDayKey();
-  const t = daily[key] || {w:0,l:0,d:0,games:[]};
-
-  const total = (t.w||0)+(t.l||0)+(t.d||0);
-  const wr = winRate(t.w||0, t.l||0, t.d||0);
-  $("todaySummary").textContent =
-    `Bugün: ${total} oyun · ✅ ${t.w||0} · ❌ ${t.l||0} · ➖ ${t.d||0} · Başarı Oranı: ${(wr*100).toFixed(0)}%`;
-
-  const goal = loadGoal();
-  const done = total >= goal;
-  $("goalHint").textContent =
-    done ? "Bugünün hedefi tamam. Törü yerini buldu."
-         : `Hedefe ${goal-total} oyun kaldı. Sabırla yürü.`;
-
-  const keys = lastNDaysKeys(14);
-  let lines = [];
-  for(const k of keys){
-    const x = daily[k];
-    if(!x){
-      lines.push(`${k}: 0 oyun`);
-      continue;
-    }
-    const tt=(x.w||0)+(x.l||0)+(x.d||0);
-    const r = winRate(x.w||0,x.l||0,x.d||0);
-    lines.push(`${k}: ${tt} oyun · ✅${x.w||0} ❌${x.l||0} ➖${x.d||0} · ${(r*100).toFixed(0)}%`);
-  }
-  $("historyList").textContent = lines.join("\\n");
-
-  const first7 = keys.slice(0,7);
-  const last7  = keys.slice(7);
-  function sum(keysArr){
-    let w=0,l=0,d=0,t=0;
-    for(const k of keysArr){
-      const x = daily[k];
-      if(!x) continue;
-      w += x.w||0; l += x.l||0; d += x.d||0;
-    }
-    t = w+l+d;
-    return {w,l,d,t, r: winRate(w,l,d)};
-  }
-  const a = sum(first7);
-  const b = sum(last7);
-  const delta = (b.r - a.r);
-
-  let verdict;
-  if(b.t < 3){
-    verdict = "Yeterli veri yok: Son 7 günde oyun sayısı az. (En az 3–5 oyun iyi olur.)";
-  }else if(delta > 0.08){
-    verdict = "GELİŞİM VAR: Başarı oranı anlamlı yükselmiş.";
-  }else if(delta < -0.08){
-    verdict = "DÜŞÜŞ VAR: Başarı oranı düşmüş. Açılış + taktik tekrar önerilir.";
-  }else{
-    verdict = "DENGE: Benzer performans. Oyun sayısını artırınca trend netleşir.";
-  }
-
-  $("progressAnalysis").textContent =
-    `Önceki 7 gün: ${a.t} oyun · ${(a.r*100).toFixed(0)}%\\n` +
-    `Son 7 gün:   ${b.t} oyun · ${(b.r*100).toFixed(0)}%\\n` +
-    `Değişim: ${(delta*100).toFixed(0)} puan\\n` +
-    `${verdict}`;
-}
-
-$("markWin").addEventListener("click", ()=> addResult("W"));
-$("markLoss").addEventListener("click", ()=> addResult("L"));
-$("markDraw").addEventListener("click", ()=> addResult("D"));
-$("undoLast").addEventListener("click", undoLastResult);
-
-function onGameFinished(result){
-  let msg="";
-  if(result==="1-0") msg="Beyaz MAT etti. Zafer beyazın.";
-  else if(result==="0-1") msg="Siyah MAT etti. Zafer siyahın.";
-  else msg="PAT / Berabere. Törü dengeyi yazdı.";
-
-  $("status").textContent = msg;
-  $("kaganText").innerHTML = `<span style="color:var(--good); font-weight:900;">Hüküm verildi.</span> ${msg}`;
-  $("dedeText").innerHTML = `${pick(DEDE_USLUP)}<br><br><b>${msg}</b>`;
-
-  // otomatik günlük kayıt
-  if(result==="1-0") addResult("W", {ai:$("aiLevel").value});
-  else if(result==="0-1") addResult("L", {ai:$("aiLevel").value});
-  else addResult("D", {ai:$("aiLevel").value});
-}
-
-/* =========================
-   10) YouTube (LOCKED by videoId)
-========================= */
-const LS_SONGS = "toru_songs_v1";
-let SONGS = [
-  { title: "Senin parça (m0fXYGf0bfw)", id: "m0fXYGf0bfw" },
-];
-function normalizeYouTubeId(urlOrId){
-  if(!urlOrId) return null;
-  const t = urlOrId.trim();
-  if(/^[a-zA-Z0-9_-]{11}$/.test(t)) return t;
-  try{
-    const u = new URL(t);
-    if(u.hostname.includes("youtu.be")){
-      const id = u.pathname.replace("/","").trim();
-      return (/^[a-zA-Z0-9_-]{11}$/.test(id)) ? id : null;
-    }
-    const v = u.searchParams.get("v");
-    if(v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
-    const m = u.pathname.match(/\\/(embed|shorts)\\/([a-zA-Z0-9_-]{11})/);
-    if(m) return m[2];
-    return null;
-  }catch{
-    return null;
-  }
-}
-function loadSongs(){
-  try{
-    const raw = localStorage.getItem(LS_SONGS);
-    if(!raw) return;
-    const arr = JSON.parse(raw);
-    if(Array.isArray(arr) && arr.length){
-      SONGS = arr.filter(x=>x && x.id && x.title);
-    }
-  }catch{}
-}
-function saveSongs(){ localStorage.setItem(LS_SONGS, JSON.stringify(SONGS)); }
-
-const songSelect = $("songSelect");
-function renderSongs(){
-  songSelect.innerHTML = "";
-  SONGS.forEach((s)=>{
-    const o=document.createElement("option");
-    o.value = s.id;
-    o.textContent = s.title;
-    songSelect.appendChild(o);
-  });
-}
-
-let ytPlayer=null, ytReady=false, currentIndex=0;
-function setYtStatus(t){ $("ytStatus").textContent = "Durum: " + t; }
-function playByIndex(i){
-  if(!SONGS.length) return setYtStatus("Liste boş");
-  currentIndex = (i + SONGS.length) % SONGS.length;
-  const s = SONGS[currentIndex];
-  songSelect.value = s.id;
-  if(!ytReady) return setYtStatus("Player hazır değil");
-  ytPlayer.loadVideoById(s.id);
-  setYtStatus("Çalıyor: " + s.title);
-}
-function playSelected(){
-  const id = songSelect.value;
-  const idx = SONGS.findIndex(x=>x.id===id);
-  playByIndex(idx>=0 ? idx : 0);
-}
-function playNext(){ playByIndex(currentIndex + 1); }
-function pauseYt(){ if(ytReady) ytPlayer.pauseVideo(); }
-
-$("playBtn").addEventListener("click", playSelected);
-$("pauseBtn").addEventListener("click", pauseYt);
-$("nextBtn").addEventListener("click", playNext);
-songSelect.addEventListener("change", playSelected);
-
-$("addBtn").addEventListener("click", ()=>{
-  const url = $("songUrl").value;
-  const id = normalizeYouTubeId(url);
-  if(!id){
-    setYtStatus("Link/ID okunamadı. 'watch?v=...' olmalı.");
-    return;
-  }
-  const title = prompt("Şarkı adı ne olsun?", "Yeni Parça");
-  if(!title) return;
-  if(SONGS.some(x=>x.id===id)){
-    setYtStatus("Bu parça zaten listede.");
-    return;
-  }
-  SONGS.push({title, id});
-  saveSongs();
-  renderSongs();
-  $("songUrl").value = "";
-  setYtStatus("Listeye eklendi: " + title);
-});
-
-function loadYouTubeAPI(){
-  const tag=document.createElement("script");
-  tag.src="https://www.youtube.com/iframe_api";
-  document.body.appendChild(tag);
-}
-window.onYouTubeIframeAPIReady = function(){
-  ytPlayer = new YT.Player("yt", {
-    height:"0", width:"0",
-    videoId: SONGS[0]?.id || "",
-    playerVars:{
-      autoplay:0, controls:0, rel:0, modestbranding:1, playsinline:1,
-      origin: location.origin
-    },
-    events:{
-      onReady: ()=>{
-        ytReady=true;
-        setYtStatus("Hazır. İlk kez ÇAL’a dokun.");
-      },
-      onStateChange: (ev)=>{
-        if(ev.data===YT.PlayerState.ENDED) playNext();
-        if(ev.data===YT.PlayerState.PLAYING) setYtStatus("Çalıyor");
-        if(ev.data===YT.PlayerState.PAUSED) setYtStatus("Duraklatıldı");
-      },
-      onError: (e)=>{
-        setYtStatus("Bu parça açılamadı (kod "+e.data+"). Sonraki parçaya geçiliyor…");
-        setTimeout(playNext, 700);
-      }
-    }
-  });
-};
-loadYouTubeAPI();
-
-/* =========================
-   11) Start
-========================= */
-(async function start(){
-  // mobilde varsayılan AI kapalı (kasmasın)
-  if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    $("aiLevel").value = "off";
-  }
-
-  loadSongs();
-  renderSongs();
-
-  updateGoalUI();
-  updateDailyUI();
-
-  await refreshLegal();
-  render();
-})();
-</script>
+  </script>
 </body>
 </html>
