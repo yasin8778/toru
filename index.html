@@ -2,1003 +2,977 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Törü Satranç</title>
-  <style>
-    :root { color-scheme: dark; }
-    * { box-sizing: border-box; }
-    body{
-      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: radial-gradient(1200px 700px at 30% 10%, #3a1c59 0%, #0b1220 55%, #070a12 100%);
-      color:#e9eefc;
-    }
-    .app{ width:min(1100px, 96vw); margin: 14px auto; display:grid; gap:12px; grid-template-columns: 1.2fr .8fr; }
-    @media (max-width: 980px){ .app{ grid-template-columns: 1fr; } }
-    .card{
-      background: rgba(10,16,32,.72);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.45);
-      padding: 14px;
-      backdrop-filter: blur(10px);
-    }
-    .top{
-      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-      margin-bottom: 10px;
-    }
-    .brand{ display:flex; align-items:center; gap:10px; }
-    .logo{
-      width:40px; height:40px; border-radius:14px;
-      background: linear-gradient(135deg, #ff8a00, #ff3d6b);
-      display:grid; place-items:center; font-weight:900;
-      box-shadow: 0 10px 30px rgba(255,90,120,.18);
-    }
-    .title h1{ margin:0; font-size: 18px; letter-spacing:.2px; }
-    .title .sub{ opacity:.78; font-size: 12px; margin-top:2px; }
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TÖRÜ SATRANÇ • Kurallı + Güçlü AI</title>
 
-    .btns{ display:flex; gap:8px; flex-wrap:wrap; }
-    button{
-      border: 1px solid rgba(255,255,255,.14);
+  <!-- Chess rules/legality -->
+  <script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/cjs/chess.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:#0f1b33;
+      --card:#0d162c;
+      --soft:#132244;
+      --text:#e9f0ff;
+      --muted:#a8b6d6;
+      --acc:#ff6a3d;
+      --acc2:#33d17a;
+      --warn:#ffcc66;
+      --danger:#ff4d6d;
+      --sqLight:#E8D8C4;
+      --sqDark:#B48E6A;
+      --sqLight2:#F2E6D6;
+      --sqDark2:#A77D57;
+      --shadow: 0 14px 40px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background: radial-gradient(1000px 600px at 20% 10%, #182a57 0%, transparent 55%),
+                  radial-gradient(900px 700px at 80% 25%, #2a1643 0%, transparent 55%),
+                  var(--bg);
+      min-height:100vh;
+      padding:18px;
+    }
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .wrap{grid-template-columns:1fr}
+    }
+    .topbar{
+      grid-column:1/-1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:14px 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 260px;
+    }
+    .logo{
+      width:42px;height:42px;border-radius:12px;
+      display:grid;place-items:center;
+      background: radial-gradient(circle at 30% 20%, #ffb07a, #ff6a3d 55%, #c83a1e);
+      box-shadow: 0 10px 18px rgba(255,106,61,.22);
+      font-weight:800;
+    }
+    .brand h1{
+      font-size:16px; margin:0; line-height:1.1;
+    }
+    .brand p{
+      margin:2px 0 0; font-size:12px; color:var(--muted);
+    }
+
+    .btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end}
+    button, .chip{
+      border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.06);
-      color:#e9eefc;
-      padding: 10px 12px;
-      border-radius: 14px;
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
       cursor:pointer;
+      transition: transform .06s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
       font-weight:700;
-      transition: transform .08s ease, background .12s ease, border-color .12s ease;
+      font-size:13px;
+    }
+    button:hover{background: rgba(255,255,255,.10)}
+    button:active{transform: translateY(1px)}
+    .primary{background: linear-gradient(180deg, rgba(255,106,61,.95), rgba(200,58,30,.95)); border-color: rgba(255,106,61,.55)}
+    .primary:hover{background: linear-gradient(180deg, rgba(255,106,61,1), rgba(200,58,30,1))}
+    .ok{background: linear-gradient(180deg, rgba(51,209,122,.92), rgba(35,140,82,.92)); border-color: rgba(51,209,122,.55)}
+    .danger{background: linear-gradient(180deg, rgba(255,77,109,.92), rgba(160,40,65,.92)); border-color: rgba(255,77,109,.55)}
+    .ghost{background: rgba(255,255,255,.06)}
+    .mini{padding:8px 10px; font-size:12px; border-radius:10px}
+
+    .panel{
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .head{
+      padding:12px 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      background: rgba(0,0,0,.18);
+    }
+    .panel .head .title{
+      font-weight:900;
+      letter-spacing:.2px;
+      display:flex; gap:10px; align-items:center;
+    }
+    .panel .body{
+      padding:14px;
+    }
+
+    /* Board */
+    .boardWrap{
+      display:flex; gap:14px; align-items:flex-start; justify-content:center;
+      flex-wrap:wrap;
+    }
+    .board{
+      width: min(540px, 92vw);
+      aspect-ratio: 1/1;
+      border-radius: 16px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 16px 30px rgba(0,0,0,.35);
+      display:grid;
+      grid-template-columns: repeat(8, 1fr);
+      position:relative;
+      background: rgba(0,0,0,.10);
+    }
+    .sq{
+      display:grid;
+      place-items:center;
+      font-size: clamp(24px, 5.5vw, 44px);
+      cursor:pointer;
+      position:relative;
       user-select:none;
       touch-action: manipulation;
     }
-    button:hover{ transform: translateY(-1px); background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.22); }
-    button.primary{ background: linear-gradient(135deg, rgba(255,138,0,.28), rgba(255,61,107,.22)); border-color: rgba(255,255,255,.18); }
-    button.danger{ background: rgba(255,60,80,.16); }
-    button:disabled{ opacity:.45; cursor:not-allowed; transform:none; }
-
-    .boardWrap{ display:flex; flex-direction:column; gap:10px; }
-    .board{
-      width:min(560px, 92vw);
-      aspect-ratio: 1/1;
-      border-radius: 18px;
-      overflow:hidden;
-      border: 1px solid rgba(255,255,255,.14);
-      box-shadow: inset 0 0 0 1px rgba(0,0,0,.25), 0 14px 50px rgba(0,0,0,.35);
-      background:#0c1222;
-      margin: 0 auto;
-      position:relative;
+    .light{background: linear-gradient(180deg, var(--sqLight2), var(--sqLight))}
+    .dark{background: linear-gradient(180deg, var(--sqDark2), var(--sqDark))}
+    .sq:hover{filter:brightness(1.05)}
+    .coord{
+      position:absolute;
+      font-size:10px;
+      opacity:.7;
+      color: rgba(0,0,0,.55);
+      bottom:4px; right:5px;
+      font-weight:800;
     }
+    .hlSel{
+      outline: 3px solid rgba(255,255,255,.7);
+      outline-offset: -3px;
+    }
+    .hlMove::after{
+      content:"";
+      position:absolute;
+      width: 18%;
+      aspect-ratio:1/1;
+      border-radius:999px;
+      background: rgba(51,209,122,.85);
+      box-shadow: 0 0 0 8px rgba(51,209,122,.18);
+    }
+    .hlCap::after{
+      content:"";
+      position:absolute;
+      width: 72%;
+      height:72%;
+      border-radius: 999px;
+      border: 3px solid rgba(255,77,109,.9);
+      box-shadow: 0 0 0 10px rgba(255,77,109,.14);
+    }
+    .lastFrom{outline: 3px solid rgba(255,204,102,.75); outline-offset:-3px}
+    .lastTo{outline: 3px solid rgba(255,204,102,.95); outline-offset:-3px}
+    .checkGlow{
+      box-shadow: inset 0 0 0 4px rgba(255,77,109,.8);
+    }
+
+    /* Right panel controls */
     .grid{
       display:grid;
-      grid-template-columns: repeat(8, 1fr);
-      grid-template-rows: repeat(8, 1fr);
-      width:100%; height:100%;
+      gap:10px;
     }
-    .sq{
-      display:grid; place-items:center;
-      font-size: clamp(26px, 4.2vw, 42px);
-      line-height:1;
-      position:relative;
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
+      padding:10px 12px;
+      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.07);
+      border-radius: 14px;
     }
-    .light{ background: #cdbb92; }
-    .dark{ background: #6a5a3a; }
-    .sq::after{
-      content:"";
-      position:absolute; inset:0;
-      pointer-events:none;
+    label{font-size:13px; font-weight:800}
+    .muted{color:var(--muted); font-weight:700; font-size:12px}
+    select, input[type="range"]{
+      width: 100%;
+      max-width: 280px;
     }
-    .sq.sel::after{ background: rgba(0, 220, 255, .18); }
-    .sq.last::after{ background: rgba(255, 210, 0, .18); }
-    .sq.legal::after{
-      background:
-        radial-gradient(circle at 50% 50%, rgba(0,255,140,.55) 0 18%, rgba(0,0,0,0) 19% 100%);
+    select{
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
+      color:var(--text);
+      font-weight:800;
     }
-    .sq.capture.legal::after{
-      background:
-        radial-gradient(circle at 50% 50%, rgba(255,70,90,.65) 0 18%, rgba(0,0,0,0) 19% 100%);
+    .tog{
+      display:flex; align-items:center; gap:10px;
     }
-    .sq.check::after{ box-shadow: inset 0 0 0 4px rgba(255,60,80,.55); }
+    input[type="checkbox"]{
+      width:18px;height:18px;
+      accent-color: var(--acc2);
+    }
 
-    .status{
-      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.05);
-      font-size: 13px;
-    }
-    .pill{ opacity:.9; }
-    .rightCol{ display:flex; flex-direction:column; gap:12px; }
-    .sectionTitle{ font-weight:900; margin:0 0 8px; font-size: 14px; opacity:.95; }
     .moves{
-      height: 340px;
+      height: 320px;
       overflow:auto;
-      padding: 10px;
+      padding:12px;
+      background: rgba(0,0,0,.20);
+      border:1px solid rgba(255,255,255,.08);
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       font-size: 13px;
+      line-height: 1.55;
     }
-    .row{ display:flex; gap:10px; padding: 6px 8px; border-radius: 10px; }
-    .row:nth-child(odd){ background: rgba(255,255,255,.04); }
-    .mn{ width:38px; opacity:.75; }
-    .mv{ flex:1; display:flex; gap:10px; }
-    .note{
-      font-size: 12px;
-      opacity:.78;
-      line-height:1.35;
-      padding: 10px 12px;
+    .status{
+      padding:10px 12px;
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.22);
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;
     }
-    .toggle{
-      display:flex; align-items:center; gap:10px; font-size:13px; opacity:.92;
-      padding: 10px 12px; border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
+    .pill{
+      padding:7px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      font-weight:900;
+      font-size:12px;
+      color:var(--text);
+      white-space:nowrap;
     }
-    input[type="checkbox"]{ transform: scale(1.2); }
-    .footer{
-      text-align:center; font-size: 12px; opacity:.65; margin-top: 4px;
+    .pill.ok{background: rgba(51,209,122,.16); border-color: rgba(51,209,122,.35)}
+    .pill.warn{background: rgba(255,204,102,.16); border-color: rgba(255,204,102,.35)}
+    .pill.dng{background: rgba(255,77,109,.16); border-color: rgba(255,77,109,.35)}
+    .footerBtns{
+      display:flex; gap:10px; flex-wrap:wrap;
     }
-    .promoBox{
-      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
-      background: rgba(0,0,0,.55);
-      padding: 18px;
+
+    .note{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+      margin-top:10px;
     }
-    .modal{
-      width:min(420px, 92vw);
-      background: rgba(10,16,32,.92);
-      border: 1px solid rgba(255,255,255,.14);
-      border-radius: 18px;
-      padding: 14px;
-      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.75);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: 999px;
+      padding:10px 14px;
+      box-shadow: var(--shadow);
+      color: var(--text);
+      font-weight: 900;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .18s ease, transform .18s ease;
     }
-    .modal h3{ margin: 0 0 8px; }
-    .modal p{ margin: 0 0 12px; opacity:.85; font-size: 13px; line-height:1.4; }
-    .modal .choices{ display:flex; gap:8px; flex-wrap:wrap; }
+    .toast.show{
+      opacity: 1;
+      transform: translateX(-50%) translateY(-3px);
+    }
   </style>
 </head>
+
 <body>
-  <div class="app">
-    <div class="card boardWrap">
-      <div class="top">
-        <div class="brand">
-          <div class="logo">TÖ</div>
-          <div class="title">
-            <h1>Törü Satranç</h1>
-            <div class="sub">Kurallı satranç + hızlı basit AI</div>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">TÖ</div>
+        <div>
+          <h1>TÖRÜ SATRANÇ</h1>
+          <p>Kurallı satranç • Güçlü AI (Stockfish)</p>
+        </div>
+      </div>
+
+      <div class="btns">
+        <button class="primary" id="btnNew">Yeni Oyun</button>
+        <button class="ghost" id="btnFlip">Tahtayı Çevir</button>
+        <button class="ghost" id="btnUndo">Geri Al</button>
+        <button class="ghost" id="btnHint">İpucu</button>
+        <button class="danger" id="btnReset">Sıfırla</button>
+      </div>
+    </div>
+
+    <!-- Left: Board -->
+    <div class="panel">
+      <div class="head">
+        <div class="title">♟️ Oyun Tahtası</div>
+        <div class="muted" id="engineBadge">AI: hazırlanıyor…</div>
+      </div>
+      <div class="body">
+        <div class="boardWrap">
+          <div class="board" id="board"></div>
+        </div>
+
+        <div style="margin-top:12px" class="status">
+          <div class="pill" id="pillTurn">Sıra: -</div>
+          <div class="pill warn" id="pillState">Durum: -</div>
+          <div class="pill ok" id="pillMode">Mod: -</div>
+        </div>
+
+        <div class="note" id="miniHelp">
+          İpucu: Taşa tıkla → yeşil noktalar yasal hamlelerdir. Rakip taş üzerindeki kırmızı halka = alma.
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Controls + Moves -->
+    <div class="panel">
+      <div class="head">
+        <div class="title">🧠 Ayarlar & Hamleler</div>
+        <div class="muted" id="aiThink">AI beklemede</div>
+      </div>
+      <div class="body">
+        <div class="grid">
+          <div class="row">
+            <div style="min-width:160px">
+              <label>Taraf</label>
+              <div class="muted">Beyaz mı Siyah mı?</div>
+            </div>
+            <select id="selSide">
+              <option value="w">Beyaz (Sen)</option>
+              <option value="b">Siyah (Sen)</option>
+              <option value="none">2 Oyuncu (AI kapalı)</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <div style="min-width:160px">
+              <label>AI Seviye</label>
+              <div class="muted">Skill + Depth</div>
+            </div>
+            <select id="selLevel">
+              <option value="1">Çok Kolay</option>
+              <option value="3">Kolay</option>
+              <option value="6">Orta</option>
+              <option value="10" selected>Zor</option>
+              <option value="14">Çok Zor</option>
+              <option value="18">Usta</option>
+              <option value="20">Efsane</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="tog">
+              <input type="checkbox" id="chkLegal" checked />
+              <label for="chkLegal">Yasal hamleleri göster</label>
+            </div>
+            <div class="tog">
+              <input type="checkbox" id="chkSound" />
+              <label for="chkSound">Ses</label>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="tog">
+              <input type="checkbox" id="chkAutoFlip" checked />
+              <label for="chkAutoFlip">Sıra değişince otomatik çevir</label>
+            </div>
+            <div class="tog">
+              <input type="checkbox" id="chkCoords" />
+              <label for="chkCoords">Koordinat göster</label>
+            </div>
+          </div>
+
+          <div class="row">
+            <div style="min-width:160px">
+              <label>Hamleler</label>
+              <div class="muted">SAN notasyonu</div>
+            </div>
+            <div class="footerBtns">
+              <button class="mini" id="btnCopyPGN">PGN Kopyala</button>
+              <button class="mini" id="btnCopyFEN">FEN Kopyala</button>
+            </div>
+          </div>
+
+          <div class="moves" id="moves"></div>
+
+          <div class="note">
+            Not: Bu sürümde “kurulum/domain/teknik durum” gibi oyuncuyu ilgilendirmeyen bilgiler gösterilmez. Sadece oyun.
           </div>
         </div>
-        <div class="btns">
-          <button class="primary" id="newBtn">Yeni Oyun</button>
-          <button id="flipBtn">Tahtayı Çevir</button>
-          <button id="undoBtn" class="danger" disabled>Geri Al</button>
-        </div>
-      </div>
-
-      <div class="board" aria-label="Satranç Tahtası">
-        <div class="grid" id="grid"></div>
-      </div>
-
-      <div class="status" id="status">
-        <div class="pill" id="turnPill">Sıra: Beyaz</div>
-        <div class="pill" id="statePill">Durum: Oyun devam ediyor</div>
-      </div>
-      <div class="footer">İpucu: Taşa tıkla → yeşil hedeflere tıkla.</div>
-    </div>
-
-    <div class="card rightCol">
-      <div class="toggle">
-        <input id="showLegal" type="checkbox" checked />
-        <label for="showLegal">Yasal hamleleri göster</label>
-      </div>
-
-      <div class="toggle">
-        <input id="aiOn" type="checkbox" checked />
-        <label for="aiOn">AI açık (Siyah)</label>
-      </div>
-
-      <div>
-        <div class="sectionTitle">Hamleler</div>
-        <div class="moves" id="moves"></div>
-      </div>
-
-      <div class="note">
-        <b>Not:</b> Bu sürümde “kurulum / domain / teknik durum” gibi oyuncuyu ilgilendirmeyen bilgiler ekranda gösterilmez.
-        Sadece oyun durumunu görürsün.
       </div>
     </div>
   </div>
 
-  <!-- Promotion modal for pawn promotion -->
-  <div class="promoBox" id="promoBox">
-    <div class="modal">
-      <h3>Terfi</h3>
-      <p>Piyonu hangi taşa çevirelim?</p>
-      <div class="choices" id="promoChoices"></div>
-      <div style="margin-top:10px; font-size:12px; opacity:.75;">(Varsayılan: Vezir)</div>
-    </div>
-  </div>
+  <div class="toast" id="toast"></div>
 
 <script>
-/**
- * Törü Satranç — Tek HTML
- * - Legal move checking with king safety
- * - Castling, en passant, promotion
- * - Undo stack
- * - Simple fast AI (material + tiny PST)
- */
 (() => {
-  // --- UI refs
-  const grid = document.getElementById('grid');
-  const newBtn = document.getElementById('newBtn');
-  const flipBtn = document.getElementById('flipBtn');
-  const undoBtn = document.getElementById('undoBtn');
-  const movesEl = document.getElementById('moves');
-  const turnPill = document.getElementById('turnPill');
-  const statePill = document.getElementById('statePill');
-  const showLegal = document.getElementById('showLegal');
-  const aiOn = document.getElementById('aiOn');
-  const promoBox = document.getElementById('promoBox');
-  const promoChoices = document.getElementById('promoChoices');
+  // ---------- Helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const toastEl = $("toast");
+  let toastTimer = null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=>toastEl.classList.remove("show"), 1400);
+  }
 
-  // --- Pieces as letters (uppercase = White, lowercase = Black)
-  // We'll render with Unicode glyphs.
-  const GLYPH = {
-    'K':'♔','Q':'♕','R':'♖','B':'♗','N':'♘','P':'♙',
-    'k':'♚','q':'♛','r':'♜','b':'♝','n':'♞','p':'♟'
+  // Basic click sound (optional)
+  const audioCtx = (() => {
+    try { return new (window.AudioContext || window.webkitAudioContext)(); } catch { return null; }
+  })();
+  function beep(freq=520, ms=50){
+    if(!$("chkSound").checked || !audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.frequency.value = freq;
+    o.connect(g); g.connect(audioCtx.destination);
+    g.gain.setValueAtTime(0.06, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + ms/1000);
+    o.start(); o.stop(audioCtx.currentTime + ms/1000);
+  }
+
+  // ---------- Chess State ----------
+  const game = new Chess();
+  let orientation = "w";          // board display orientation: "w" bottom or "b" bottom
+  let selectedSq = null;
+  let legalTargets = [];
+  let lastMove = null;            // {from,to}
+  let playerSide = "w";           // "w" or "b" or "none"
+  let aiBusy = false;
+  let hintBusy = false;
+
+  // ---------- Pieces (Unicode) ----------
+  const P = {
+    w: { k:"♔", q:"♕", r:"♖", b:"♗", n:"♘", p:"♙" },
+    b: { k:"♚", q:"♛", r:"♜", b:"♝", n:"♞", p:"♟" }
   };
 
-  const isWhite = p => p && p === p.toUpperCase();
-  const isBlack = p => p && p === p.toLowerCase();
-  const sameSide = (a,b) => a && b && ((isWhite(a)&&isWhite(b)) || (isBlack(a)&&isBlack(b)));
-  const oppSide = (a,b) => a && b && ((isWhite(a)&&isBlack(b)) || (isBlack(a)&&isWhite(b)));
-
-  const inBounds = (r,c) => r>=0 && r<8 && c>=0 && c<8;
-  const clone = obj => JSON.parse(JSON.stringify(obj));
-
-  // --- Game state
-  let S;
-  let flipped = false; // board orientation
-  let selected = null; // {r,c}
-  let legalTargets = []; // array of {r,c, capture:boolean}
-  let pendingPromotion = null; // {from,to, piece:'P'/'p'}
-  let lock = false; // prevent multi clicks during AI/promotion
-
-  function newGame() {
-    S = {
-      board: [
-        ['r','n','b','q','k','b','n','r'],
-        ['p','p','p','p','p','p','p','p'],
-        ['','','','','','','',''],
-        ['','','','','','','',''],
-        ['','','','','','','',''],
-        ['','','','','','','',''],
-        ['P','P','P','P','P','P','P','P'],
-        ['R','N','B','Q','K','B','N','R'],
-      ],
-      turn: 'w', // 'w' or 'b'
-      castling: { K:true, Q:true, k:true, q:true }, // rights
-      ep: null, // en passant square {r,c} where capture lands
-      halfmove: 0,
-      fullmove: 1,
-      lastMove: null, // {from:{r,c}, to:{r,c}}
-      history: [], // stack of previous states for undo
-      san: [] // move strings list
-    };
-    selected = null;
-    legalTargets = [];
-    pendingPromotion = null;
-    lock = false;
-    render();
-    updateStatus();
-    renderMoves();
-    maybeAiMove();
+  // ---------- Board Rendering ----------
+  const boardEl = $("board");
+  function squareName(fileIndex, rankIndex){ // file 0..7 => a..h, rank 0..7 => 8..1
+    const file = "abcdefgh"[fileIndex];
+    const rank = (8 - rankIndex);
+    return file + rank;
   }
 
-  // --- Board rendering helpers
-  function viewToModel(rView,cView){
-    // if flipped: invert
-    if(!flipped) return {r:rView, c:cView};
-    return {r:7-rView, c:7-cView};
-  }
-  function modelToView(r,c){
-    if(!flipped) return {r, c};
-    return {r:7-r, c:7-c};
-  }
-
-  function buildGridOnce(){
-    grid.innerHTML = '';
+  function getDisplaySquares(){
+    // build 8x8 list of square names in current orientation
+    const squares = [];
     for(let r=0;r<8;r++){
-      for(let c=0;c<8;c++){
-        const sq = document.createElement('div');
-        sq.className = 'sq ' + (((r+c)%2===0) ? 'light' : 'dark');
-        sq.dataset.r = r;
-        sq.dataset.c = c;
-        sq.addEventListener('click', onSquareClick, {passive:true});
-        grid.appendChild(sq);
+      for(let f=0;f<8;f++){
+        const file = orientation === "w" ? f : 7 - f;
+        const rank = orientation === "w" ? r : 7 - r;
+        squares.push(squareName(file, rank));
       }
     }
+    return squares;
+  }
+
+  function isLightSquare(sq){
+    const f = "abcdefgh".indexOf(sq[0]);
+    const r = parseInt(sq[1],10)-1;
+    return ((f + r) % 2) === 0;
   }
 
   function render(){
-    if(!grid.children.length) buildGridOnce();
+    const squares = getDisplaySquares();
+    boardEl.innerHTML = "";
+    const showCoords = $("chkCoords").checked;
 
-    // Clear classes and set pieces
-    for(const el of grid.children){
-      el.classList.remove('sel','legal','capture','last','check');
-      const rView = +el.dataset.r, cView = +el.dataset.c;
-      const {r,c} = viewToModel(rView,cView);
-      const p = S.board[r][c];
-      el.textContent = p ? GLYPH[p] : '';
-    }
+    for(const sq of squares){
+      const div = document.createElement("div");
+      div.className = "sq " + (isLightSquare(sq) ? "light":"dark");
+      div.dataset.sq = sq;
 
-    // selection
-    if(selected){
-      const v = modelToView(selected.r, selected.c);
-      const el = grid.querySelector(`.sq[data-r="${v.r}"][data-c="${v.c}"]`);
-      if(el) el.classList.add('sel');
-    }
+      const piece = game.get(sq);
+      if(piece){
+        div.textContent = P[piece.color][piece.type];
+      } else {
+        div.textContent = "";
+      }
 
-    // legal targets
-    if(showLegal.checked){
-      for(const t of legalTargets){
-        const v = modelToView(t.r, t.c);
-        const el = grid.querySelector(`.sq[data-r="${v.r}"][data-c="${v.c}"]`);
-        if(el){
-          el.classList.add('legal');
-          if(t.capture) el.classList.add('capture');
+      // coords on light squares only (optional)
+      if(showCoords && isLightSquare(sq)){
+        const c = document.createElement("div");
+        c.className = "coord";
+        c.textContent = sq;
+        div.appendChild(c);
+      }
+
+      // highlights
+      if(selectedSq === sq) div.classList.add("hlSel");
+      if(lastMove && lastMove.from === sq) div.classList.add("lastFrom");
+      if(lastMove && lastMove.to === sq) div.classList.add("lastTo");
+
+      if($("chkLegal").checked){
+        if(legalTargets.includes(sq)){
+          // capture?
+          const moves = game.moves({square: selectedSq, verbose:true});
+          const isCap = moves.some(m => m.to === sq && (m.captured || m.flags.includes("e")));
+          div.classList.add(isCap ? "hlCap" : "hlMove");
         }
       }
-    }
 
-    // last move
-    if(S.lastMove){
-      for(const sq2 of [S.lastMove.from, S.lastMove.to]){
-        const v = modelToView(sq2.r, sq2.c);
-        const el = grid.querySelector(`.sq[data-r="${v.r}"][data-c="${v.c}"]`);
-        if(el) el.classList.add('last');
+      // check glow for king
+      const inCheck = game.in_check();
+      if(inCheck && piece && piece.type==="k" && piece.color===game.turn()){
+        div.classList.add("checkGlow");
       }
+
+      div.addEventListener("click", () => onSquareClick(sq));
+      boardEl.appendChild(div);
     }
 
-    // check highlight
-    const kPos = findKing(S.turn);
-    if(kPos && isInCheck(S, S.turn)){
-      const v = modelToView(kPos.r,kPos.c);
-      const el = grid.querySelector(`.sq[data-r="${v.r}"][data-c="${v.c}"]`);
-      if(el) el.classList.add('check');
-    }
-
-    undoBtn.disabled = S.history.length === 0;
+    renderStatus();
+    renderMoves();
   }
 
-  function updateStatus(){
-    const turnText = (S.turn==='w') ? 'Beyaz' : 'Siyah';
-    turnPill.textContent = 'Sıra: ' + turnText;
+  function renderStatus(){
+    const turn = game.turn()==="w" ? "Beyaz" : "Siyah";
+    $("pillTurn").textContent = "Sıra: " + turn;
 
-    const legal = generateLegalMoves(S, S.turn);
-    const inCheck = isInCheck(S, S.turn);
-
-    if(legal.length === 0){
-      if(inCheck){
-        statePill.textContent = 'Durum: Şah mat! Kazanan: ' + (S.turn==='w' ? 'Siyah' : 'Beyaz');
-      }else{
-        statePill.textContent = 'Durum: Pat (berabere)';
-      }
-      lock = true; // game over
-      return;
+    let state = "Oyun devam ediyor";
+    let cls = "pill warn";
+    if(game.is_checkmate()){
+      state = "Şah Mat • Kazanan: " + (game.turn()==="w" ? "Siyah" : "Beyaz");
+      cls = "pill dng";
+    } else if(game.is_draw()){
+      state = "Berabere";
+      cls = "pill warn";
+    } else if(game.in_check()){
+      state = "Şah!";
+      cls = "pill warn";
     }
+    $("pillState").className = cls;
+    $("pillState").textContent = "Durum: " + state;
 
-    if(inCheck) statePill.textContent = 'Durum: Şah!';
-    else statePill.textContent = 'Durum: Oyun devam ediyor';
+    const mode =
+      playerSide==="none" ? "2 Oyuncu" :
+      (playerSide==="w" ? "Sen: Beyaz • AI: Siyah" : "Sen: Siyah • AI: Beyaz");
+    $("pillMode").textContent = "Mod: " + mode;
   }
 
   function renderMoves(){
-    movesEl.innerHTML = '';
-    const san = S.san;
-    for(let i=0;i<san.length;i+=2){
-      const row = document.createElement('div');
-      row.className = 'row';
-      const mn = document.createElement('div');
-      mn.className = 'mn';
-      mn.textContent = (Math.floor(i/2)+1) + '.';
-      const mv = document.createElement('div');
-      mv.className = 'mv';
-      const w = document.createElement('div');
-      w.textContent = san[i] ?? '';
-      const b = document.createElement('div');
-      b.textContent = san[i+1] ?? '';
-      mv.appendChild(w); mv.appendChild(b);
-      row.appendChild(mn); row.appendChild(mv);
-      movesEl.appendChild(row);
+    const hist = game.history({ verbose: true });
+    // group by full moves
+    let out = "";
+    for(let i=0;i<hist.length;i+=2){
+      const n = Math.floor(i/2)+1;
+      const w = hist[i] ? hist[i].san : "";
+      const b = hist[i+1] ? hist[i+1].san : "";
+      out += `${n}. ${w}${b? "   "+b:""}\n`;
     }
-    movesEl.scrollTop = movesEl.scrollHeight;
+    $("moves").textContent = out.trim() || "Henüz hamle yok.";
   }
 
-  // --- Click logic
-  function onSquareClick(e){
-    if(lock) return;
-    const rView = +e.currentTarget.dataset.r;
-    const cView = +e.currentTarget.dataset.c;
-    const {r,c} = viewToModel(rView,cView);
+  // ---------- Move Selection ----------
+  function setSelection(sq){
+    selectedSq = sq;
+    legalTargets = [];
+    if(!sq) return;
 
-    const p = S.board[r][c];
-    const side = S.turn;
+    const piece = game.get(sq);
+    if(!piece) return;
+    if(piece.color !== game.turn()) return;
 
-    // if we have a selection: try move
-    if(selected){
-      const target = legalTargets.find(t => t.r===r && t.c===c);
-      if(target){
-        doMove(selected, {r,c});
+    // if AI's turn, user can't select
+    if(isAITurn()) return;
+
+    // if playerSide fixed, only allow selecting player's pieces
+    if(playerSide !== "none" && piece.color !== playerSide) return;
+
+    const moves = game.moves({ square: sq, verbose: true });
+    legalTargets = moves.map(m => m.to);
+  }
+
+  function clearSelection(){
+    selectedSq = null;
+    legalTargets = [];
+  }
+
+  function onSquareClick(sq){
+    if(aiBusy) return;
+
+    // If nothing selected yet:
+    if(!selectedSq){
+      setSelection(sq);
+      render();
+      return;
+    }
+
+    // If clicked same square -> deselect
+    if(selectedSq === sq){
+      clearSelection();
+      render();
+      return;
+    }
+
+    // Try to make move if sq is legal target
+    if(legalTargets.includes(sq)){
+      const move = game.move({ from: selectedSq, to: sq, promotion: "q" }); // auto queen
+      if(move){
+        lastMove = { from: move.from, to: move.to };
+        beep(620, 55);
+        clearSelection();
+        render();
+        maybeAutoFlip();
+        maybeAIMove();
         return;
       }
     }
 
-    // select piece if belongs to current side
-    if(p && ((side==='w' && isWhite(p)) || (side==='b' && isBlack(p)))){
-      selected = {r,c};
-      legalTargets = legalTargetsForPiece(S, selected);
-      render();
-      return;
-    }
-
-    // otherwise clear selection
-    selected = null;
-    legalTargets = [];
+    // Otherwise select new piece
+    clearSelection();
+    setSelection(sq);
     render();
   }
 
-  function legalTargetsForPiece(state, from){
-    const moves = generateLegalMoves(state, state.turn);
-    const out = [];
-    for(const m of moves){
-      if(m.from.r===from.r && m.from.c===from.c){
-        const cap = !!m.capture;
-        out.push({r:m.to.r, c:m.to.c, capture:cap});
+  function maybeAutoFlip(){
+    if(!$("chkAutoFlip").checked) return;
+    if(playerSide === "none") return;
+    // Flip so the side to move is at bottom? keep player at bottom usually:
+    // Here: keep player's side at bottom:
+    orientation = playerSide;
+    render();
+  }
+
+  // ---------- Stockfish Engine ----------
+  // We create a worker that importScripts Stockfish.
+  let engine = null;
+  let engineReady = false;
+  let pendingBestMoveResolve = null;
+  let pendingInfoHandler = null;
+
+  function createEngine(){
+    // Common CDN path for stockfish.js builds (works with importScripts in worker in most cases)
+    const STOCKFISH_CDN = "https://cdn.jsdelivr.net/npm/stockfish@16.0.0/stockfish.js";
+
+    const workerCode = `
+      let sf = null;
+      function post(msg){ self.postMessage(msg); }
+
+      async function boot(){
+        try{
+          importScripts("${STOCKFISH_CDN}");
+          // stockfish.js usually exposes STOCKFISH() factory OR Stockfish() function.
+          if (typeof STOCKFISH !== "undefined") sf = STOCKFISH();
+          else if (typeof Stockfish !== "undefined") sf = Stockfish();
+          else if (typeof createStockfish !== "undefined") sf = createStockfish();
+          else sf = null;
+
+          if(!sf){
+            post({type:"error", data:"Stockfish yüklenemedi."});
+            return;
+          }
+          // UCI ready
+          sf.onmessage = (e) => post({type:"line", data: (typeof e === "string") ? e : e.data});
+          post({type:"ready"});
+        }catch(err){
+          post({type:"error", data:String(err)});
+        }
       }
-    }
-    return out;
-  }
+      boot();
 
-  // --- Move application with undo + SAN + promotion modal
-  function doMove(from, to){
-    const legal = generateLegalMoves(S, S.turn);
-    const move = legal.find(m => m.from.r===from.r && m.from.c===from.c && m.to.r===to.r && m.to.c===to.c);
-    if(!move) return;
+      self.onmessage = (e) => {
+        if(!sf) return;
+        const {type, data} = e.data;
+        if(type==="cmd") sf.postMessage(data);
+      };
+    `;
 
-    // push history snapshot
-    S.history.push(clone({
-      board:S.board,
-      turn:S.turn,
-      castling:S.castling,
-      ep:S.ep,
-      halfmove:S.halfmove,
-      fullmove:S.fullmove,
-      lastMove:S.lastMove,
-      san:S.san
-    }));
+    const blob = new Blob([workerCode], { type: "application/javascript" });
+    const url = URL.createObjectURL(blob);
+    engine = new Worker(url);
 
-    // apply
-    applyMove(S, move, /*recordSan*/true);
-
-    // clear selection
-    selected = null;
-    legalTargets = [];
-    render();
-    updateStatus();
-    renderMoves();
-
-    // AI
-    maybeAiMove();
-  }
-
-  function undo(){
-    if(S.history.length===0 || lock) return;
-    const prev = S.history.pop();
-    S.board = prev.board;
-    S.turn = prev.turn;
-    S.castling = prev.castling;
-    S.ep = prev.ep;
-    S.halfmove = prev.halfmove;
-    S.fullmove = prev.fullmove;
-    S.lastMove = prev.lastMove;
-    S.san = prev.san;
-
-    selected = null;
-    legalTargets = [];
-    lock = false;
-    render();
-    updateStatus();
-    renderMoves();
-  }
-
-  // --- Promotion modal
-  function showPromotion(choiceSet, onPick){
-    promoChoices.innerHTML = '';
-    for(const ch of choiceSet){
-      const b = document.createElement('button');
-      b.textContent = GLYPH[ch] + ' ' + pieceName(ch);
-      b.addEventListener('click', () => onPick(ch), {passive:true});
-      promoChoices.appendChild(b);
-    }
-    promoBox.style.display = 'flex';
-  }
-  function hidePromotion(){ promoBox.style.display = 'none'; }
-
-  function pieceName(p){
-    const u = p.toUpperCase();
-    if(u==='Q') return 'Vezir';
-    if(u==='R') return 'Kale';
-    if(u==='B') return 'Fil';
-    if(u==='N') return 'At';
-    return 'Taş';
-  }
-
-  // --- Chess logic
-  function findKing(side){
-    const k = (side==='w') ? 'K' : 'k';
-    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-      if(S.board[r][c]===k) return {r,c};
-    }
-    return null;
-  }
-
-  function isInCheck(state, side){
-    const king = (() => {
-      const k = (side==='w')?'K':'k';
-      for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-        if(state.board[r][c]===k) return {r,c};
+    engine.onmessage = (e) => {
+      const msg = e.data;
+      if(msg.type === "ready"){
+        engineReady = true;
+        $("engineBadge").textContent = "AI: Stockfish hazır ✅";
+        // Init UCI options
+        sendCmd("uci");
+        sendCmd("isready");
+        // normalize
+        setEngineLevel(parseInt($("selLevel").value,10));
+        return;
       }
-      return null;
-    })();
-    if(!king) return false;
-    const enemy = (side==='w') ? 'b' : 'w';
-    const attacks = generatePseudoMoves(state, enemy, /*attacksOnly*/true);
-    return attacks.some(m => m.to.r===king.r && m.to.c===king.c);
-  }
-
-  function generateLegalMoves(state, side){
-    const pseudo = generatePseudoMoves(state, side, false);
-    const legal = [];
-    for(const m of pseudo){
-      const copy = cloneStateLight(state);
-      applyMove(copy, m, false);
-      if(!isInCheck(copy, side)) legal.push(m);
-    }
-    return legal;
-  }
-
-  function cloneStateLight(state){
-    return {
-      board: state.board.map(row => row.slice()),
-      turn: state.turn,
-      castling: {...state.castling},
-      ep: state.ep ? {r:state.ep.r, c:state.ep.c} : null,
-      halfmove: state.halfmove,
-      fullmove: state.fullmove,
-      lastMove: state.lastMove ? {from:{...state.lastMove.from}, to:{...state.lastMove.to}} : null,
-      san: state.san ? state.san.slice() : []
+      if(msg.type === "error"){
+        $("engineBadge").textContent = "AI: başlatılamadı (basit AI) ⚠️";
+        engineReady = false;
+        return;
+      }
+      if(msg.type === "line"){
+        const line = msg.data || "";
+        // optional info
+        if(line.startsWith("info ") && pendingInfoHandler){
+          pendingInfoHandler(line);
+        }
+        // bestmove line
+        if(line.startsWith("bestmove")){
+          const parts = line.split(" ");
+          const bm = parts[1];
+          if(pendingBestMoveResolve){
+            const r = pendingBestMoveResolve;
+            pendingBestMoveResolve = null;
+            pendingInfoHandler = null;
+            r(bm);
+          }
+        }
+      }
     };
   }
 
-  function generatePseudoMoves(state, side, attacksOnly){
-    const moves = [];
-    const b = state.board;
-    const isMine = (p) => side==='w' ? isWhite(p) : isBlack(p);
-    const isEnemy = (p) => side==='w' ? isBlack(p) : isWhite(p);
-
-    for(let r=0;r<8;r++) for(let c=0;c<8;c++){
-      const p = b[r][c];
-      if(!p || !isMine(p)) continue;
-
-      const u = p.toUpperCase();
-      if(u==='P'){
-        const dir = (side==='w') ? -1 : 1;
-        const startRow = (side==='w') ? 6 : 1;
-        const promoRow = (side==='w') ? 0 : 7;
-
-        // captures (also attacks)
-        for(const dc of [-1,1]){
-          const rr = r + dir, cc = c + dc;
-          if(!inBounds(rr,cc)) continue;
-          const target = b[rr][cc];
-          // normal capture
-          if(target && isEnemy(target)){
-            moves.push({from:{r,c}, to:{r:rr,c:cc}, piece:p, capture:target});
-          }
-          // en passant capture
-          if(state.ep && state.ep.r===rr && state.ep.c===cc){
-            // captured pawn sits behind ep square
-            const capR = r, capC = cc;
-            const cap = b[capR][capC];
-            if(cap && cap.toUpperCase()==='P' && isEnemy(cap)){
-              moves.push({from:{r,c}, to:{r:rr,c:cc}, piece:p, capture:cap, ep:true});
-            }
-          }
-        }
-        if(attacksOnly) continue;
-
-        // forward move
-        const f1 = r + dir;
-        if(inBounds(f1,c) && !b[f1][c]){
-          moves.push({from:{r,c}, to:{r:f1,c}, piece:p});
-          // double from start
-          const f2 = r + 2*dir;
-          if(r===startRow && !b[f2][c]){
-            moves.push({from:{r,c}, to:{r:f2,c}, piece:p, dbl:true});
-          }
-        }
-
-      } else if(u==='N'){
-        const deltas = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
-        for(const [dr,dc] of deltas){
-          const rr=r+dr, cc=c+dc;
-          if(!inBounds(rr,cc)) continue;
-          const t=b[rr][cc];
-          if(!t || isEnemy(t)) moves.push({from:{r,c}, to:{r:rr,c:cc}, piece:p, capture:t||null});
-        }
-
-      } else if(u==='B' || u==='R' || u==='Q'){
-        const dirs = [];
-        if(u==='B' || u==='Q') dirs.push([-1,-1],[-1,1],[1,-1],[1,1]);
-        if(u==='R' || u==='Q') dirs.push([-1,0],[1,0],[0,-1],[0,1]);
-        for(const [dr,dc] of dirs){
-          let rr=r+dr, cc=c+dc;
-          while(inBounds(rr,cc)){
-            const t=b[rr][cc];
-            if(!t){
-              moves.push({from:{r,c}, to:{r:rr,c:cc}, piece:p});
-            }else{
-              if(isEnemy(t)) moves.push({from:{r,c}, to:{r:rr,c:cc}, piece:p, capture:t});
-              break;
-            }
-            rr+=dr; cc+=dc;
-          }
-        }
-
-      } else if(u==='K'){
-        for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
-          if(!dr && !dc) continue;
-          const rr=r+dr, cc=c+dc;
-          if(!inBounds(rr,cc)) continue;
-          const t=b[rr][cc];
-          if(!t || isEnemy(t)) moves.push({from:{r,c}, to:{r:rr,c:cc}, piece:p, capture:t||null});
-        }
-        if(attacksOnly) continue;
-
-        // castling (only pseudo here; legality via check filter + empty squares)
-        if(side==='w'){
-          // King at e1: (7,4)
-          if(r===7 && c===4 && p==='K'){
-            if(state.castling.K && !b[7][5] && !b[7][6]){
-              moves.push({from:{r,c}, to:{r:7,c:6}, piece:p, castle:'K'});
-            }
-            if(state.castling.Q && !b[7][3] && !b[7][2] && !b[7][1]){
-              moves.push({from:{r,c}, to:{r:7,c:2}, piece:p, castle:'Q'});
-            }
-          }
-        }else{
-          // King at e8: (0,4)
-          if(r===0 && c===4 && p==='k'){
-            if(state.castling.k && !b[0][5] && !b[0][6]){
-              moves.push({from:{r,c}, to:{r:0,c:6}, piece:p, castle:'k'});
-            }
-            if(state.castling.q && !b[0][3] && !b[0][2] && !b[0][1]){
-              moves.push({from:{r,c}, to:{r:0,c:2}, piece:p, castle:'q'});
-            }
-          }
-        }
-      }
-    }
-    // remove illegal castling through check squares in legal filtering phase (we handle extra in apply/validate)
-    // We'll handle: king not in check, squares passed not attacked.
-    return moves.filter(m => {
-      if(!m.castle) return true;
-      // extra: squares attacked
-      const sideNow = side;
-      // King cannot be in check currently:
-      if(isInCheck(state, sideNow)) return false;
-      // squares the king passes through:
-      const squares = [];
-      if(m.castle==='K') squares.push({r:7,c:5},{r:7,c:6});
-      if(m.castle==='Q') squares.push({r:7,c:3},{r:7,c:2});
-      if(m.castle==='k') squares.push({r:0,c:5},{r:0,c:6});
-      if(m.castle==='q') squares.push({r:0,c:3},{r:0,c:2});
-      // check each intermediate square not attacked
-      const enemy = (sideNow==='w') ? 'b' : 'w';
-      const attacks = generatePseudoMoves(state, enemy, true);
-      return squares.every(sq => !attacks.some(a => a.to.r===sq.r && a.to.c===sq.c));
-    });
+  function sendCmd(cmd){
+    if(!engine) return;
+    engine.postMessage({type:"cmd", data: cmd});
   }
 
-  function applyMove(state, move, recordSan){
-    const b = state.board;
-    const {from,to} = move;
-    const piece = move.piece;
-
-    // SAN (rough but useful)
-    const sanBefore = recordSan ? buildSAN(state, move) : null;
-
-    // update halfmove
-    const captured = move.capture ? true : false;
-    const pawnMove = piece.toUpperCase()==='P';
-    state.halfmove = (captured || pawnMove) ? 0 : (state.halfmove + 1);
-
-    // clear en passant target by default
-    state.ep = null;
-
-    // move piece
-    b[from.r][from.c] = '';
-    // en passant capture removes pawn behind target square
-    if(move.ep){
-      const capR = from.r; // pawn being captured is on from-r row
-      const capC = to.c;
-      b[capR][capC] = '';
-    }
-
-    // castling rook move
-    if(move.castle){
-      if(move.castle==='K'){ // white king side
-        b[7][6] = 'K';
-        b[7][5] = 'R';
-        b[7][7] = '';
-      } else if(move.castle==='Q'){
-        b[7][2] = 'K';
-        b[7][3] = 'R';
-        b[7][0] = '';
-      } else if(move.castle==='k'){
-        b[0][6] = 'k';
-        b[0][5] = 'r';
-        b[0][7] = '';
-      } else if(move.castle==='q'){
-        b[0][2] = 'k';
-        b[0][3] = 'r';
-        b[0][0] = '';
-      }
-      // king moved, lose rights
-      if(piece==='K'){ state.castling.K=false; state.castling.Q=false; }
-      if(piece==='k'){ state.castling.k=false; state.castling.q=false; }
-    } else {
-      // normal placement
-      let put = piece;
-      // promotion (auto queen unless UI picks)
-      if(piece.toUpperCase()==='P'){
-        const promoRow = isWhite(piece) ? 0 : 7;
-        if(to.r === promoRow){
-          // if recordSan and UI play: we will pick via modal only for human moves
-          // For simplicity: promote to Queen by default here; UI can override by calling doPromotionReplace.
-          put = isWhite(piece) ? 'Q' : 'q';
-          // Mark on move for SAN
-          move.promo = put;
-        }
-        // set en passant target if double pawn move
-        if(move.dbl){
-          state.ep = { r: (from.r + to.r)/2, c: from.c };
-        }
-      }
-      b[to.r][to.c] = put;
-
-      // update castling rights if king/rook moved or rook captured
-      // king moves
-      if(piece==='K'){ state.castling.K=false; state.castling.Q=false; }
-      if(piece==='k'){ state.castling.k=false; state.castling.q=false; }
-      // rook moves
-      if(piece==='R' && from.r===7 && from.c===0) state.castling.Q=false;
-      if(piece==='R' && from.r===7 && from.c===7) state.castling.K=false;
-      if(piece==='r' && from.r===0 && from.c===0) state.castling.q=false;
-      if(piece==='r' && from.r===0 && from.c===7) state.castling.k=false;
-
-      // rook captured
-      if(move.capture){
-        const cap = move.capture;
-        // If a rook was captured on its original square, lose that side
-        if(cap==='R' && to.r===7 && to.c===0) state.castling.Q=false;
-        if(cap==='R' && to.r===7 && to.c===7) state.castling.K=false;
-        if(cap==='r' && to.r===0 && to.c===0) state.castling.q=false;
-        if(cap==='r' && to.r===0 && to.c===7) state.castling.k=false;
-      }
-    }
-
-    state.lastMove = {from:{...from}, to:{...to}};
-
-    // turn switch + fullmove
-    if(state.turn === 'b') state.fullmove += 1;
-    state.turn = (state.turn==='w') ? 'b' : 'w';
-
-    if(recordSan){
-      // if promotion happened by default, allow human to choose (only when it is a human move and AI is off for that side)
-      state.san = state.san || [];
-      state.san.push(sanBefore);
+  function setEngineLevel(skill){
+    // Skill 0..20, depth also increases.
+    // We'll map: depth = clamp(4..18)
+    const depth = Math.max(4, Math.min(18, Math.floor(skill/1.2)));
+    // A few strong defaults:
+    if(engineReady){
+      sendCmd("setoption name Skill Level value " + skill);
+      sendCmd("setoption name Threads value 2");
+      sendCmd("setoption name Hash value 64");
+      // Some builds support these:
+      sendCmd("setoption name UCI_LimitStrength value false");
+      sendCmd("setoption name Contempt value 0");
+      // store depth in UI dataset
+      $("selLevel").dataset.depth = String(depth);
+      $("engineBadge").textContent = `AI: Stockfish (Skill ${skill}, Depth ${depth})`;
+    }else{
+      $("engineBadge").textContent = `AI: Basit (Skill ${skill})`;
     }
   }
 
-  function buildSAN(state, move){
-    // Minimal SAN: piece letter (or pawn file), capture "x", target square, promotion, check/mate (post)
-    // We'll compute check/mate after applying on a copy.
-    const piece = move.piece;
-    const side = state.turn;
-    const u = piece.toUpperCase();
-    const file = 'abcdefgh'[move.from.c];
-    const toSq = 'abcdefgh'[move.to.c] + (8 - move.to.r);
-
-    // castling
-    if(move.castle){
-      const s = (move.castle==='K' || move.castle==='k') ? 'O-O' : 'O-O-O';
-      // check marker will be added after
-      return s + checkSuffixAfter(state, move);
+  async function getBestMove(fen, skill){
+    // If engine is ready, use it. Else fallback to tiny heuristic.
+    if(engineReady){
+      const depth = parseInt($("selLevel").dataset.depth || "10", 10);
+      return new Promise((resolve) => {
+        pendingBestMoveResolve = resolve;
+        pendingInfoHandler = (line) => {
+          // you can parse depth/score if you want later
+        };
+        sendCmd("position fen " + fen);
+        sendCmd("go depth " + depth);
+      });
     }
-
-    let s = '';
-    if(u==='P'){
-      if(move.capture || move.ep){
-        s += file + 'x' + toSq;
-      }else{
-        s += toSq;
-      }
-    } else {
-      const letter = (u==='N')?'N':u; // use N for knight
-      s += letter;
-      if(move.capture) s += 'x';
-      s += toSq;
-    }
-
-    // promotion marker if pawn reaching last rank
-    if(u==='P'){
-      const promoRow = (side==='w') ? 0 : 7;
-      if(move.to.r===promoRow){
-        s += '=Q'; // default
-      }
-    }
-
-    return s + checkSuffixAfter(state, move);
+    // Fallback: random legal move (very easy)
+    const moves = game.moves({ verbose:true });
+    if(!moves.length) return null;
+    // prefer captures
+    const caps = moves.filter(m => m.captured || m.flags.includes("e"));
+    const pick = (caps.length ? caps : moves)[Math.floor(Math.random()*(caps.length?caps.length:moves.length))];
+    return pick.from + pick.to + (pick.promotion || "");
   }
 
-  function checkSuffixAfter(state, move){
-    // Apply on copy and see check/mate against opponent after move
-    const side = state.turn;
-    const opp = (side==='w') ? 'b' : 'w';
-    const copy = cloneStateLight(state);
-    applyMove(copy, clone(move), false);
-    const inCheck = isInCheck(copy, opp);
-    const legalOpp = generateLegalMoves(copy, opp);
-    if(inCheck && legalOpp.length===0) return '#';
-    if(inCheck) return '+';
-    return '';
+  function uciToMoveObj(uci){
+    // uci like e2e4 or e7e8q
+    if(!uci || uci.length < 4) return null;
+    return {
+      from: uci.slice(0,2),
+      to: uci.slice(2,4),
+      promotion: uci.length >= 5 ? uci[4] : "q"
+    };
   }
 
-  // --- Simple AI (black by default)
-  const VAL = { p:100, n:320, b:330, r:500, q:900, k:20000 };
-  const PST = {
-    // tiny central preference for knights/bishops
-    n: [
-      -50,-40,-30,-30,-30,-30,-40,-50,
-      -40,-20,  0,  5,  5,  0,-20,-40,
-      -30,  5, 10, 15, 15, 10,  5,-30,
-      -30,  0, 15, 20, 20, 15,  0,-30,
-      -30,  5, 15, 20, 20, 15,  5,-30,
-      -30,  0, 10, 15, 15, 10,  0,-30,
-      -40,-20,  0,  0,  0,  0,-20,-40,
-      -50,-40,-30,-30,-30,-30,-40,-50
-    ],
-    b: [
-      -20,-10,-10,-10,-10,-10,-10,-20,
-      -10,  5,  0,  0,  0,  0,  5,-10,
-      -10, 10, 10, 10, 10, 10, 10,-10,
-      -10,  0, 10, 10, 10, 10,  0,-10,
-      -10,  5,  5, 10, 10,  5,  5,-10,
-      -10,  0,  5, 10, 10,  5,  0,-10,
-      -10,  0,  0,  0,  0,  0,  0,-10,
-      -20,-10,-10,-10,-10,-10,-10,-20
-    ]
-  };
+  function isAITurn(){
+    if(playerSide === "none") return false;
+    return game.turn() !== playerSide;
+  }
 
-  function evalState(state){
-    // positive = white better, negative = black better
-    let score = 0;
-    for(let r=0;r<8;r++){
-      for(let c=0;c<8;c++){
-        const p = state.board[r][c];
-        if(!p) continue;
-        const u = p.toUpperCase();
-        const v = (u==='P')?VAL.p:(u==='N')?VAL.n:(u==='B')?VAL.b:(u==='R')?VAL.r:(u==='Q')?VAL.q:VAL.k;
-        let ps = 0;
-        // position tables for N/B only
-        if(u==='N'){
-          const idx = r*8+c;
-          ps = PST.n[idx];
-        } else if(u==='B'){
-          const idx = r*8+c;
-          ps = PST.b[idx];
-        }
-        if(isWhite(p)) score += v + ps;
-        else score -= v + ps;
+  async function maybeAIMove(){
+    if(playerSide === "none") return;
+    if(game.is_game_over()) return;
+    if(!isAITurn()) return;
+
+    aiBusy = true;
+    $("aiThink").textContent = "AI düşünüyor…";
+    const skill = parseInt($("selLevel").value,10);
+
+    try{
+      const fen = game.fen();
+      const best = await getBestMove(fen, skill);
+      if(!best){ aiBusy=false; $("aiThink").textContent="AI beklemede"; return; }
+      const mv = uciToMoveObj(best);
+      if(!mv){ aiBusy=false; $("aiThink").textContent="AI beklemede"; return; }
+
+      const made = game.move({ from: mv.from, to: mv.to, promotion: mv.promotion || "q" });
+      if(made){
+        lastMove = { from: made.from, to: made.to };
+        beep(440, 55);
       }
-    }
-    return score;
-  }
-
-  function pickAiMove(){
-    const side = S.turn;
-    // we want AI only for black and when checkbox is on
-    if(!(aiOn.checked && side==='b')) return null;
-
-    const moves = generateLegalMoves(S, side);
-    if(moves.length===0) return null;
-
-    // 1-ply search: pick best (minimize eval for black)
-    let best = null;
-    let bestScore = Infinity;
-
-    for(const m of moves){
-      const copy = cloneStateLight(S);
-      applyMove(copy, clone(m), false);
-      // After black moves, white to play -> evaluate
-      let sc = evalState(copy);
-
-      // small bonus for giving check
-      if(isInCheck(copy, 'w')) sc -= 15;
-
-      // prefer captures a bit
-      if(m.capture) sc -= 10;
-
-      if(sc < bestScore){
-        bestScore = sc;
-        best = m;
-      }
-    }
-    return best;
-  }
-
-  function maybeAiMove(){
-    if(lock) return;
-    if(!(aiOn.checked && S.turn==='b')) return;
-
-    // small delay to feel natural but not slow
-    lock = true;
-    setTimeout(() => {
-      const m = pickAiMove();
-      if(!m){ lock=false; return; }
-
-      // push history for undo
-      S.history.push(clone({
-        board:S.board,
-        turn:S.turn,
-        castling:S.castling,
-        ep:S.ep,
-        halfmove:S.halfmove,
-        fullmove:S.fullmove,
-        lastMove:S.lastMove,
-        san:S.san
-      }));
-
-      applyMove(S, m, true);
-
-      selected = null;
-      legalTargets = [];
-      lock = false;
+    }catch(e){
+      // ignore
+    }finally{
+      aiBusy = false;
+      $("aiThink").textContent = "AI beklemede";
       render();
-      updateStatus();
-      renderMoves();
-    }, 120);
+    }
   }
 
-  // --- Events
-  newBtn.addEventListener('click', () => {
-    // hard reset
-    newGame();
-  }, {passive:true});
-
-  flipBtn.addEventListener('click', () => {
-    flipped = !flipped;
+  // ---------- Hint (Suggestion) ----------
+  async function giveHint(){
+    if(hintBusy || aiBusy) return;
+    if(game.is_game_over()) return;
+    if(playerSide !== "none" && game.turn() !== playerSide){
+      toast("İpucu için sıra sende olmalı.");
+      return;
+    }
+    hintBusy = true;
+    $("aiThink").textContent = "İpucu hesaplanıyor…";
+    const skill = Math.min(20, parseInt($("selLevel").value,10) + 2);
+    try{
+      const fen = game.fen();
+      const best = await getBestMove(fen, skill);
+      const mv = uciToMoveObj(best);
+      if(mv){
+        // highlight hint move
+        lastMove = { from: mv.from, to: mv.to };
+        toast(`İpucu: ${mv.from} → ${mv.to}`);
+      }
+    }catch(e){}
+    hintBusy = false;
+    $("aiThink").textContent = "AI beklemede";
     render();
-  }, {passive:true});
+  }
 
-  undoBtn.addEventListener('click', () => {
-    undo();
-  }, {passive:true});
+  // ---------- Controls ----------
+  $("btnNew").addEventListener("click", () => {
+    // start new keeping side selection
+    game.reset();
+    lastMove = null;
+    clearSelection();
+    orientation = (playerSide==="none") ? "w" : playerSide;
+    render();
+    toast("Yeni oyun başladı.");
+    // if player chose black, AI plays first
+    maybeAIMove();
+  });
 
-  // --- Start
-  newGame();
+  $("btnReset").addEventListener("click", () => {
+    // full reset to defaults
+    game.reset();
+    lastMove = null;
+    clearSelection();
+    $("selSide").value = "w";
+    playerSide = "w";
+    orientation = "w";
+    $("selLevel").value = "10";
+    setEngineLevel(10);
+    $("chkLegal").checked = true;
+    $("chkAutoFlip").checked = true;
+    $("chkCoords").checked = false;
+    render();
+    toast("Ayarlar sıfırlandı.");
+    maybeAIMove();
+  });
+
+  $("btnFlip").addEventListener("click", () => {
+    orientation = (orientation==="w") ? "b" : "w";
+    render();
+  });
+
+  $("btnUndo").addEventListener("click", () => {
+    if(aiBusy) return;
+    if(game.history().length === 0) return;
+
+    // Undo: if vs AI, undo 2 plies (player+AI) when possible
+    if(playerSide !== "none"){
+      if(game.history().length >= 2){
+        game.undo();
+        game.undo();
+      }else{
+        game.undo();
+      }
+    }else{
+      game.undo();
+    }
+    lastMove = null;
+    clearSelection();
+    render();
+    toast("Geri alındı.");
+  });
+
+  $("btnHint").addEventListener("click", giveHint);
+
+  $("selSide").addEventListener("change", () => {
+    playerSide = $("selSide").value;
+    if(playerSide === "none"){
+      $("pillMode").textContent = "Mod: 2 Oyuncu";
+      $("engineBadge").textContent = engineReady ? "AI: Stockfish hazır ✅" : "AI: kapalı";
+    }else{
+      orientation = playerSide;
+      setEngineLevel(parseInt($("selLevel").value,10));
+    }
+    // restart game for clarity
+    game.reset();
+    lastMove = null;
+    clearSelection();
+    render();
+    toast("Mod değişti: " + (playerSide==="none" ? "2 oyuncu" : (playerSide==="w" ? "Sen beyaz" : "Sen siyah")));
+    maybeAIMove();
+  });
+
+  $("selLevel").addEventListener("change", () => {
+    setEngineLevel(parseInt($("selLevel").value,10));
+    toast("AI seviyesi güncellendi.");
+  });
+
+  $("chkLegal").addEventListener("change", render);
+  $("chkCoords").addEventListener("change", render);
+  $("chkAutoFlip").addEventListener("change", () => toast("Oto çevir: " + ($("chkAutoFlip").checked ? "açık" : "kapalı")));
+
+  $("btnCopyPGN").addEventListener("click", async () => {
+    const pgn = game.pgn({ newline_char: "\n" }) || "";
+    try{
+      await navigator.clipboard.writeText(pgn);
+      toast("PGN kopyalandı.");
+    }catch{
+      toast("Kopyalanamadı (tarayıcı izni).");
+    }
+  });
+
+  $("btnCopyFEN").addEventListener("click", async () => {
+    const fen = game.fen();
+    try{
+      await navigator.clipboard.writeText(fen);
+      toast("FEN kopyalandı.");
+    }catch{
+      toast("Kopyalanamadı (tarayıcı izni).");
+    }
+  });
+
+  // ---------- Init ----------
+  function init(){
+    // default
+    playerSide = $("selSide").value;
+    orientation = playerSide==="none" ? "w" : playerSide;
+
+    $("engineBadge").textContent = "AI: başlatılıyor…";
+    createEngine();
+
+    // set level after engine ready too
+    setEngineLevel(parseInt($("selLevel").value,10));
+
+    render();
+    // If player is black, AI starts
+    maybeAIMove();
+  }
+
+  init();
 })();
 </script>
 </body>
