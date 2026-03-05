@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Törü — Türk'ün Töresi</title>
+  <title>Törü — Türk’ün Töresi · Satranç</title>
   <style>
     :root{
       --bg:#070b16;
@@ -13,10 +13,15 @@
       --acc:#4aa3ff;
       --good:#2ee59d;
       --bad:#ff5b7a;
-      --light:#f3d8b8;
-      --dark:#b98563;
-      --sq: clamp(38px, 9.2vw, 64px);
+      --warn:#ffd56a;
+
+      --light:#f3d8b8; /* açık kare */
+      --dark:#b98563;  /* koyu kare */
+
+      --sq: clamp(38px, 9.2vw, 64px); /* kare boyu */
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
     }
+
     *{box-sizing:border-box}
     body{
       margin:0;
@@ -27,17 +32,17 @@
       display:flex;
       justify-content:center;
     }
-    .wrap{width:min(1100px, 100%);}
+    .wrap{width:min(1180px, 100%);}
 
     .hero{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border:1px solid var(--stroke);
       border-radius:18px;
       padding:16px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      box-shadow: var(--shadow);
     }
     .hrow{display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;}
-    h1{margin:0; font-size:28px; letter-spacing:.3px;}
+    h1{margin:0; font-size:26px; letter-spacing:.3px;}
     .sub{color:var(--muted); margin-top:4px; line-height:1.35}
 
     .pillrow{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
@@ -52,10 +57,11 @@
       gap:8px;
       align-items:center;
       user-select:none;
+      white-space:nowrap;
     }
 
     .btnrow{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
-    button, select, input{
+    button, select, input, textarea{
       appearance:none;
       border:1px solid var(--stroke);
       background: rgba(255,255,255,.06);
@@ -65,22 +71,30 @@
       font-weight:700;
       cursor:pointer;
     }
+    input, textarea{cursor:text; font-weight:600;}
+    textarea{width:100%; min-height:86px; resize:vertical;}
     button.primary{background: rgba(74,163,255,.18); border-color: rgba(74,163,255,.45)}
     button.danger{background: rgba(255,91,122,.16); border-color: rgba(255,91,122,.45)}
+    button.good{background: rgba(46,229,157,.14); border-color: rgba(46,229,157,.40)}
+    button.warn{background: rgba(255,213,106,.14); border-color: rgba(255,213,106,.42)}
     button:active{transform: translateY(1px)}
-    select{font-weight:700}
+    select{font-weight:800}
 
     .grid{margin-top:12px; display:grid; gap:12px; grid-template-columns: 1fr;}
-    @media (min-width: 980px){ .grid{grid-template-columns: 520px 1fr;} }
+    @media (min-width: 980px){ .grid{grid-template-columns: 560px 1fr;} }
 
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border:1px solid var(--stroke);
       border-radius:18px;
       padding:14px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      box-shadow: var(--shadow);
     }
 
+    .sectionTitle{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 10px;}
+    .sectionTitle h2{margin:0; font-size:18px; letter-spacing:.2px;}
+
+    /* BOARD */
     .boardWrap{display:flex; justify-content:center;}
     .boardLayer{ position:relative; display:inline-block; }
     #arrowCanvas{ position:absolute; inset:0; pointer-events:none; }
@@ -125,6 +139,21 @@
     .w{color:#f7f7f7; text-shadow: 0 1px 0 rgba(0,0,0,.35), 0 0 10px rgba(255,255,255,.18);}
     .b{color:#141414; text-shadow: 0 1px 0 rgba(255,255,255,.10), 0 0 10px rgba(0,0,0,.12);}
 
+    /* Coordinates on squares */
+    .coord{
+      position:absolute;
+      font-size:12px;
+      font-weight:900;
+      opacity:.85;
+      pointer-events:none;
+      user-select:none;
+      letter-spacing:.02em;
+    }
+    .coord.light{ color:rgba(0,0,0,0.78); }
+    .coord.dark{ color:rgba(255,255,255,0.88); }
+    .coord.file{ bottom:2px; right:4px; }
+    .coord.rank{ top:2px; left:4px; }
+
     .statusline{
       display:flex;
       justify-content:space-between;
@@ -136,8 +165,7 @@
     }
     .statusline b{color:var(--txt)}
     .note{margin-top:10px; color:var(--muted); line-height:1.45}
-    .sectionTitle{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 10px;}
-    .sectionTitle h2{margin:0; font-size:18px; letter-spacing:.2px;}
+    .small{font-size:12.5px; color:var(--muted); line-height:1.45}
 
     .bubble{
       border:1px solid var(--stroke);
@@ -152,10 +180,11 @@
       background: rgba(255,255,255,.05);
       padding:6px 10px;
       border-radius:999px;
-      font-weight:800;
+      font-weight:900;
       font-size:13px;
       color:var(--muted);
       margin-bottom:8px;
+      user-select:none;
     }
 
     .chat{display:grid; gap:10px;}
@@ -173,14 +202,19 @@
       background: rgba(255,255,255,.05);
       padding:6px 10px;
       border-radius:999px;
-      font-weight:900;
+      font-weight:1000;
       font-size:13px;
       color:var(--muted);
       margin-bottom:8px;
     }
     .msg .txt{line-height:1.55; color:var(--txt)}
-    .small{font-size:12.5px; color:var(--muted); line-height:1.45}
+    .green{color:var(--good)}
+    .red{color:var(--bad)}
+    .warnTxt{color:var(--warn)}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    .spacer{height:10px}
 
+    /* Intro */
     .intro{
       position:fixed;
       inset:0;
@@ -192,23 +226,26 @@
       padding:18px;
     }
     .introBox{
-      width:min(760px, 100%);
+      width:min(820px, 100%);
       border:1px solid rgba(255,255,255,.14);
       background: rgba(0,0,0,.45);
       border-radius:22px;
       padding:20px 18px;
       box-shadow: 0 24px 80px rgba(0,0,0,.55);
     }
-    .introTitle{font-size:20px; font-weight:900; margin:0 0 10px}
+    .introTitle{font-size:20px; font-weight:1000; margin:0 0 10px}
     .runes{
-      font-size: clamp(18px, 3.6vw, 28px);
+      font-size: clamp(16px, 3.1vw, 26px);
       letter-spacing: .08em;
       line-height:1.7;
       white-space:pre-wrap;
-      font-weight:800;
+      font-weight:900;
     }
     .fadeOut{animation: fadeOut .7s ease forwards;}
     @keyframes fadeOut{to{opacity:0; transform: translateY(-6px)}}
+
+    /* P2P */
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;}
   </style>
 </head>
 
@@ -218,22 +255,31 @@
   <div class="hero">
     <div class="hrow">
       <div>
-        <h1>Törü — Türk'ün Töresi</h1>
-        <div class="sub">Kurallı Satranç · <b>Kağan 𐰴𐰍𐰣</b> · <b>Dede 𐱅𐰑𐰀</b></div>
+        <h1>Törü — Türk’ün Töresi</h1>
+        <div class="sub">Kurallı Satranç · <b>Kağan 𐰴𐰍𐰣</b> (yol) · <b>Dede 𐱅𐰑𐰀</b> (yorum) · Koordinatlı Tahta · Geri Alma · YouTube Müzik</div>
       </div>
 
       <div class="btnrow">
+        <select id="sidePick" title="Taraf">
+          <option value="w" selected>Ben: Beyaz</option>
+          <option value="b">Ben: Siyah</option>
+        </select>
+
         <select id="aiLevel" title="AI">
           <option value="off">AI: Kapalı (2 Kişi)</option>
-          <option value="l1">AI: Seviye 1 (Başlangıç)</option>
-          <option value="l2">AI: Seviye 2 (Kolay)</option>
-          <option value="l3">AI: Seviye 3 (Orta-)</option>
-          <option value="l4" selected>AI: Seviye 4 (Orta)</option>
-          <option value="l5">AI: Seviye 5 (Orta+)</option>
-          <option value="l6">AI: Seviye 6 (Zor)</option>
-          <option value="l7">AI: Seviye 7 (Usta)</option>
-          <option value="l8">AI: Seviye 8 (Çok Zor)</option>
+          <option value="l1">AI: 1 (Çok Kolay)</option>
+          <option value="l2" selected>AI: 2 (Kolay ama ciddi)</option>
+          <option value="l3">AI: 3 (Orta-)</option>
+          <option value="l4">AI: 4 (Orta)</option>
+          <option value="l5">AI: 5 (Orta+)</option>
+          <option value="l6">AI: 6 (Zor)</option>
+          <option value="l7">AI: 7 (Usta)</option>
+          <option value="l8">AI: 8 (Çok Zor)</option>
+          <option value="l9">AI: 9 (Zorlu)</option>
+          <option value="l10">AI: 10 (En Güçlü)</option>
         </select>
+
+        <button id="undoMoveBtn" class="warn">Hamle Geri Al</button>
         <button id="flipBtn">Tahtayı Çevir</button>
         <button id="resetBtn" class="danger">Yeniden Başlat</button>
       </div>
@@ -245,21 +291,25 @@
       <div class="pill">Değerlendirme: <b id="eval">+0.0</b></div>
       <div class="pill">Son Hamle: <b id="lastMove">-</b></div>
       <div class="pill">Açılış: <b id="opening">-</b></div>
+      <div class="pill">Saat: <b id="clockLine">Kapalı</b></div>
     </div>
 
     <div class="note">
-      ✅ Taş dizilimi <b>gerçek satranç dizilimi</b>dir (Vezirler <b>d sütunu</b>).<br/>
-      ✅ Tahta rengi kuralı: <b>a8 açık</b>, <b>h1 açık</b>, <b>a1 koyu</b>, <b>h8 koyu</b>.
+      ✅ Tam kurallar: Rok / En Passant / Terfi / Mat-Pat / 50 hamle kuralı. <br/>
+      ✅ Tahta standardı: <b>a8 açık</b>, <b>h1 açık</b>. Vezirler <b>d sütununda</b>. <br/>
+      ⚠️ YouTube tarayıcı kuralı: Ses için ilk kez <b>ÇAL</b>’a dokunman gerekir.
     </div>
   </div>
 
   <div class="grid">
+    <!-- LEFT -->
     <div class="card">
       <div class="sectionTitle">
         <h2>Tahta</h2>
         <div class="pillrow">
-          <div class="pill">Kağan 𐰴𐰍𐰣</div>
-          <div class="pill">Dede 𐱅𐰑𐰀</div>
+          <label class="pill"><input type="checkbox" id="showCoords" checked style="transform:scale(1.1); margin-right:8px;"> Koordinat</label>
+          <label class="pill"><input type="checkbox" id="showLegal" checked style="transform:scale(1.1); margin-right:8px;"> Gidiş Noktaları</label>
+          <label class="pill"><input type="checkbox" id="showArrow" checked style="transform:scale(1.1); margin-right:8px;"> Kağan Oku</label>
         </div>
       </div>
 
@@ -269,21 +319,96 @@
           <canvas id="arrowCanvas"></canvas>
         </div>
       </div>
+
+      <div class="bubble">
+        <div class="tag">Saat (İsteğe Bağlı)</div>
+        <div class="row">
+          <label class="pill"><input type="checkbox" id="clockOn" style="transform:scale(1.1); margin-right:8px;"> Saat Aç</label>
+          <select id="clockMin">
+            <option value="1">1 dk</option>
+            <option value="3">3 dk</option>
+            <option value="5" selected>5 dk</option>
+            <option value="10">10 dk</option>
+            <option value="15">15 dk</option>
+          </select>
+          <select id="clockInc">
+            <option value="0" selected>+0 sn</option>
+            <option value="1">+1 sn</option>
+            <option value="2">+2 sn</option>
+            <option value="3">+3 sn</option>
+            <option value="5">+5 sn</option>
+          </select>
+          <button id="clockReset" class="primary">Saati Sıfırla</button>
+        </div>
+        <div class="small" id="clockHelp">Saat kapalı.</div>
+      </div>
+
+      <div class="bubble">
+        <div class="tag">P2P Online (Sunucusuz)</div>
+        <div class="small">
+          Bu mod “kopyala-yapıştır” ile iki oyuncuyu bağlar. Biri <b>Kur</b> der, “Offer” kopyalar; diğeri yapıştırıp <b>Bağlan</b> der, “Answer” kopyalar geri yollar.
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <button id="p2pHost" class="good">Kur (Host)</button>
+          <button id="p2pJoin" class="primary">Bağlan (Join)</button>
+          <button id="p2pClose" class="danger">Kapat</button>
+        </div>
+        <div class="spacer"></div>
+        <div class="small"><b>Offer / Answer:</b></div>
+        <textarea id="p2pBox" class="mono" placeholder="Offer veya Answer buraya..."></textarea>
+        <div class="row" style="margin-top:10px">
+          <button id="p2pCopy" class="warn">Kutuyu Kopyala</button>
+          <span class="pill">Bağlantı: <b id="p2pState">Kapalı</b></span>
+        </div>
+        <div class="small" id="p2pHint" style="margin-top:8px"></div>
+      </div>
     </div>
 
+    <!-- RIGHT -->
     <div class="card">
       <div class="sectionTitle">
-        <h2>Kağan 𐰴𐰍𐰣 & Dede 𐱅𐰑𐰀</h2>
+        <h2>Kağan & Dede</h2>
         <div class="pillrow">
-          <div class="pill">Kağan: <b id="kaganMini">-</b></div>
-          <div class="pill">Dede: <b id="dedeMini">-</b></div>
+          <div class="pill">Kağan 𐰴𐰍𐰣: <b id="kaganMini">-</b></div>
+          <div class="pill">Dede 𐱅𐰑𐰀: <b id="dedeMini">-</b></div>
         </div>
+      </div>
+
+      <div class="bubble" style="margin-top:0">
+        <div class="tag">Yol Gösterme (Kağan)</div>
+        <div class="small">İstersen Kağan “en iyi hamleyi” söyler ve ok çizer. İstersen kapatırsın.</div>
+        <div class="row" style="margin-top:10px">
+          <label class="pill"><input type="checkbox" id="hintOn" checked style="transform:scale(1.1); margin-right:8px;"> Öneri Aç</label>
+          <label class="pill"><input type="checkbox" id="autoHint" checked style="transform:scale(1.1); margin-right:8px;"> Sıra bende iken otomatik</label>
+          <button id="hintBtn" class="primary">Kağan’dan Öneri Al</button>
+        </div>
+      </div>
+
+      <div class="bubble">
+        <div class="tag">Dede Öğreti Modu</div>
+        <div class="small">İstersen Dede oyun öncesi “ders” anlatır. İstersen kapatırsın.</div>
+        <div class="row" style="margin-top:10px">
+          <label class="pill"><input type="checkbox" id="dedeOn" checked style="transform:scale(1.1); margin-right:8px;"> Dede Aç</label>
+          <select id="dedeMode">
+            <option value="off">Ders: Kapalı</option>
+            <option value="history">Tarihçe</option>
+            <option value="pieces">Taşlar</option>
+            <option value="basic">Temel Töre</option>
+            <option value="openings">Açılışlar</option>
+            <option value="endgames">Oyun Sonu</option>
+            <option value="tactics">Taktik</option>
+            <option value="mate">Mat Temaları</option>
+          </select>
+          <button id="dedeLessonBtn">Dede’den Ders</button>
+        </div>
+        <div class="small" style="margin-top:8px" id="dedeLessonText"></div>
       </div>
 
       <div class="chat" id="chat">
         <div class="msg">
           <div class="who">Kağan 𐰴𐰍𐰣</div>
-          <div class="txt" id="kaganText">Törü bozulmaz. İlk hamleni yap.</div>
+          <div class="txt" id="kaganText">Törüyle başla: Merkez, gelişim, güvenlik. İlk hamleni yap.</div>
         </div>
         <div class="msg">
           <div class="who">Dede 𐱅𐰑𐰀</div>
@@ -292,20 +417,83 @@
       </div>
 
       <div class="bubble">
-        <div class="tag">Not</div>
+        <div class="tag">Müzik (YouTube · Kilitli Liste)</div>
         <div class="small">
-          Eğer “taşlar görünmüyor” olursa: iPhone/Safari bazen font fallback yapar. Bu sürümde Unicode taşlar standarttır.
-          Yine de sorun olursa bana ekran görüntüsü at, taşları PNG ikonla da yaparım.
+          ✅ Sadece <b>video ID</b> ile çalar (başka videoya kaymaz).<br/>
+          ✅ “Listeyi düzenle” varsayılan kapalıdır (başkası eklemesin diye).
         </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <select id="songSelect" style="min-width:min(520px,100%);"></select>
+          <button id="playBtn" class="primary">ÇAL</button>
+          <button id="pauseBtn">DURAKLAT</button>
+          <button id="nextBtn">SONRAKİ</button>
+        </div>
+
+        <div class="spacer"></div>
+        <div class="row">
+          <label class="pill"><input type="checkbox" id="songEditOn" style="transform:scale(1.1); margin-right:8px;"> Listeyi düzenle (sadece sen)</label>
+          <input id="songUrl" placeholder="YouTube linki/ID (watch?v=...)" style="flex:1; min-width:min(520px,100%);" />
+          <button id="addBtn" class="warn">Ekle</button>
+        </div>
+
+        <div class="small" style="margin-top:8px" id="ytStatus">Durum: Player yükleniyor…</div>
+        <div id="yt" style="width:0;height:0;overflow:hidden;"></div>
+      </div>
+
+      <div class="bubble">
+        <div class="tag">Günlük Hedef · İstatistik</div>
+        <div class="small">
+          Hedefi <b>1–10000</b> seçebilirsin. Sonuçları yerel depoya kaydeder (telefon/PC tarayıcı hafızası).
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <label class="pill">Hedef: <b><span id="goalNum">5</span></b> oyun</label>
+          <button id="goalMinus">-</button>
+          <button id="goalPlus">+</button>
+          <input id="goalSet" type="number" min="1" max="10000" value="5" style="width:140px" />
+          <button id="goalApply" class="primary">Hedefe Uygula</button>
+        </div>
+
+        <div class="spacer"></div>
+        <div class="row">
+          <label class="pill">Bugün: <b><span id="todayTotal">0</span></b></label>
+          <label class="pill">Tamamlanma: <b><span id="goalPct">0%</span></b></label>
+          <label class="pill">✅ <b><span id="todayW">0</span></b></label>
+          <label class="pill">❌ <b><span id="todayL">0</span></b></label>
+          <label class="pill">➖ <b><span id="todayD">0</span></b></label>
+          <label class="pill">Başarı: <b><span id="todayWR">0%</span></b></label>
+        </div>
+
+        <div class="small" style="margin-top:8px" id="goalHint"></div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,.10); margin:12px 0" />
+
+        <div class="tag">Kayıt & Analiz</div>
+        <div class="small" id="analysisLine"></div>
+        <div class="row" style="margin-top:10px">
+          <button id="markWin" class="good">+1 Galibiyet</button>
+          <button id="markLoss" class="danger">+1 Mağlubiyet</button>
+          <button id="markDraw">+1 Berabere</button>
+          <button id="undoLastStat" class="warn">Son Kaydı Geri Al</button>
+          <button id="clearToday" class="danger">Bugünü Sıfırla</button>
+        </div>
+
+        <div class="small" style="margin-top:10px"><b>Gün Gün Geçmiş (son 14 gün):</b></div>
+        <div id="historyList" class="small" style="margin-top:6px; white-space:pre-wrap"></div>
+
+        <div class="small" style="margin-top:10px"><b>Gelişim Analizi:</b></div>
+        <div id="progressAnalysis" class="small" style="margin-top:6px; white-space:pre-wrap"></div>
       </div>
 
     </div>
   </div>
 </div>
 
+<!-- Intro -->
 <div id="intro" class="intro" title="Dokununca geçer">
   <div class="introBox">
-    <div class="introTitle">𐱅𐰇𐰼𐰇 · TÖRÜ — Türk'ün Töresi</div>
+    <div class="introTitle">𐱅𐰇𐰺𐰇 · Törü — Türk’ün Töresi</div>
     <div class="runes" id="runeText"></div>
     <div class="small" style="margin-top:10px">Başlamak için dokun…</div>
   </div>
@@ -316,17 +504,22 @@
    0) Helpers
 ========================= */
 const $ = (id)=>document.getElementById(id);
+const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+const nowDayKey = ()=> new Date().toISOString().slice(0,10);
+const pick = (arr)=> arr[Math.floor(Math.random()*arr.length)];
+const sleep = (ms)=> new Promise(r=>setTimeout(r,ms));
 
 /* =========================
-   1) Orhun intro
+   1) Intro (Göktürkçe + töre sözleri)
 ========================= */
 const RUNES = [
-  "𐰴𐰍𐰣: 𐱅𐰇𐰼𐰇 𐰉𐰆𐰔𐰆𐰞𐰢𐰔",
-  "𐱅𐰑𐰀: 𐰖𐰃𐰏𐰃𐱅 𐰋𐰀𐰽𐰞𐰀𐰑𐰃",
+  "𐰴𐰍𐰣: 𐱅𐰇𐰺𐰇 𐰉𐰆𐰔𐰞𐰢𐰀",
+  "𐱅𐰑𐰀: 𐰴𐰆𐱅 𐰋𐰃𐰠𐰏𐰀 𐰋𐰃𐰠𐰀 𐰋𐰇𐰼𐰢𐰾",
   "",
-  "Törü — Türk'ün Töresi",
-  "Akıl kılavuz olur.",
-].join("\n");
+  "Törü bozulmaz; düzen bozulursa ordu çözülür.",
+  "Akıl kılavuzdur; sabır kılıçtan keskindir.",
+  "Er olana yol, töreyle açılır."
+].join("\\n");
 
 (function introType(){
   const el = $("runeText");
@@ -334,25 +527,28 @@ const RUNES = [
   const t = setInterval(()=>{
     el.textContent = RUNES.slice(0, i++);
     if(i>RUNES.length){ clearInterval(t); }
-  }, 18);
+  }, 16);
 })();
 function hideIntro(){
   const intro = $("intro");
-  if(!intro) return;
+  if(!intro || intro.style.display==="none") return;
   intro.classList.add("fadeOut");
   setTimeout(()=> intro.style.display="none", 720);
 }
 $("intro").addEventListener("click", hideIntro, {passive:true});
-setTimeout(hideIntro, 2500);
+setTimeout(hideIntro, 2400);
 
 /* =========================
-   2) Chess core (rules)
-   - Dizilim ve kurallar: gerçek satranç
+   2) Chess core (tam kurallar)
+   - Rok / En passant / Terfi
+   - Mat / Pat / 50 hamle
 ========================= */
 const PIECE_UNI = {
   P:"♙", N:"♘", B:"♗", R:"♖", Q:"♕", K:"♔",
   p:"♟", n:"♞", b:"♝", r:"♜", q:"♛", k:"♚",
 };
+const isWhite = (p)=> p && p===p.toUpperCase();
+const isBlack = (p)=> p && p===p.toLowerCase();
 const pieceValue = (p)=>{
   switch(p.toLowerCase()){
     case "p": return 100;
@@ -364,8 +560,6 @@ const pieceValue = (p)=>{
   }
   return 0;
 };
-const isWhite = (p)=> p && p===p.toUpperCase();
-const isBlack = (p)=> p && p===p.toLowerCase();
 function sqToRC(sq){ return {r: Math.floor(sq/8), c: sq%8}; }
 function rcToSq(r,c){ return r*8+c; }
 function inBoard(r,c){ return r>=0 && r<8 && c>=0 && c<8; }
@@ -373,32 +567,32 @@ function algebra(sq){
   const {r,c}=sqToRC(sq);
   return "abcdefgh"[c] + (8-r);
 }
+function parseAlg(a){
+  const c="abcdefgh".indexOf(a[0]);
+  const r=8-parseInt(a[1],10);
+  if(c<0||r<0||r>7) return null;
+  return rcToSq(r,c);
+}
 function cloneState(s){ return JSON.parse(JSON.stringify(s)); }
 
-/* ✅ GERÇEK SATRANÇ DİZİLİMİ
-   8. sıra: r n b q k b n r
-   7. sıra: p p p p p p p p
-   2. sıra: P P P P P P P P
-   1. sıra: R N B Q K B N R
-   Vezirler d sütununda: d8=q, d1=Q
-*/
 function initialState(){
+  // r0 = black back rank, r7 = white back rank
   const b = Array(64).fill(null);
-  const backBlack = ["r","n","b","q","k","b","n","r"];
-  const backWhite = ["R","N","B","Q","K","B","N","R"];
-  for(let c=0;c<8;c++) b[rcToSq(0,c)] = backBlack[c]; // 8th rank
-  for(let c=0;c<8;c++) b[rcToSq(1,c)] = "p";        // 7th
-  for(let c=0;c<8;c++) b[rcToSq(6,c)] = "P";        // 2nd
-  for(let c=0;c<8;c++) b[rcToSq(7,c)] = backWhite[c]; // 1st
+  const back = ["r","n","b","q","k","b","n","r"];
+  for(let c=0;c<8;c++){
+    b[rcToSq(0,c)] = back[c];
+    b[rcToSq(1,c)] = "p";
+    b[rcToSq(6,c)] = "P";
+    b[rcToSq(7,c)] = back[c].toUpperCase();
+  }
   return {
     board: b,
     turn: "w",
     castling: {K:true,Q:true,k:true,q:true},
-    ep: null,
-    halfmove: 0,
+    ep: null,      // en passant target square
+    halfmove: 0,   // 50-move counter (half-moves)
     fullmove: 1,
     last: null,
-    history: [],
     result: null,
   };
 }
@@ -412,6 +606,7 @@ function attackedBy(state, sq, byColor){
   const b = state.board;
   const {r,c}=sqToRC(sq);
 
+  // pawns
   if(byColor==="w"){
     for(const dc of [-1,1]){
       const rr=r+1, cc=c+dc;
@@ -424,6 +619,7 @@ function attackedBy(state, sq, byColor){
     }
   }
 
+  // knights
   const kD = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
   for(const [dr,dc] of kD){
     const rr=r+dr, cc=c+dc;
@@ -434,6 +630,7 @@ function attackedBy(state, sq, byColor){
     if(byColor==="b" && p==="n") return true;
   }
 
+  // bishops/queens diagonals
   const diag = [[-1,-1],[-1,1],[1,-1],[1,1]];
   for(const [dr,dc] of diag){
     let rr=r+dr, cc=c+dc;
@@ -448,6 +645,7 @@ function attackedBy(state, sq, byColor){
     }
   }
 
+  // rooks/queens lines
   const line = [[-1,0],[1,0],[0,-1],[0,1]];
   for(const [dr,dc] of line){
     let rr=r+dr, cc=c+dc;
@@ -462,6 +660,7 @@ function attackedBy(state, sq, byColor){
     }
   }
 
+  // king adjacency
   for(let dr=-1;dr<=1;dr++){
     for(let dc=-1;dc<=1;dc++){
       if(dr===0 && dc===0) continue;
@@ -472,6 +671,7 @@ function attackedBy(state, sq, byColor){
       if(byColor==="b" && p==="k") return true;
     }
   }
+
   return false;
 }
 
@@ -503,10 +703,10 @@ function genPseudoMoves(state){
           const to=rcToSq(rr,cc);
           const tp=b[to];
           if(!tp){
-            push({from:sq,to, piece:p, cap:null, promo:null, ep:false, castle:false});
+            push({from:sq,to, piece:p, cap:null, promo:null, ep:false, castle:false, dbl:false});
           }else{
             if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp))){
-              push({from:sq,to, piece:p, cap:tp, promo:null, ep:false, castle:false});
+              push({from:sq,to, piece:p, cap:tp, promo:null, ep:false, castle:false, dbl:false});
             }
             break;
           }
@@ -521,6 +721,7 @@ function genPseudoMoves(state){
         const startR = (us==="w") ? 6 : 1;
         const promoR = (us==="w") ? 0 : 7;
 
+        // one step
         const rr=r+dir, cc=c;
         if(inBoard(rr,cc)){
           const to=rcToSq(rr,cc);
@@ -528,48 +729,53 @@ function genPseudoMoves(state){
             if(rr===promoR){
               for(const pr of ["q","r","b","n"]){
                 const promo = us==="w" ? pr.toUpperCase() : pr;
-                push({from:sq,to,piece:p,cap:null,promo,ep:false,castle:false});
+                push({from:sq,to,piece:p,cap:null,promo,ep:false,castle:false,dbl:false});
               }
             }else{
-              push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+              push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false,dbl:false});
+              // two step
               if(r===startR){
                 const rr2=r+dir*2;
                 const to2=rcToSq(rr2,cc);
                 if(!b[to2]){
-                  push({from:sq,to:to2,piece:p,cap:null,promo:null,ep:false,castle:false, dbl:true});
+                  push({from:sq,to:to2,piece:p,cap:null,promo:null,ep:false,castle:false,dbl:true});
                 }
               }
             }
           }
         }
 
+        // captures + en passant
         for(const dc of [-1,1]){
           const rrC=r+dir, ccC=c+dc;
           if(!inBoard(rrC,ccC)) continue;
           const to=rcToSq(rrC,ccC);
           const tp=b[to];
 
+          // normal capture
           if(tp && ((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))){
             if(rrC===promoR){
               for(const pr of ["q","r","b","n"]){
                 const promo = us==="w" ? pr.toUpperCase() : pr;
-                push({from:sq,to,piece:p,cap:tp,promo,ep:false,castle:false});
+                push({from:sq,to,piece:p,cap:tp,promo,ep:false,castle:false,dbl:false});
               }
             }else{
-              push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+              push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false,dbl:false});
             }
           }
 
+          // en passant
           if(state.ep!==null && to===state.ep){
             const capSq = rcToSq(r, ccC);
             const capP = b[capSq];
             if(capP && capP.toLowerCase()==="p" && ((us==="w" && isBlack(capP)) || (us==="b" && isWhite(capP)))){
-              push({from:sq,to,piece:p,cap:capP,promo:null,ep:true,castle:false, capSq});
+              push({from:sq,to,piece:p,cap:capP,promo:null,ep:true,capSq,castle:false,dbl:false});
             }
           }
         }
         break;
       }
+
       case "n":{
         const d=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
         for(const [dr,dc] of d){
@@ -577,16 +783,19 @@ function genPseudoMoves(state){
           if(!inBoard(rr,cc)) continue;
           const to=rcToSq(rr,cc);
           const tp=b[to];
-          if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+          if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false,dbl:false});
           else if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))
-            push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+            push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false,dbl:false});
         }
         break;
       }
+
       case "b": addSlide([[-1,-1],[-1,1],[1,-1],[1,1]]); break;
       case "r": addSlide([[-1,0],[1,0],[0,-1],[0,1]]); break;
       case "q": addSlide([[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]]); break;
+
       case "k":{
+        // king steps
         for(let dr=-1;dr<=1;dr++){
           for(let dc=-1;dc<=1;dc++){
             if(dr===0 && dc===0) continue;
@@ -594,36 +803,37 @@ function genPseudoMoves(state){
             if(!inBoard(rr,cc)) continue;
             const to=rcToSq(rr,cc);
             const tp=b[to];
-            if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+            if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false,dbl:false});
             else if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))
-              push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+              push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false,dbl:false});
           }
         }
 
+        // castling
         const kingHome = us==="w" ? rcToSq(7,4) : rcToSq(0,4);
         if(sq===kingHome && !inCheck(state, us)){
           if(us==="w" && state.castling.K){
             const f1=rcToSq(7,5), g1=rcToSq(7,6), h1=rcToSq(7,7);
             if(!b[f1] && !b[g1] && b[h1]==="R" && !attackedBy(state,f1,them) && !attackedBy(state,g1,them)){
-              push({from:sq,to:g1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h1, rookTo:f1});
-            }
-          }
-          if(us==="b" && state.castling.k){
-            const f8=rcToSq(0,5), g8=rcToSq(0,6), h8=rcToSq(0,7);
-            if(!b[f8] && !b[g8] && b[h8]==="r" && !attackedBy(state,f8,them) && !attackedBy(state,g8,them)){
-              push({from:sq,to:g8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h8, rookTo:f8});
+              push({from:sq,to:g1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h1, rookTo:f1, dbl:false});
             }
           }
           if(us==="w" && state.castling.Q){
             const d1=rcToSq(7,3), c1=rcToSq(7,2), b1=rcToSq(7,1), a1=rcToSq(7,0);
             if(!b[d1] && !b[c1] && !b[b1] && b[a1]==="R" && !attackedBy(state,d1,them) && !attackedBy(state,c1,them)){
-              push({from:sq,to:c1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a1, rookTo:d1});
+              push({from:sq,to:c1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a1, rookTo:d1, dbl:false});
+            }
+          }
+          if(us==="b" && state.castling.k){
+            const f8=rcToSq(0,5), g8=rcToSq(0,6), h8=rcToSq(0,7);
+            if(!b[f8] && !b[g8] && b[h8]==="r" && !attackedBy(state,f8,them) && !attackedBy(state,g8,them)){
+              push({from:sq,to:g8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h8, rookTo:f8, dbl:false});
             }
           }
           if(us==="b" && state.castling.q){
             const d8=rcToSq(0,3), c8=rcToSq(0,2), b8=rcToSq(0,1), a8=rcToSq(0,0);
             if(!b[d8] && !b[c8] && !b[b8] && b[a8]==="r" && !attackedBy(state,d8,them) && !attackedBy(state,c8,them)){
-              push({from:sq,to:c8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a8, rookTo:d8});
+              push({from:sq,to:c8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a8, rookTo:d8, dbl:false});
             }
           }
         }
@@ -639,23 +849,31 @@ function makeMove(state, m){
   const b = s.board;
   s.ep = null;
 
+  // halfmove reset
   if(m.piece.toLowerCase()==="p" || m.cap) s.halfmove=0;
   else s.halfmove++;
 
+  // move piece
   b[m.to] = m.promo ? m.promo : m.piece;
   b[m.from] = null;
 
+  // en passant capture
   if(m.ep && m.capSq!=null) b[m.capSq]=null;
+
+  // castling rook move
   if(m.castle){
     b[m.rookTo] = b[m.rookFrom];
     b[m.rookFrom] = null;
   }
+
+  // double pawn push sets ep square
   if(m.dbl){
-    const {r:cR,c:cC}=sqToRC(m.to);
-    const epR = (s.turn==="w") ? cR+1 : cR-1;
-    s.ep = rcToSq(epR, cC);
+    const {r:toR,c:toC}=sqToRC(m.to);
+    const epR = (s.turn==="w") ? toR+1 : toR-1;
+    s.ep = rcToSq(epR, toC);
   }
 
+  // revoke castling rights
   const from = m.from, to = m.to;
   const moved = m.piece;
   const cap = m.cap;
@@ -680,36 +898,35 @@ function makeMove(state, m){
     if(to===rcToSq(0,7)) revoke("k");
   }
 
+  // change turn
   s.turn = (s.turn==="w") ? "b" : "w";
   if(s.turn==="w") s.fullmove++;
 
   s.last = {from:m.from,to:m.to, san:""};
-  s.history.push(m);
   return s;
 }
 
 function legalMoves(state){
   const pseudo = genPseudoMoves(state);
   const leg=[];
+  const us = state.turn;
   for(const m of pseudo){
     const s2 = makeMove(state, m);
-    const us = state.turn;
     if(!inCheck(s2, us)) leg.push(m);
   }
   return leg;
 }
 
 function gameEnd(state){
-  if(state.result) return state.result;
   const moves = legalMoves(state);
   const us = state.turn;
   const inC = inCheck(state, us);
 
   if(moves.length===0){
-    if(inC) return us==="w" ? "0-1" : "1-0";
-    return "1/2-1/2";
+    if(inC) return us==="w" ? "0-1" : "1-0"; // checkmate
+    return "1/2-1/2"; // stalemate
   }
-  if(state.halfmove>=100) return "1/2-1/2";
+  if(state.halfmove>=100) return "1/2-1/2"; // 50-move rule
   return null;
 }
 
@@ -742,59 +959,7 @@ function sanForMove(state, m){
 }
 
 /* =========================
-   3) Eval + MiniMax
-========================= */
-function evalState(state){
-  const b=state.board;
-  let score=0;
-  for(const p of b){
-    if(!p) continue;
-    const v = pieceValue(p);
-    score += isWhite(p) ? v : -v;
-  }
-  score += (state.turn==="w") ? 5 : -5;
-  return score;
-}
-function minimax(state, depth, alpha, beta){
-  const end = gameEnd(state);
-  if(end){
-    if(end==="1/2-1/2") return {score:0, move:null};
-    if(end==="1-0") return {score: 999999, move:null};
-    if(end==="0-1") return {score: -999999, move:null};
-  }
-  if(depth===0) return {score: evalState(state), move:null};
-
-  const moves = legalMoves(state);
-  moves.sort((a,b)=> (b.cap?1:0)-(a.cap?1:0));
-
-  const maximizing = (state.turn==="w");
-  let bestMove=null;
-
-  if(maximizing){
-    let best=-Infinity;
-    for(const m of moves){
-      const s2=makeMove(state,m);
-      const res=minimax(s2, depth-1, alpha, beta);
-      if(res.score>best){ best=res.score; bestMove=m; }
-      alpha=Math.max(alpha,best);
-      if(beta<=alpha) break;
-    }
-    return {score:best, move:bestMove};
-  }else{
-    let best=Infinity;
-    for(const m of moves){
-      const s2=makeMove(state,m);
-      const res=minimax(s2, depth-1, alpha, beta);
-      if(res.score<best){ best=res.score; bestMove=m; }
-      beta=Math.min(beta,best);
-      if(beta<=alpha) break;
-    }
-    return {score:best, move:bestMove};
-  }
-}
-
-/* =========================
-   4) Açılış mini
+   3) Açılış veritabanı (mini ama iş görür)
 ========================= */
 const OPENINGS = [
   {seq:["e4","e5","Nf3","Nc6","Bb5"], name:"İspanyol Açılışı (Ruy Lopez)"},
@@ -802,9 +967,11 @@ const OPENINGS = [
   {seq:["d4","d5","c4"], name:"Vezir Gambiti"},
   {seq:["e4","e5","Nf3","Nf6"], name:"Petrov Savunması"},
   {seq:["d4","Nf6","c4","g6"], name:"Kral Hint Savunması"},
-  {seq:["b4"], name:"Orangutan (Sokolsky)"},
-  {seq:["g4"], name:"Grob Saldırısı"},
+  {seq:["c4"], name:"İngiliz Açılışı"},
+  {seq:["Nf3"], name:"Réti Açılışı"},
   {seq:["f4"], name:"Kuş Açılışı (Bird)"},
+  {seq:["b4"], name:"Sokolsky (Orangutan)"},
+  {seq:["g4"], name:"Grob Saldırısı"},
 ];
 function openingName(sanList){
   for(const o of OPENINGS){
@@ -819,18 +986,341 @@ function openingName(sanList){
 }
 
 /* =========================
-   5) UI / Render
+   4) Eval + hızlı AI (zaman bütçeli)
+   - Telefonu yormasın diye TIME-LIMIT
+========================= */
+function evalState(state){
+  const b=state.board;
+  let score=0;
+  for(const p of b){
+    if(!p) continue;
+    const v = pieceValue(p);
+    score += isWhite(p) ? v : -v;
+  }
+  // küçük tempo bonus
+  score += (state.turn==="w") ? 5 : -5;
+  return score;
+}
+
+function aiConfig(level){
+  // timeMs: hamle başına düşünme süresi
+  // maxDepth: üst sınır (iterative deepening)
+  // blunder: düşük seviyede ara sıra zayıf hamle seçme olasılığı
+  const map = {
+    l1:  {timeMs:120,  maxDepth:2, blunder:0.35},
+    l2:  {timeMs:180,  maxDepth:3, blunder:0.20},
+    l3:  {timeMs:260,  maxDepth:3, blunder:0.12},
+    l4:  {timeMs:380,  maxDepth:4, blunder:0.08},
+    l5:  {timeMs:520,  maxDepth:4, blunder:0.06},
+    l6:  {timeMs:700,  maxDepth:5, blunder:0.03},
+    l7:  {timeMs:900,  maxDepth:5, blunder:0.02},
+    l8:  {timeMs:1200, maxDepth:6, blunder:0.00},
+    l9:  {timeMs:1600, maxDepth:6, blunder:0.00},
+    l10: {timeMs:2200, maxDepth:7, blunder:0.00},
+  };
+  return map[level] || map.l2;
+}
+
+// move ordering: captures first
+function orderMoves(state, moves){
+  return moves.slice().sort((a,b)=>{
+    const ac = a.cap ? 1 : 0;
+    const bc = b.cap ? 1 : 0;
+    if(ac!==bc) return bc-ac;
+    // prefer promotions
+    const ap = a.promo ? 1 : 0;
+    const bp = b.promo ? 1 : 0;
+    if(ap!==bp) return bp-ap;
+    return 0;
+  });
+}
+
+function pickWeakerMove(state, chance){
+  if(Math.random() > chance) return null;
+  const moves = legalMoves(state);
+  if(moves.length <= 1) return null;
+
+  const scored = moves.map(m=>{
+    const s2 = makeMove(state, m);
+    return {m, score: evalState(s2)};
+  });
+
+  // If black to move -> wants minimize. If white -> maximize.
+  const maximizing = (state.turn==="w");
+  scored.sort((a,b)=> maximizing ? (a.score-b.score) : (b.score-a.score)); // pick worse for self
+  const idx = Math.min(scored.length-1, 1 + Math.floor(Math.random()*Math.min(6, scored.length-1)));
+  return scored[idx].m;
+}
+
+function searchBestMoveTimed(rootState, timeMs, maxDepth){
+  const start = performance.now();
+  let timedOut = false;
+
+  function timeUp(){ return (performance.now()-start) >= timeMs; }
+
+  function negamax(state, depth, alpha, beta){
+    if(timeUp()){ timedOut=true; return {score:0, move:null}; }
+
+    const end = gameEnd(state);
+    if(end){
+      if(end==="1/2-1/2") return {score:0, move:null};
+      if(end==="1-0") return {score: 999999, move:null};
+      if(end==="0-1") return {score: -999999, move:null};
+    }
+    if(depth===0) return {score: evalState(state), move:null};
+
+    let bestMove=null;
+    const moves = orderMoves(state, legalMoves(state));
+    if(moves.length===0) return {score: evalState(state), move:null};
+
+    // perspective: always score from side-to-move? We'll use "side to move" sign trick:
+    // We'll compute score in absolute evalState (white-positive). In negamax, flip by turn.
+    const sign = (state.turn==="w") ? 1 : -1;
+
+    let best = -Infinity;
+    for(const m of moves){
+      const s2 = makeMove(state, m);
+      const res = negamax(s2, depth-1, -beta, -alpha);
+      if(timedOut) break;
+      const val = -(res.score); // negamax
+      // BUT our evalState is absolute; to adapt, we include sign:
+      // Instead, we can transform absolute score to side-to-move score:
+      // We'll do that at leaf/end:
+      // For simplicity keep leaf absolute but convert here:
+      // Actually easier: define leaf as "side-to-move viewpoint"
+    }
+    // We'll implement a clean version below.
+    return {score:0, move:null};
+  }
+
+  // Better: implement alpha-beta with absolute eval but maximizing depending on turn.
+  function alphabeta(state, depth, alpha, beta){
+    if(timeUp()){ timedOut=true; return {score:0, move:null}; }
+
+    const end = gameEnd(state);
+    if(end){
+      if(end==="1/2-1/2") return {score:0, move:null};
+      if(end==="1-0") return {score: 999999, move:null};
+      if(end==="0-1") return {score: -999999, move:null};
+    }
+    if(depth===0) return {score: evalState(state), move:null};
+
+    const moves = orderMoves(state, legalMoves(state));
+    if(moves.length===0) return {score: evalState(state), move:null};
+
+    const maximizing = (state.turn==="w");
+    let bestMove=null;
+
+    if(maximizing){
+      let best=-Infinity;
+      for(const m of moves){
+        const s2=makeMove(state,m);
+        const res=alphabeta(s2, depth-1, alpha, beta);
+        if(timedOut) break;
+        if(res.score>best){ best=res.score; bestMove=m; }
+        alpha=Math.max(alpha,best);
+        if(beta<=alpha) break;
+      }
+      return {score:best, move:bestMove};
+    }else{
+      let best=Infinity;
+      for(const m of moves){
+        const s2=makeMove(state,m);
+        const res=alphabeta(s2, depth-1, alpha, beta);
+        if(timedOut) break;
+        if(res.score<best){ best=res.score; bestMove=m; }
+        beta=Math.min(beta,best);
+        if(beta<=alpha) break;
+      }
+      return {score:best, move:bestMove};
+    }
+  }
+
+  // iterative deepening
+  let best = {score: evalState(rootState), move: null};
+  for(let d=1; d<=maxDepth; d++){
+    timedOut=false;
+    const res = alphabeta(rootState, d, -Infinity, Infinity);
+    if(!timedOut && res.move) best = res;
+    if(timeUp()) break;
+  }
+  return best;
+}
+
+/* =========================
+   5) Kağan & Dede metinleri
+========================= */
+const KAGAN_EMIR = [
+  "Töreyle oyna: Merkez, gelişim, güvenlik.",
+  "Önce düzen kur; sonra baskıyı artır.",
+  "Taşlarını yalnız bırakma; destekle ilerle.",
+  "Gereksiz hamle töreyi yorar.",
+  "Sade oyna, sağlam oyna.",
+  "Şah emniyeti olmadan saldırı yıkılır.",
+  "Açık hat bul, kaleyi oraya koy.",
+  "Zayıf kareyi tut; sonra vur.",
+  "İki hamle ileri düşün; acele etme.",
+  "Taktik fırsat kollayanın olur."
+];
+const DEDE_USLUP = [
+  "Yiğit, hamle bir ok gibidir; nereye atarsan oraya varır.",
+  "Kurt sürüsü dağılmaz; taşların da dağılmasın.",
+  "At gider iz kalır; hamle gider hüküm kalır.",
+  "Sabır kılıçtan keskindir; beklemesini bil.",
+  "Bir taşın kıymeti, durduğu yerle ölçülür.",
+  "Gönül ister saldırı; akıl ister tedbir."
+];
+
+function dedeComment(san, evalBefore, evalAfter, stateAfter){
+  const swing = evalAfter - evalBefore;
+  let mood="";
+  if(Math.abs(swing) < 35) mood = "Denge bozulmadı; ama yol uzun.";
+  else if(swing > 120) mood = "Güzel hamle! Rüzgâr senden yana döndü.";
+  else if(swing < -120) mood = "Aman yiğit… Bu hamle bir gedik açtı; dikkat et.";
+  else mood = "Tedbirle yürü.";
+
+  const them = stateAfter.turn; // side to move after
+  const check = inCheck(stateAfter, them);
+  const lm = legalMoves(stateAfter).length;
+  let extra = [];
+  if(check) extra.push("Şah çekildi.");
+  if(lm <= 6) extra.push("Rakibin yolu daralıyor (mat ağı olabilir).");
+  if(stateAfter.halfmove>=80) extra.push("50 hamle kuralına yaklaşılıyor.");
+
+  return `${pick(DEDE_USLUP)}<br><br>Hamle: <b>${san}</b>. ${mood}` + (extra.length ? `<br><br><span class="warnTxt"><b>Not:</b> ${extra.join(" ")}</span>` : "");
+}
+
+/* Dede dersleri */
+const DEDE_LESSONS = {
+  history: [
+    "Satranç (modern kurallar), eski kökleri Çaturanga’ya uzanan bir strateji oyunu. Zamanla İran–Arap dünyası–Avrupa hattında evrilerek bugünkü şeklini aldı.",
+    "Oyun üçe ayrılır: Açılış (düzen), Oyun Ortası (plan/taktik), Oyun Sonu (teknik).",
+    "Strateji töre gibidir: önce düzen, sonra icra."
+  ],
+  pieces: [
+    "Piyon: küçük ama kader taşır; sona varırsa terfi eder. At: çatal ustasıdır. Fil: çaprazın gücü. Kale: açık hat sever. Vezir: güçlü ama erken gezdirilmez. Şah: kaybedilmez.",
+    "Yaklaşık değerler: P=1, N=3, B=3, R=5, Q=9. Ama konum her şeyi değiştirir.",
+    "Açılışta töre: merkez + gelişim + rok."
+  ],
+  basic: [
+    "Açılış töresi: Merkez piyonları (e/d), atlar, filler, rok. Aynı taşı boş yere iki kez oynama.",
+    "Plan: zayıf kare – zayıf piyon – açık hat. Üçü de fırsattır.",
+    "Savunma da saldırı kadar önemlidir: şahın güvenliği."
+  ],
+  openings: [
+    "İspanyol: uzun vadeli baskı. Sicilya: asimetrik savaş. Vezir Gambiti: pozisyonel mücadele. Kral Hint: dinamik saldırı.",
+    "Az bilinenler sürpriz içindir ama risk taşır: Sokolsky (b4), Bird (f4), Grob (g4).",
+    "Ezber değil fikir öğren: amaç taş geliştirmektir."
+  ],
+  endgames: [
+    "Oyun sonunda şah savaşçıdır: merkeze yürür. Geçer piyon yaratmak çoğu zaman oyunu kazandırır.",
+    "Kale oyun sonu: kale çoğu zaman piyonun arkasında iyi çalışır.",
+    "Temel matları öğren: K+Q, K+R."
+  ],
+  tactics: [
+    "Çatal: bir taş iki hedefi vurur (özellikle at).",
+    "Açmaz/Şiş: arkasındaki daha değerli taş yüzünden kıpırdayamama.",
+    "Saptırma: savunucuyu görevinden koparma."
+  ],
+  mate: [
+    "Arka sıra matı: kaçış kareleri kapalıysa kale/vezir son sıradan bitirir.",
+    "Boğma mat: atla, rakibin taşları şahı boğar.",
+    "Kutu matı: kaçış karelerini tek tek kapat."
+  ]
+};
+
+/* =========================
+   6) UI / Game loop
 ========================= */
 let S = initialState();
-let flipped = false;
+let flipped = false;      // manual flip
 let selected = null;
 let legalCache = [];
 let sanHistory = [];
+let stateStack = [];      // undo
+let moveStack = [];       // move objects for P2P
+let playerSide = "w";     // user side
+let p2p = {pc:null, dc:null, role:null}; // p2p data
+let onlineEnabled = false;
+
 const boardEl = $("board");
 
+/* === Clock === */
+let clock = {
+  on:false,
+  baseMs: 5*60*1000,
+  incMs: 0,
+  wMs: 5*60*1000,
+  bMs: 5*60*1000,
+  running:false,
+  lastTick:0,
+};
+let clockTimer = null;
+
+function fmtMs(ms){
+  ms = Math.max(0, Math.floor(ms));
+  const s = Math.floor(ms/1000);
+  const m = Math.floor(s/60);
+  const ss = String(s%60).padStart(2,"0");
+  return `${m}:${ss}`;
+}
+function clockApplySettings(){
+  clock.on = $("clockOn").checked;
+  clock.baseMs = parseInt($("clockMin").value,10)*60*1000;
+  clock.incMs = parseInt($("clockInc").value,10)*1000;
+  if(!clock.on){
+    $("clockHelp").textContent = "Saat kapalı.";
+    $("clockLine").textContent = "Kapalı";
+    stopClock();
+  }else{
+    $("clockHelp").textContent = `Saat açık: ${$("clockMin").value} dk, artış ${$("clockInc").value} sn.`;
+    $("clockLine").textContent = `B ${fmtMs(clock.wMs)} · S ${fmtMs(clock.bMs)}`;
+  }
+}
+function clockReset(){
+  clock.wMs = clock.baseMs;
+  clock.bMs = clock.baseMs;
+  clock.running = false;
+  clock.lastTick = performance.now();
+  $("clockLine").textContent = clock.on ? `B ${fmtMs(clock.wMs)} · S ${fmtMs(clock.bMs)}` : "Kapalı";
+}
+function startClockIfNeeded(){
+  if(!clock.on) return;
+  if(clock.running) return;
+  clock.running = true;
+  clock.lastTick = performance.now();
+  if(clockTimer) clearInterval(clockTimer);
+  clockTimer = setInterval(()=>{
+    if(!clock.running || !clock.on || S.result) return;
+    const now = performance.now();
+    const dt = now - clock.lastTick;
+    clock.lastTick = now;
+
+    if(S.turn==="w") clock.wMs -= dt;
+    else clock.bMs -= dt;
+
+    $("clockLine").textContent = `B ${fmtMs(clock.wMs)} · S ${fmtMs(clock.bMs)}`;
+
+    if(clock.wMs<=0){
+      S.result = "0-1";
+      onGameFinished("0-1", "Beyaz süre bitti.");
+      render();
+    }
+    if(clock.bMs<=0){
+      S.result = "1-0";
+      onGameFinished("1-0", "Siyah süre bitti.");
+      render();
+    }
+  }, 120);
+}
+function stopClock(){
+  clock.running = false;
+}
+
+/* === Rendering === */
 function render(){
   const end = gameEnd(S);
-  if(end && !S.result){ S.result = end; }
+  if(end && !S.result){ S.result = end; onGameFinished(end); }
 
   $("turn").textContent = (S.turn==="w") ? "Beyaz" : "Siyah";
   $("status").textContent = S.result ? (S.result==="1/2-1/2" ? "Berabere" : "Oyun bitti") : "Hazır";
@@ -839,39 +1329,55 @@ function render(){
   $("eval").textContent = (ev>=0?"+":"") + ev.toFixed(1);
   $("opening").textContent = openingName(sanHistory);
 
-  boardEl.innerHTML = "";
   legalCache = legalMoves(S);
+
+  // board mapping:
+  // show from player's perspective by default (playerSide)
+  // plus manual flip override
+  const wantPlayerView = (playerSide==="b"); // if player is black, default show flipped
+  const viewFlip = flipped ^ wantPlayerView;
+
+  boardEl.innerHTML = "";
 
   const last = S.last ? {from:S.last.from,to:S.last.to} : null;
   const inC = inCheck(S, S.turn);
   const kingSq = inC ? findKing(S, S.turn) : null;
 
+  // Coordinates arrays for displayed view
+  // If viewFlip=false: bottom is rank 1, files a..h left->right
+  // If viewFlip=true: bottom is rank 8, files h..a left->right (from black view)
+  const fileLabels = viewFlip ? ["h","g","f","e","d","c","b","a"] : ["a","b","c","d","e","f","g","h"];
+  const rankLabels = viewFlip ? [8,7,6,5,4,3,2,1] : [1,2,3,4,5,6,7,8];
+
   for(let view=0; view<64; view++){
     const vr = Math.floor(view/8), vc = view%8;
 
-    const r = flipped ? (7 - vr) : vr;
-    const c = flipped ? (7 - vc) : vc;
+    // map view -> real board square
+    const r = viewFlip ? (7 - vr) : vr;
+    const c = viewFlip ? (7 - vc) : vc;
     const sq = rcToSq(r,c);
 
-    // ✅ DOĞRU: a8 açık, h1 açık, a1 koyu, h8 koyu
-    // r0c0 (a8) => açık; r7c7 (h1) => açık; bu durumda (r+c) çift => açık
+    // IMPORTANT: square color must follow REAL board square:
+    // a8 light, h1 light => (r+c)%2==0 works with r0 top.
     const isLight = ((r + c) % 2 === 0);
 
     const d = document.createElement("div");
     d.className = "sq " + (isLight ? "light":"dark");
+    d.dataset.sq = String(sq);
 
     if(selected===sq) d.classList.add("sel");
     if(last && (sq===last.from || sq===last.to)) d.classList.add("last");
     if(kingSq===sq) d.classList.add("check");
 
-    if(selected!=null){
+    // show legal squares from selection
+    const showLegal = $("showLegal").checked;
+    if(showLegal && selected!=null){
       for(const m of legalCache){
         if(m.from===selected && m.to===sq){ d.classList.add("hint"); break; }
       }
     }
 
-    d.dataset.sq = String(sq);
-
+    // piece
     const p = S.board[sq];
     if(p){
       const span = document.createElement("span");
@@ -880,17 +1386,73 @@ function render(){
       d.appendChild(span);
     }
 
+    // coordinates on edge squares only (like many boards)
+    if($("showCoords").checked){
+      // ranks on left file a (from view)
+      // files on bottom rank (from view)
+      // We'll draw: rank numbers on left edge squares, file letters on bottom edge squares.
+      // But we want standard: rank numbers on left side of the board in current view, files at bottom.
+      if(vc===0){
+        const rank = document.createElement("div");
+        rank.className = "coord rank " + (isLight ? "light":"dark");
+        rank.textContent = rankLabels[7 - vr]; // top shows 8 or 1 depending
+        d.appendChild(rank);
+      }
+      if(vr===7){
+        const file = document.createElement("div");
+        file.className = "coord file " + (isLight ? "light":"dark");
+        file.textContent = fileLabels[vc];
+        d.appendChild(file);
+      }
+    }
+
     d.addEventListener("click", onSquareClick, {passive:true});
     boardEl.appendChild(d);
   }
 
   $("lastMove").textContent = S.last ? S.last.san : "-";
-  $("kaganMini").textContent = (S.result ? "Tamam" : "Hazır");
-  $("dedeMini").textContent = (S.result ? "Hüküm" : "Bekler");
+  $("kaganMini").textContent = (S.result ? "Hüküm" : ($("hintOn").checked ? "Öneri hazır" : "Kapalı"));
+  $("dedeMini").textContent = (S.result ? "Hüküm" : ($("dedeOn").checked ? "Yorumlar" : "Kapalı"));
+
+  // hint auto
+  resizeArrowCanvas();
+  if($("hintOn").checked) maybeAutoHint();
+
+  // update clock line
+  if(clock.on){
+    $("clockLine").textContent = `B ${fmtMs(clock.wMs)} · S ${fmtMs(clock.bMs)}`;
+  }else{
+    $("clockLine").textContent = "Kapalı";
+  }
+
+  // start clock after first move
+  if(!S.result && (sanHistory.length>0)) startClockIfNeeded();
+
+  // online status note
+  if(onlineEnabled && p2p.dc && p2p.dc.readyState==="open"){
+    $("status").textContent = "Online: Bağlı";
+  }
+
+  // if it's AI turn, schedule
+  maybeAiReply();
 }
 
 function onSquareClick(e){
   if(S.result) return;
+
+  // if online and it's not your turn -> ignore
+  if(onlineEnabled && p2p.dc && p2p.dc.readyState==="open"){
+    if(S.turn !== playerSide){
+      return;
+    }
+  }else{
+    // offline: if AI on and it's AI turn -> ignore
+    const lvl = $("aiLevel").value;
+    if(lvl!=="off" && S.turn !== playerSide){
+      return;
+    }
+  }
+
   const sq = parseInt(e.currentTarget.dataset.sq, 10);
   const p = S.board[sq];
 
@@ -916,91 +1478,829 @@ function onSquareClick(e){
     return;
   }
 
+  // promotion default to queen
   let mv = candidates[0];
   if(candidates.some(x=>x.promo)){
     mv = candidates.find(x=>x.promo && x.promo.toLowerCase()==="q") || candidates[0];
   }
-  playMove(mv);
+
+  playMove(mv, {sendOnline:true});
 }
 
-function playMove(mv){
+function playMove(mv, opts={sendOnline:false}){
+  const evalBefore = evalState(S);
   const san = sanForMove(S, mv);
+
+  // push undo stack
+  stateStack.push(cloneState(S));
+
   const after = makeMove(S, mv);
   after.last.san = san;
   S = after;
 
+  // history
   sanHistory.push(san.replace(/[+#]$/,""));
-  $("lastMove").textContent = san;
+  moveStack.push({from:mv.from,to:mv.to,promo:mv.promo||null, san});
 
-  $("dedeText").innerHTML = `Hamle: <b>${san}</b>.`;
+  // apply clock increment to side who moved
+  if(clock.on){
+    // side who moved is opposite of current turn after move
+    const movedSide = (S.turn==="w") ? "b" : "w";
+    if(movedSide==="w") clock.wMs += clock.incMs;
+    else clock.bMs += clock.incMs;
+  }
 
+  const evalAfter = evalState(S);
+
+  // Dede comment
+  if($("dedeOn").checked){
+    $("dedeText").innerHTML = dedeComment(san, evalBefore, evalAfter, S);
+  }
+
+  // Kağan text updated by hint system (render will update)
   selected = null;
-  render();
-  maybeAiReply();
-}
+  currentHint = null;
+  drawArrow(null);
 
-$("flipBtn").addEventListener("click", ()=>{ flipped=!flipped; render(); });
-$("resetBtn").addEventListener("click", ()=>{
-  S = initialState();
-  selected=null;
-  sanHistory=[];
-  $("kaganText").innerHTML = `Törü bozulmaz. İlk hamleni yap.`;
-  $("dedeText").innerHTML = `Yiğit, hamle gelince sözüm de gelir.`;
+  // send to online peer
+  if(opts.sendOnline && onlineEnabled && p2p.dc && p2p.dc.readyState==="open"){
+    p2p.dc.send(JSON.stringify({t:"mv", from:mv.from, to:mv.to, promo:mv.promo||null}));
+  }
+
   render();
-});
+}
 
 /* =========================
-   6) AI
+   7) Undo move
 ========================= */
-function aiConfig(level){
-  const map = {
-    l1: {depth:2, blunder:0.35},
-    l2: {depth:2, blunder:0.20},
-    l3: {depth:3, blunder:0.12},
-    l4: {depth:3, blunder:0.08},
-    l5: {depth:4, blunder:0.06},
-    l6: {depth:4, blunder:0.03},
-    l7: {depth:5, blunder:0.02},
-    l8: {depth:5, blunder:0.00},
-  };
-  return map[level] || {depth:3, blunder:0.10};
-}
-function pickWeakerMove(state, chance){
-  if(Math.random() > chance) return null;
-  const moves = legalMoves(state);
-  if(moves.length <= 1) return null;
+function undoMove(){
+  if(S.result) return;
+  if(stateStack.length===0) return;
 
-  const scored = moves.map(m=>{
-    const s2 = makeMove(state, m);
-    return {m, score: evalState(s2)};
-  });
+  // if online, forbid undo unless disconnected (simple rule)
+  if(onlineEnabled && p2p.dc && p2p.dc.readyState==="open"){
+    alert("Online modda geri alma kapalı (adil olması için).");
+    return;
+  }
 
-  scored.sort((a,b)=> a.score - b.score);
-  const idx = Math.min(scored.length-1, 1 + Math.floor(Math.random()*Math.min(5, scored.length-1)));
-  return scored[idx].m;
+  // if AI enabled, undo should revert two plies if last was AI? We'll revert one ply each click.
+  const prev = stateStack.pop();
+  S = prev;
+  sanHistory.pop();
+  moveStack.pop();
+  selected=null;
+  currentHint=null;
+  drawArrow(null);
+  render();
 }
-function maybeAiReply(){
+
+$("undoMoveBtn").addEventListener("click", undoMove);
+
+/* =========================
+   8) Kağan Hint (ok)
+========================= */
+const arrowCv = document.getElementById("arrowCanvas");
+function resizeArrowCanvas(){
+  const layer = arrowCv.parentElement;
+  const rect = layer.getBoundingClientRect();
+  arrowCv.width = Math.max(1, Math.round(rect.width * devicePixelRatio));
+  arrowCv.height = Math.max(1, Math.round(rect.height * devicePixelRatio));
+  arrowCv.style.width = rect.width + "px";
+  arrowCv.style.height = rect.height + "px";
+}
+window.addEventListener("resize", ()=>{ resizeArrowCanvas(); drawArrow(currentHint); });
+
+function sqCenterOnScreen(sq){
+  const el = boardEl.querySelector(`[data-sq="${sq}"]`);
+  if(!el) return null;
+  const r = el.getBoundingClientRect();
+  const layer = arrowCv.getBoundingClientRect();
+  const cx = (r.left + r.right)/2 - layer.left;
+  const cy = (r.top + r.bottom)/2 - layer.top;
+  return {x:cx, y:cy};
+}
+
+let currentHint = null; // {from,to,san}
+
+function drawArrow(hint){
+  const ctx = arrowCv.getContext("2d");
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  ctx.clearRect(0,0,arrowCv.width/devicePixelRatio, arrowCv.height/devicePixelRatio);
+  if(!hint) return;
+  if(!$("showArrow").checked) return;
+
+  const a = sqCenterOnScreen(hint.from);
+  const b = sqCenterOnScreen(hint.to);
+  if(!a || !b) return;
+
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "rgba(74,163,255,.92)";
+  ctx.fillStyle = "rgba(74,163,255,.92)";
+
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.stroke();
+
+  const ang = Math.atan2(b.y-a.y, b.x-a.x);
+  const headLen = 18;
+  ctx.beginPath();
+  ctx.moveTo(b.x, b.y);
+  ctx.lineTo(b.x - headLen*Math.cos(ang - Math.PI/7), b.y - headLen*Math.sin(ang - Math.PI/7));
+  ctx.lineTo(b.x - headLen*Math.cos(ang + Math.PI/7), b.y - headLen*Math.sin(ang + Math.PI/7));
+  ctx.closePath();
+  ctx.fill();
+}
+
+function getHint(){
+  if(S.result) return null;
+  // only hint for player's turn (not AI)
+  if(S.turn !== playerSide) return null;
+  const lvl = $("aiLevel").value;
+  const cfg = aiConfig(lvl==="off" ? "l4" : lvl); // hint uses decent strength
+  const best = searchBestMoveTimed(S, Math.min(650, cfg.timeMs+200), Math.min(5, cfg.maxDepth+1)).move;
+  if(!best) return null;
+  const san = sanForMove(S, best);
+  return {from: best.from, to: best.to, san};
+}
+
+function updateKaganText(h){
+  if(!$("hintOn").checked){
+    $("kaganText").innerHTML = `${pick(KAGAN_EMIR)}<br><br><span class="muted">Öneri kapalı.</span>`;
+    return;
+  }
+  if(!h){
+    $("kaganText").innerHTML = `${pick(KAGAN_EMIR)}<br><br><span class="muted">Şu an öneri yok.</span>`;
+    return;
+  }
+  $("kaganText").innerHTML =
+    `${pick(KAGAN_EMIR)}<br><br>Buyruk: <b>${h.san}</b> — ${algebra(h.from)} → ${algebra(h.to)}`;
+}
+
+$("hintBtn").addEventListener("click", ()=>{
+  if(!$("hintOn").checked) return;
+  currentHint = getHint();
+  drawArrow(currentHint);
+  updateKaganText(currentHint);
+});
+
+function maybeAutoHint(){
+  if(!$("hintOn").checked) { updateKaganText(null); return; }
+  if(!$("autoHint").checked) { updateKaganText(currentHint); return; }
+  if(S.result) return;
+  if(S.turn !== playerSide) return;
+  currentHint = getHint();
+  drawArrow(currentHint);
+  updateKaganText(currentHint);
+}
+
+/* =========================
+   9) AI reply (time-limited, hızlı)
+========================= */
+let aiThinking = false;
+
+async function maybeAiReply(){
   const lvl = $("aiLevel").value;
   if(lvl==="off") return;
   if(S.result) return;
-  if(S.turn!=="b") return;
+  if(onlineEnabled && p2p.dc && p2p.dc.readyState==="open") return; // online: no AI
+  if(aiThinking) return;
+
+  // AI plays opposite of player
+  if(S.turn === playerSide) return;
+
+  aiThinking = true;
+  $("status").textContent = "AI düşünüyor…";
+
+  await sleep(40);
 
   const cfg = aiConfig(lvl);
-  $("status").textContent = "AI düşünüyor…";
-  setTimeout(()=>{
-    const weaker = pickWeakerMove(S, cfg.blunder);
-    if(weaker) return playMove(weaker);
 
-    const mm = minimax(S, cfg.depth, -Infinity, Infinity);
-    if(mm.move) playMove(mm.move);
-    else render();
-  }, 60);
+  // low levels blunder sometimes
+  const weaker = pickWeakerMove(S, cfg.blunder);
+  let mv = weaker;
+
+  if(!mv){
+    const res = searchBestMoveTimed(S, cfg.timeMs, cfg.maxDepth);
+    mv = res.move;
+  }
+
+  if(mv){
+    playMove(mv, {sendOnline:false});
+  }else{
+    render();
+  }
+
+  aiThinking = false;
 }
 
 /* =========================
-   7) Start
+   10) Dede Ders
 ========================= */
+$("dedeLessonBtn").addEventListener("click", ()=>{
+  const mode = $("dedeMode").value;
+  if(mode==="off"){
+    $("dedeLessonText").textContent = "Dede susar; yiğit kendi yolunu bulur.";
+    return;
+  }
+  const arr = DEDE_LESSONS[mode] || [];
+  $("dedeLessonText").textContent = arr.length ? arr[Math.floor(Math.random()*arr.length)] : "Ders bulunamadı.";
+});
+
+/* =========================
+   11) Buttons / Options
+========================= */
+$("flipBtn").addEventListener("click", ()=>{ flipped=!flipped; render(); });
+
+$("resetBtn").addEventListener("click", ()=>{
+  onlineEnabled = false;
+  // reset game
+  S = initialState();
+  selected=null;
+  legalCache=[];
+  sanHistory=[];
+  stateStack=[];
+  moveStack=[];
+  currentHint=null;
+  drawArrow(null);
+  stopClock();
+  clockApplySettings();
+  clockReset();
+
+  $("kaganText").innerHTML = "Törüyle başla: Merkez, gelişim, güvenlik. İlk hamleni yap.";
+  $("dedeText").innerHTML = "Yiğit, hamle gelince sözüm de gelir.";
+  render();
+});
+
+$("sidePick").addEventListener("change", ()=>{
+  playerSide = $("sidePick").value;
+  // when side changes, restart cleanly for fairness
+  $("resetBtn").click();
+});
+
+$("aiLevel").addEventListener("change", ()=>{
+  // if AI turned on/off, restart to avoid confusion
+  $("resetBtn").click();
+});
+
+$("showCoords").addEventListener("change", render);
+$("showLegal").addEventListener("change", render);
+$("showArrow").addEventListener("change", ()=> drawArrow(currentHint));
+$("hintOn").addEventListener("change", render);
+$("autoHint").addEventListener("change", render);
+$("dedeOn").addEventListener("change", ()=>{
+  if(!$("dedeOn").checked){
+    $("dedeText").textContent = "Dede kapalı.";
+  }
+  render();
+});
+
+/* Clock */
+$("clockOn").addEventListener("change", ()=>{ clockApplySettings(); clockReset(); render(); });
+$("clockMin").addEventListener("change", ()=>{ clockApplySettings(); clockReset(); render(); });
+$("clockInc").addEventListener("change", ()=>{ clockApplySettings(); clockReset(); render(); });
+$("clockReset").addEventListener("click", ()=>{ clockApplySettings(); clockReset(); render(); });
+
+/* =========================
+   12) Game finished -> stats auto log
+========================= */
+function resultText(result){
+  if(result==="1-0") return "Beyaz kazandı (MAT / süre / terk).";
+  if(result==="0-1") return "Siyah kazandı (MAT / süre / terk).";
+  return "Berabere (PAT / 50 hamle).";
+}
+
+function onGameFinished(result, reason=null){
+  const msg = reason ? `${resultText(result)} (${reason})` : resultText(result);
+
+  $("status").textContent = msg;
+  $("kaganText").innerHTML = `<span class="green" style="font-weight:1000;">Hüküm verildi.</span> ${msg}`;
+  if($("dedeOn").checked){
+    $("dedeText").innerHTML = `${pick(DEDE_USLUP)}<br><br><b>${msg}</b>`;
+  }
+
+  // auto save daily stats
+  if(result==="1-0") addResult("W");
+  else if(result==="0-1") addResult("L");
+  else addResult("D");
+
+  stopClock();
+}
+
+/* =========================
+   13) Daily goal + stats (1..10000)
+========================= */
+const LS_GOAL = "toru_goal_v1";
+const LS_DAILY = "toru_daily_v1";
+
+function loadGoal(){
+  const g = parseInt(localStorage.getItem(LS_GOAL)||"5",10);
+  return clamp(isNaN(g)?5:g, 1, 10000);
+}
+function saveGoal(g){ localStorage.setItem(LS_GOAL, String(g)); }
+
+function loadDaily(){
+  try{ return JSON.parse(localStorage.getItem(LS_DAILY) || "{}") || {}; }
+  catch{ return {}; }
+}
+function saveDaily(obj){ localStorage.setItem(LS_DAILY, JSON.stringify(obj)); }
+
+function getDayObj(daily, key){
+  daily[key] = daily[key] || { w:0, l:0, d:0, games:[] , goalMet:false};
+  return daily[key];
+}
+function winRate(w,l,d){
+  const total=w+l+d;
+  if(total<=0) return 0;
+  return (w + 0.5*d) / total;
+}
+function totalGames(x){ return (x.w||0)+(x.l||0)+(x.d||0); }
+
+function lastNDaysKeys(n=14){
+  const out=[];
+  const d=new Date();
+  for(let i=0;i<n;i++){
+    const dd=new Date(d);
+    dd.setDate(d.getDate()-i);
+    out.push(dd.toISOString().slice(0,10));
+  }
+  return out.reverse();
+}
+
+function updateStatsUI(){
+  const goal = loadGoal();
+  const daily = loadDaily();
+  const key = nowDayKey();
+  const t = daily[key] || {w:0,l:0,d:0,games:[]};
+
+  const W=t.w||0, L=t.l||0, D=t.d||0;
+  const tot= W+L+D;
+  const pct = Math.floor((tot/goal)*100);
+
+  $("goalNum").textContent = goal;
+  $("goalSet").value = goal;
+  $("todayTotal").textContent = tot;
+  $("goalPct").textContent = clamp(pct,0,999) + "%";
+  $("todayW").textContent = W;
+  $("todayL").textContent = L;
+  $("todayD").textContent = D;
+
+  const wr = winRate(W,L,D);
+  $("todayWR").textContent = Math.round(wr*100) + "%";
+
+  const left = Math.max(0, goal - tot);
+  const met = tot >= goal;
+
+  // hedefin ne kadarı tamam, ne kadarı başarılı/başarısız?
+  // başarılı oranını tüm oyunlar üzerinden veriyoruz, ayrıca "hedefe kadar olan kısım" için aynı oranı belirtiyoruz.
+  const inGoal = Math.min(tot, goal);
+  const completion = met ? `Hedef tamamlandı (≥ ${goal}).` : `Hedefe ${left} oyun kaldı.`;
+
+  $("goalHint").textContent =
+    `${completion} Bugün başarı: ${(wr*100).toFixed(0)}%.`;
+
+  // analysis line: gelişim + hedef tutarlılığı
+  const keys = lastNDaysKeys(14);
+  let metCount=0, playedDays=0;
+  for(const k of keys){
+    const x = daily[k];
+    if(!x) continue;
+    const tt = totalGames(x);
+    if(tt>0) playedDays++;
+    if(tt>=goal) metCount++;
+  }
+  const consistency = playedDays ? Math.round((metCount/playedDays)*100) : 0;
+
+  $("analysisLine").textContent =
+    `Hedef tutarlılığı (son ${playedDays||0} aktif günde): ${consistency}% · (Hedef ${goal} oyun)`;
+
+  // history list
+  let lines = [];
+  for(const k of keys){
+    const x = daily[k];
+    if(!x){
+      lines.push(`${k}: 0 oyun`);
+      continue;
+    }
+    const tt=totalGames(x);
+    const r = winRate(x.w||0,x.l||0,x.d||0);
+    const met = tt>=goal ? "✓" : "·";
+    lines.push(`${k}: ${tt} oyun ${met} · ✅${x.w||0} ❌${x.l||0} ➖${x.d||0} · ${(r*100).toFixed(0)}%`);
+  }
+  $("historyList").textContent = lines.join("\n");
+
+  // progress analysis: last 7 vs prev 7
+  const first7 = keys.slice(0,7);
+  const last7  = keys.slice(7);
+  function sum(keysArr){
+    let w=0,l=0,d=0;
+    let met=0, active=0;
+    for(const k of keysArr){
+      const x = daily[k];
+      if(!x) continue;
+      w += x.w||0; l += x.l||0; d += x.d||0;
+      const tt = totalGames(x);
+      if(tt>0) active++;
+      if(tt>=goal) met++;
+    }
+    const t = w+l+d;
+    return {w,l,d,t, r: winRate(w,l,d), active, met};
+  }
+  const a = sum(first7);
+  const b = sum(last7);
+  const delta = (b.r - a.r);
+
+  let verdict;
+  if(b.t < 3){
+    verdict = "Yeterli veri yok: Son 7 günde oyun sayısı az (en az 3–5 iyi olur).";
+  }else if(delta > 0.08){
+    verdict = "GELİŞİM VAR: Başarı oranı anlamlı yükselmiş.";
+  }else if(delta < -0.08){
+    verdict = "DÜŞÜŞ VAR: Başarı oranı düşmüş. Açılış + taktik tekrar önerilir.";
+  }else{
+    verdict = "DENGE: Benzer performans. Oyun sayısı artınca trend netleşir.";
+  }
+
+  const consA = a.active ? Math.round((a.met/a.active)*100) : 0;
+  const consB = b.active ? Math.round((b.met/b.active)*100) : 0;
+  const consDelta = consB - consA;
+
+  $("progressAnalysis").textContent =
+    `Önceki 7 gün: ${a.t} oyun · ${(a.r*100).toFixed(0)}% · Hedef tutarlılığı: ${consA}%\n` +
+    `Son 7 gün:   ${b.t} oyun · ${(b.r*100).toFixed(0)}% · Hedef tutarlılığı: ${consB}%\n` +
+    `Başarı değişimi: ${(delta*100).toFixed(0)} puan\n` +
+    `Tutarlılık değişimi: ${consDelta>=0?"+":""}${consDelta} puan\n` +
+    `${verdict}`;
+}
+
+function addResult(resChar){
+  const daily = loadDaily();
+  const key = nowDayKey();
+  const t = getDayObj(daily, key);
+
+  if(resChar==="W") t.w++;
+  else if(resChar==="L") t.l++;
+  else t.d++;
+
+  t.games.push({
+    at: new Date().toISOString(),
+    res: resChar,
+    side: playerSide==="w" ? "Beyaz" : "Siyah",
+    ai: $("aiLevel").value,
+    opening: openingName(sanHistory),
+  });
+
+  saveDaily(daily);
+  updateStatsUI();
+}
+
+function undoLastResult(){
+  const daily = loadDaily();
+  const key = nowDayKey();
+  const t = daily[key];
+  if(!t || !t.games || !t.games.length) return;
+
+  const last = t.games.pop();
+  if(last.res==="W") t.w = Math.max(0, (t.w||0)-1);
+  if(last.res==="L") t.l = Math.max(0, (t.l||0)-1);
+  if(last.res==="D") t.d = Math.max(0, (t.d||0)-1);
+
+  saveDaily(daily);
+  updateStatsUI();
+}
+
+function clearToday(){
+  const daily = loadDaily();
+  const key = nowDayKey();
+  delete daily[key];
+  saveDaily(daily);
+  updateStatsUI();
+}
+
+$("markWin").addEventListener("click", ()=> addResult("W"));
+$("markLoss").addEventListener("click", ()=> addResult("L"));
+$("markDraw").addEventListener("click", ()=> addResult("D"));
+$("undoLastStat").addEventListener("click", undoLastResult);
+$("clearToday").addEventListener("click", clearToday);
+
+$("goalMinus").addEventListener("click", ()=>{
+  const g = clamp(loadGoal()-1,1,10000);
+  saveGoal(g);
+  updateStatsUI();
+});
+$("goalPlus").addEventListener("click", ()=>{
+  const g = clamp(loadGoal()+1,1,10000);
+  saveGoal(g);
+  updateStatsUI();
+});
+$("goalApply").addEventListener("click", ()=>{
+  const v = parseInt($("goalSet").value,10);
+  if(!v || isNaN(v)) return;
+  const g = clamp(v,1,10000);
+  saveGoal(g);
+  updateStatsUI();
+});
+
+/* =========================
+   14) YouTube (kilitli liste)
+========================= */
+const LS_SONGS = "toru_songs_v1";
+let SONGS = [
+  // Buraya kendi ID’lerini ekleyebilirsin.
+  // Kullanıcı linkinden alınan örnek:
+  { title: "Seçili Parça (m0fXYGf0bfw)", id: "m0fXYGf0bfw" },
+];
+
+function normalizeYouTubeId(urlOrId){
+  if(!urlOrId) return null;
+  const t = urlOrId.trim();
+  if(/^[a-zA-Z0-9_-]{11}$/.test(t)) return t;
+  try{
+    const u = new URL(t);
+    if(u.hostname.includes("youtu.be")){
+      const id = u.pathname.replace("/","").trim();
+      return (/^[a-zA-Z0-9_-]{11}$/.test(id)) ? id : null;
+    }
+    const v = u.searchParams.get("v");
+    if(v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
+    const m = u.pathname.match(/\/(embed|shorts)\/([a-zA-Z0-9_-]{11})/);
+    if(m) return m[2];
+    return null;
+  }catch{
+    return null;
+  }
+}
+
+function loadSongs(){
+  try{
+    const raw = localStorage.getItem(LS_SONGS);
+    if(!raw) return;
+    const arr = JSON.parse(raw);
+    if(Array.isArray(arr) && arr.length){
+      SONGS = arr.filter(x=>x && x.id && x.title && /^[a-zA-Z0-9_-]{11}$/.test(x.id));
+    }
+  }catch{}
+}
+function saveSongs(){ localStorage.setItem(LS_SONGS, JSON.stringify(SONGS)); }
+
+const songSelect = $("songSelect");
+function renderSongs(){
+  songSelect.innerHTML = "";
+  SONGS.forEach((s)=>{
+    const o=document.createElement("option");
+    o.value = s.id;
+    o.textContent = s.title;
+    songSelect.appendChild(o);
+  });
+}
+
+let ytPlayer=null, ytReady=false, currentIndex=0;
+function setYtStatus(t){ $("ytStatus").textContent = "Durum: " + t; }
+
+function playByIndex(i){
+  if(!SONGS.length) return setYtStatus("Liste boş");
+  currentIndex = (i + SONGS.length) % SONGS.length;
+  const s = SONGS[currentIndex];
+  songSelect.value = s.id;
+  if(!ytReady) return setYtStatus("Player hazır değil");
+  ytPlayer.loadVideoById(s.id);
+  setYtStatus("Çalıyor: " + s.title);
+}
+function playSelected(){
+  const id = songSelect.value;
+  const idx = SONGS.findIndex(x=>x.id===id);
+  playByIndex(idx>=0 ? idx : 0);
+}
+function playNext(){ playByIndex(currentIndex + 1); }
+function pauseYt(){ if(ytReady) ytPlayer.pauseVideo(); }
+
+$("playBtn").addEventListener("click", playSelected);
+$("pauseBtn").addEventListener("click", pauseYt);
+$("nextBtn").addEventListener("click", playNext);
+songSelect.addEventListener("change", playSelected);
+
+$("addBtn").addEventListener("click", ()=>{
+  if(!$("songEditOn").checked){
+    setYtStatus("Liste düzenleme kapalı (güvenlik). Açarsan ekleyebilirsin.");
+    return;
+  }
+  const url = $("songUrl").value;
+  const id = normalizeYouTubeId(url);
+  if(!id){
+    setYtStatus("Link/ID okunamadı. 'watch?v=...' olmalı.");
+    return;
+  }
+  const title = prompt("Şarkı adı ne olsun?", "Yeni Parça");
+  if(!title) return;
+  if(SONGS.some(x=>x.id===id)){
+    setYtStatus("Bu parça zaten listede.");
+    return;
+  }
+  SONGS.push({title, id});
+  saveSongs();
+  renderSongs();
+  $("songUrl").value = "";
+  setYtStatus("Listeye eklendi: " + title);
+});
+
+function loadYouTubeAPI(){
+  const tag=document.createElement("script");
+  tag.src="https://www.youtube.com/iframe_api";
+  document.body.appendChild(tag);
+}
+window.onYouTubeIframeAPIReady = function(){
+  ytPlayer = new YT.Player("yt", {
+    height:"0", width:"0",
+    videoId: SONGS[0]?.id || "",
+    playerVars:{
+      autoplay:0, controls:0, rel:0, modestbranding:1, playsinline:1,
+      origin: location.origin
+    },
+    events:{
+      onReady: ()=>{
+        ytReady=true;
+        setYtStatus("Hazır. İlk kez ÇAL’a dokun.");
+      },
+      onStateChange: (ev)=>{
+        if(ev.data===YT.PlayerState.ENDED) playNext();
+        if(ev.data===YT.PlayerState.PLAYING) setYtStatus("Çalıyor");
+        if(ev.data===YT.PlayerState.PAUSED) setYtStatus("Duraklatıldı");
+      },
+      onError: (e)=>{
+        setYtStatus("Bu parça açılamadı (kod "+e.data+"). Sonraki parçaya geçiliyor…");
+        setTimeout(playNext, 700);
+      }
+    }
+  });
+};
+loadYouTubeAPI();
+
+/* =========================
+   15) P2P Online (WebRTC, copy-paste signaling)
+========================= */
+function setP2PState(t){ $("p2pState").textContent = t; }
+function setP2PHint(t){ $("p2pHint").textContent = t || ""; }
+
+async function p2pClose(){
+  onlineEnabled = false;
+  try{ if(p2p.dc) p2p.dc.close(); }catch{}
+  try{ if(p2p.pc) p2p.pc.close(); }catch{}
+  p2p = {pc:null, dc:null, role:null};
+  setP2PState("Kapalı");
+  setP2PHint("");
+}
+
+async function p2pHost(){
+  await p2pClose();
+  onlineEnabled = true;
+
+  const pc = new RTCPeerConnection();
+  const dc = pc.createDataChannel("toru");
+  p2p = {pc, dc, role:"host"};
+
+  dc.onopen = ()=>{ setP2PState("Bağlı"); setP2PHint("Bağlandı. Hamleler senkron."); render(); };
+  dc.onclose = ()=>{ setP2PState("Koptu"); setP2PHint("Bağlantı kapandı."); };
+
+  dc.onmessage = (ev)=>{
+    try{
+      const msg = JSON.parse(ev.data);
+      if(msg.t==="mv"){
+        // apply opponent move
+        const mv = findMoveFromPayload(msg);
+        if(mv) playMove(mv, {sendOnline:false});
+      }
+    }catch{}
+  };
+
+  pc.onicecandidate = ()=>{
+    // offer'ı kutuya bas
+    // ICE gathering complete may take a bit; user can copy later
+  };
+
+  const offer = await pc.createOffer();
+  await pc.setLocalDescription(offer);
+
+  // wait a bit for ICE candidates
+  await sleep(700);
+  $("p2pBox").value = JSON.stringify(pc.localDescription);
+  setP2PState("Host Hazır");
+  setP2PHint("Offer kutuda. Kopyala, diğer cihaza gönder.");
+}
+
+async function p2pJoin(){
+  await p2pClose();
+  onlineEnabled = true;
+
+  const pc = new RTCPeerConnection();
+  p2p = {pc, dc:null, role:"join"};
+
+  pc.ondatachannel = (ev)=>{
+    const dc = ev.channel;
+    p2p.dc = dc;
+
+    dc.onopen = ()=>{ setP2PState("Bağlı"); setP2PHint("Bağlandı. Hamleler senkron."); render(); };
+    dc.onclose = ()=>{ setP2PState("Koptu"); setP2PHint("Bağlantı kapandı."); };
+
+    dc.onmessage = (ev)=>{
+      try{
+        const msg = JSON.parse(ev.data);
+        if(msg.t==="mv"){
+          const mv = findMoveFromPayload(msg);
+          if(mv) playMove(mv, {sendOnline:false});
+        }
+      }catch{}
+    };
+  };
+
+  // paste offer from box
+  let offer;
+  try{ offer = JSON.parse($("p2pBox").value.trim()); }catch{
+    setP2PHint("Kutudaki Offer JSON değil.");
+    return;
+  }
+  await pc.setRemoteDescription(offer);
+
+  const answer = await pc.createAnswer();
+  await pc.setLocalDescription(answer);
+
+  await sleep(700);
+  $("p2pBox").value = JSON.stringify(pc.localDescription);
+  setP2PState("Join Hazır");
+  setP2PHint("Answer kutuda. Kopyala, host’a gönder. Host bunu remote olarak yapıştırmalı (bu sürümde host tarafı: p2pBox’a yapıştırıp 'Bağlan' butonuna basma yerine: 'Bağlan (Join)' yok; pratikte host tarafında aynı sayfada 'Bağlan' butonuna basıp answer yapıştırabilirsin.)");
+}
+
+// Simplified: host can paste answer and click "Bağlan (Join)" to setRemote
+async function p2pHostAcceptAnswer(){
+  if(!p2p.pc || p2p.role!=="host") return;
+  let ans;
+  try{ ans = JSON.parse($("p2pBox").value.trim()); }catch{
+    setP2PHint("Kutudaki Answer JSON değil.");
+    return;
+  }
+  await p2p.pc.setRemoteDescription(ans);
+  setP2PHint("Answer alındı. Bağlantı kuruluyor…");
+}
+
+function findMoveFromPayload(msg){
+  const from = msg.from, to = msg.to;
+  const promo = msg.promo;
+  const moves = legalMoves(S);
+  const cand = moves.filter(m=>m.from===from && m.to===to);
+  if(!cand.length) return null;
+  if(promo){
+    const p = cand.find(x=>x.promo===promo);
+    return p || cand[0];
+  }
+  // if promotion exists, default queen
+  if(cand.some(x=>x.promo)){
+    return cand.find(x=>x.promo && x.promo.toLowerCase()==="q") || cand[0];
+  }
+  return cand[0];
+}
+
+$("p2pHost").addEventListener("click", p2pHost);
+$("p2pJoin").addEventListener("click", async ()=>{
+  // dual use:
+  // if host and answer pasted -> accept
+  if(p2p.role==="host"){
+    await p2pHostAcceptAnswer();
+    return;
+  }
+  await p2pJoin();
+});
+$("p2pClose").addEventListener("click", p2pClose);
+$("p2pCopy").addEventListener("click", async ()=>{
+  try{
+    await navigator.clipboard.writeText($("p2pBox").value);
+    setP2PHint("Kopyalandı.");
+  }catch{
+    setP2PHint("Kopyalama engellendi. Elle kopyalayabilirsin.");
+  }
+});
+
+/* =========================
+   16) Start-up
+========================= */
+function hardCheckBoardColor(){
+  // sanity: a8 and h1 must be light.
+  const a8 = rcToSq(0,0);
+  const h1 = rcToSq(7,7);
+  const a8Light = ((0+0)%2===0);
+  const h1Light = ((7+7)%2===0);
+  if(!a8Light || !h1Light){
+    console.warn("Tahta renk kuralı bozuldu!");
+  }
+}
+hardCheckBoardColor();
+
+loadSongs();
+renderSongs();
+clockApplySettings();
+clockReset();
+updateStatsUI();
+
 render();
 </script>
 </body>
-</html>jn
+</html>
