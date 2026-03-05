@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Bozkurt Ordusu (Börüler) — Kağan 𐰴𐰍𐰣 & Dede 𐱅𐰑𐰀</title>
+  <title>Törü — Türk'ün Töresi</title>
   <style>
     :root{
       --bg:#070b16;
@@ -65,7 +65,6 @@
       font-weight:700;
       cursor:pointer;
     }
-    input{cursor:text; font-weight:600; width:min(520px,100%);}
     button.primary{background: rgba(74,163,255,.18); border-color: rgba(74,163,255,.45)}
     button.danger{background: rgba(255,91,122,.16); border-color: rgba(255,91,122,.45)}
     button:active{transform: translateY(1px)}
@@ -125,32 +124,6 @@
     .piece{font-weight:900; filter: drop-shadow(0 2px 1px rgba(0,0,0,.35));}
     .w{color:#f7f7f7; text-shadow: 0 1px 0 rgba(0,0,0,.35), 0 0 10px rgba(255,255,255,.18);}
     .b{color:#141414; text-shadow: 0 1px 0 rgba(255,255,255,.10), 0 0 10px rgba(0,0,0,.12);}
-
-    /* Koordinatlar (a-h / 1-8) */
-    .coordFile{
-      position:absolute;
-      bottom:6px;
-      right:6px;
-      font-size:11px;
-      font-weight:800;
-      color: rgba(0,0,0,.45);
-      text-shadow: 0 1px 0 rgba(255,255,255,.25);
-      pointer-events:none;
-    }
-    .coordRank{
-      position:absolute;
-      top:6px;
-      left:6px;
-      font-size:11px;
-      font-weight:800;
-      color: rgba(0,0,0,.45);
-      text-shadow: 0 1px 0 rgba(255,255,255,.25);
-      pointer-events:none;
-    }
-    .dark .coordFile, .dark .coordRank{
-      color: rgba(255,255,255,.55);
-      text-shadow: 0 1px 0 rgba(0,0,0,.35);
-    }
 
     .statusline{
       display:flex;
@@ -245,8 +218,8 @@
   <div class="hero">
     <div class="hrow">
       <div>
-        <h1>Bozkurt Ordusu (Börüler)</h1>
-        <div class="sub">Kurallı Satranç · <b>Kağan 𐰴𐰍𐰣</b> · <b>Dede 𐱅𐰑𐰀</b> · Kilitli YouTube Liste</div>
+        <h1>Törü — Türk'ün Töresi</h1>
+        <div class="sub">Kurallı Satranç · <b>Kağan 𐰴𐰍𐰣</b> · <b>Dede 𐱅𐰑𐰀</b></div>
       </div>
 
       <div class="btnrow">
@@ -275,8 +248,8 @@
     </div>
 
     <div class="note">
-      ✅ Standart kurallar: Rok / En passant / Terfi / Mat-Pat. <br/>
-      ✅ Tahta rengi doğru: <b>a1 koyu</b>, <b>h1 açık</b>, <b>a8 açık</b>, <b>h8 koyu</b>. Vezirler <b>d sütununda</b>.
+      ✅ Taş dizilimi <b>gerçek satranç dizilimi</b>dir (Vezirler <b>d sütunu</b>).<br/>
+      ✅ Tahta rengi kuralı: <b>a8 açık</b>, <b>h1 açık</b>, <b>a1 koyu</b>, <b>h8 koyu</b>.
     </div>
   </div>
 
@@ -296,10 +269,6 @@
           <canvas id="arrowCanvas"></canvas>
         </div>
       </div>
-
-      <div class="note small" style="margin-top:12px">
-        Not: Telefonda YouTube sesini başlatmak için ilk kez “ÇAL”a dokunman gerekir. (Tarayıcı kuralı)
-      </div>
     </div>
 
     <div class="card">
@@ -311,100 +280,23 @@
         </div>
       </div>
 
-      <div class="bubble" style="margin-top:0">
-        <div class="tag">Yol Gösterme (Aç/Kapat)</div>
-        <div class="small">Kağan en iyi hamleyi söyler ve (istersen) tahtada <b>ok</b> ile gösterir. İstersen hamle noktalarını ve koordinatı da aç/kapat.</div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px">
-          <label class="pill"><input type="checkbox" id="showArrow" checked style="transform:scale(1.1); margin-right:8px;"> Kağan Oku (Yol)</label>
-          <label class="pill"><input type="checkbox" id="showHints" checked style="transform:scale(1.1); margin-right:8px;"> Hamle Noktaları</label>
-          <label class="pill"><input type="checkbox" id="showCoords" style="transform:scale(1.1); margin-right:8px;"> Koordinat (a–h / 1–8)</label>
-          <label class="pill"><input type="checkbox" id="autoHint" checked style="transform:scale(1.1); margin-right:8px;"> Sıra bende iken otomatik öner</label>
-          <button id="hintBtn" class="primary">Kağan’dan Öneri Al</button>
-        </div>
-      </div>
-
-      <div class="bubble">
-        <div class="tag">Dede Öğreti Modu</div>
-        <div class="small">Oyun öncesi seç: Dede satrancı öğretir, tarihçe/taşlar/açılış/oyun sonu/taktik anlatır.</div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px">
-          <select id="dedeMode">
-            <option value="off">Kapalı</option>
-            <option value="history">Tarihçe (genel)</option>
-            <option value="pieces">Taşlar (tanıma & değer)</option>
-            <option value="basic">Temel (açılış töresi)</option>
-            <option value="openings">Açılışlar (bilinen/az bilinen)</option>
-            <option value="endgames">Oyun sonu (teknikler)</option>
-            <option value="tactics">Taktik (çatal/açmaz/şiş)</option>
-            <option value="mate">Mat planı (temalar)</option>
-          </select>
-          <button id="dedeLessonBtn">Dede’den Ders</button>
-        </div>
-        <div class="small" style="margin-top:8px" id="dedeLessonText"></div>
-      </div>
-
       <div class="chat" id="chat">
         <div class="msg">
           <div class="who">Kağan 𐰴𐰍𐰣</div>
-          <div class="txt" id="kaganText">Er meydanı kuruldu. Börüler düzen alsın. İlk hamleni yap.</div>
+          <div class="txt" id="kaganText">Törü bozulmaz. İlk hamleni yap.</div>
         </div>
         <div class="msg">
           <div class="who">Dede 𐱅𐰑𐰀</div>
-          <div class="txt" id="dedeText">Yiğit, ilk hamleni beklerim. Hamle gelince sözüm de gelir.</div>
+          <div class="txt" id="dedeText">Yiğit, hamle gelince sözüm de gelir.</div>
         </div>
       </div>
 
       <div class="bubble">
-        <div class="tag">Müzik (YouTube — sadece bizim liste)</div>
-
-        <div class="small" style="margin-bottom:8px">
-          ✅ Playlist/search yok. Sadece <b>video ID</b> ile çalar (başka şeye kaymaz). <br/>
-          ✅ YouTube Music linki de olur: <b>watch?v=</b> içinden ID çıkarır.
+        <div class="tag">Not</div>
+        <div class="small">
+          Eğer “taşlar görünmüyor” olursa: iPhone/Safari bazen font fallback yapar. Bu sürümde Unicode taşlar standarttır.
+          Yine de sorun olursa bana ekran görüntüsü at, taşları PNG ikonla da yaparım.
         </div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-          <select id="songSelect" style="min-width:min(520px,100%);"></select>
-          <button id="playBtn" class="primary">ÇAL</button>
-          <button id="pauseBtn">DURAKLAT</button>
-          <button id="nextBtn">SONRAKİ</button>
-        </div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px;">
-          <input id="songUrl" placeholder="YouTube / YouTube Music linkini yapıştır (watch?v=...)" />
-          <button id="addBtn">Listeye Ekle</button>
-        </div>
-
-        <div class="small" style="margin-top:8px" id="ytStatus">Durum: Player yükleniyor…</div>
-        <div id="yt" style="width:0;height:0;overflow:hidden;"></div>
-      </div>
-
-      <div class="bubble">
-        <div class="tag">Günlük Hedef (1–10000)</div>
-        <div class="small">Gün içinde bitirdiğin oyun sayısını, başarı/başarısızlık oranlarını ve gelişim trendini tarayıcı hafızasında tutar.</div>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:8px">
-          <label class="pill">Hedef: <b><span id="goalNum">5</span></b> oyun</label>
-          <button id="goalMinus">-</button>
-          <button id="goalPlus">+</button>
-          <label class="pill">Bugün: <b><span id="todayCount">0</span></b></label>
-          <label class="pill">Hedef Tamam: <b><span id="goalPct">0%</span></b></label>
-        </div>
-        <div class="small" style="margin-top:6px" id="goalHint"></div>
-
-        <hr style="border:none;border-top:1px solid rgba(255,255,255,.10); margin:12px 0" />
-        <div class="tag">Bugün Sonuçlar (✅/❌/➖)</div>
-        <div class="small" id="todaySummary"></div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:10px;">
-          <button id="markWin" class="primary">Bugün +1 Galibiyet</button>
-          <button id="markLoss" class="danger">Bugün +1 Mağlubiyet</button>
-          <button id="markDraw">Bugün +1 Berabere</button>
-          <button id="undoLast">Son Kaydı Geri Al</button>
-        </div>
-
-        <div class="small" style="margin-top:10px"><b>Gün Gün Geçmiş (son 30 gün):</b></div>
-        <div id="historyList" class="small" style="margin-top:6px; white-space:pre-wrap"></div>
-
-        <div class="small" style="margin-top:10px"><b>Gelişim Analizi:</b></div>
-        <div id="progressAnalysis" class="small" style="margin-top:6px; white-space:pre-wrap"></div>
       </div>
 
     </div>
@@ -413,7 +305,7 @@
 
 <div id="intro" class="intro" title="Dokununca geçer">
   <div class="introBox">
-    <div class="introTitle">𐰉𐰆𐰔𐰴𐰆𐰺𐱃 𐰆𐰺𐰑𐰆𐰽𐰆 · Bozkurt Ordusu</div>
+    <div class="introTitle">𐱅𐰇𐰼𐰇 · TÖRÜ — Türk'ün Töresi</div>
     <div class="runes" id="runeText"></div>
     <div class="small" style="margin-top:10px">Başlamak için dokun…</div>
   </div>
@@ -424,18 +316,16 @@
    0) Helpers
 ========================= */
 const $ = (id)=>document.getElementById(id);
-const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
-const nowDayKey = ()=> new Date().toISOString().slice(0,10);
 
 /* =========================
    1) Orhun intro
 ========================= */
 const RUNES = [
-  "𐰴𐰍𐰣: 𐰉𐰆𐰺𐰃𐰠𐰼 𐱅𐰇𐰔𐰇𐰤 𐰀𐰠𐰽𐰣",
+  "𐰴𐰍𐰣: 𐱅𐰇𐰼𐰇 𐰉𐰆𐰔𐰆𐰞𐰢𐰔",
   "𐱅𐰑𐰀: 𐰖𐰃𐰏𐰃𐱅 𐰋𐰀𐰽𐰞𐰀𐰑𐰃",
   "",
-  "Bozkurt Ordusu — Er meydanı kuruldu.",
-  "Töre bozulmaz. Akıl kılavuz olur.",
+  "Törü — Türk'ün Töresi",
+  "Akıl kılavuz olur.",
 ].join("\n");
 
 (function introType(){
@@ -457,6 +347,7 @@ setTimeout(hideIntro, 2500);
 
 /* =========================
    2) Chess core (rules)
+   - Dizilim ve kurallar: gerçek satranç
 ========================= */
 const PIECE_UNI = {
   P:"♙", N:"♘", B:"♗", R:"♖", Q:"♕", K:"♔",
@@ -475,7 +366,6 @@ const pieceValue = (p)=>{
 };
 const isWhite = (p)=> p && p===p.toUpperCase();
 const isBlack = (p)=> p && p===p.toLowerCase();
-
 function sqToRC(sq){ return {r: Math.floor(sq/8), c: sq%8}; }
 function rcToSq(r,c){ return r*8+c; }
 function inBoard(r,c){ return r>=0 && r<8 && c>=0 && c<8; }
@@ -485,14 +375,21 @@ function algebra(sq){
 }
 function cloneState(s){ return JSON.parse(JSON.stringify(s)); }
 
+/* ✅ GERÇEK SATRANÇ DİZİLİMİ
+   8. sıra: r n b q k b n r
+   7. sıra: p p p p p p p p
+   2. sıra: P P P P P P P P
+   1. sıra: R N B Q K B N R
+   Vezirler d sütununda: d8=q, d1=Q
+*/
 function initialState(){
   const b = Array(64).fill(null);
   const backBlack = ["r","n","b","q","k","b","n","r"];
   const backWhite = ["R","N","B","Q","K","B","N","R"];
-  for(let c=0;c<8;c++) b[rcToSq(0,c)] = backBlack[c];
-  for(let c=0;c<8;c++) b[rcToSq(1,c)] = "p";
-  for(let c=0;c<8;c++) b[rcToSq(6,c)] = "P";
-  for(let c=0;c<8;c++) b[rcToSq(7,c)] = backWhite[c];
+  for(let c=0;c<8;c++) b[rcToSq(0,c)] = backBlack[c]; // 8th rank
+  for(let c=0;c<8;c++) b[rcToSq(1,c)] = "p";        // 7th
+  for(let c=0;c<8;c++) b[rcToSq(6,c)] = "P";        // 2nd
+  for(let c=0;c<8;c++) b[rcToSq(7,c)] = backWhite[c]; // 1st
   return {
     board: b,
     turn: "w",
@@ -515,7 +412,6 @@ function attackedBy(state, sq, byColor){
   const b = state.board;
   const {r,c}=sqToRC(sq);
 
-  // pawns
   if(byColor==="w"){
     for(const dc of [-1,1]){
       const rr=r+1, cc=c+dc;
@@ -528,7 +424,6 @@ function attackedBy(state, sq, byColor){
     }
   }
 
-  // knights
   const kD = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
   for(const [dr,dc] of kD){
     const rr=r+dr, cc=c+dc;
@@ -539,7 +434,6 @@ function attackedBy(state, sq, byColor){
     if(byColor==="b" && p==="n") return true;
   }
 
-  // bishops/queens
   const diag = [[-1,-1],[-1,1],[1,-1],[1,1]];
   for(const [dr,dc] of diag){
     let rr=r+dr, cc=c+dc;
@@ -554,7 +448,6 @@ function attackedBy(state, sq, byColor){
     }
   }
 
-  // rooks/queens
   const line = [[-1,0],[1,0],[0,-1],[0,1]];
   for(const [dr,dc] of line){
     let rr=r+dr, cc=c+dc;
@@ -569,7 +462,6 @@ function attackedBy(state, sq, byColor){
     }
   }
 
-  // king
   for(let dr=-1;dr<=1;dr++){
     for(let dc=-1;dc<=1;dc++){
       if(dr===0 && dc===0) continue;
@@ -629,7 +521,6 @@ function genPseudoMoves(state){
         const startR = (us==="w") ? 6 : 1;
         const promoR = (us==="w") ? 0 : 7;
 
-        // forward
         const rr=r+dir, cc=c;
         if(inBoard(rr,cc)){
           const to=rcToSq(rr,cc);
@@ -652,7 +543,6 @@ function genPseudoMoves(state){
           }
         }
 
-        // captures + en passant
         for(const dc of [-1,1]){
           const rrC=r+dir, ccC=c+dc;
           if(!inBoard(rrC,ccC)) continue;
@@ -710,7 +600,6 @@ function genPseudoMoves(state){
           }
         }
 
-        // castling
         const kingHome = us==="w" ? rcToSq(7,4) : rcToSq(0,4);
         if(sq===kingHome && !inCheck(state, us)){
           if(us==="w" && state.castling.K){
@@ -930,111 +819,7 @@ function openingName(sanList){
 }
 
 /* =========================
-   5) Kağan & Dede metinleri
-========================= */
-const KAGAN_EMIR = [
-  "Er meydanı kuruldu; düzeni bozma.",
-  "Önce merkez! Sonra kanatlar.",
-  "Taşı boşa sürme; her adımın hükmü olsun.",
-  "Düşün, tart, vur; sonra ilerle.",
-  "Zayıf kareyi tut; ok gibi saplan.",
-  "Şahı koru; saldırıyı unutma.",
-  "Gereksiz hamle töreyi yorar.",
-  "Vakit dar ise sadelik kurtarır.",
-  "Güç birliği yap; taşlar yalnız kalmasın.",
-  "Zafer sabırla doğar; aceleyle ölür."
-];
-const DEDE_USLUP = [
-  "Yiğit, taşın gönlünü kırma; doğru yere kondur.",
-  "At gider, iz kalır; hamle gider, hüküm kalır.",
-  "Söz bir, ok bir; hamlen de bir olsun.",
-  "Kurt sürüsü dağılmaz; taşların dağılmasın.",
-  "Düşman uyur sanma; gözün açık olsun.",
-  "Yol uzunsa akıl kısadır; sade oyna, sağlam oyna.",
-  "Bir taşın kıymeti, durduğu yerle ölçülür.",
-  "Sabır kılıçtan keskindir; beklemesini bil.",
-  "Gönül ister saldırı; akıl ister tedbir.",
-  "Yiğit, mat getirmek yiğitliktir; pat düşmek talihsizliktir."
-];
-function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-function dedeComment(san, evalBefore, evalAfter){
-  const swing = evalAfter - evalBefore;
-  let mood = "";
-  if(Math.abs(swing) < 40) mood = "Denge bozulmadı; ama yol uzun.";
-  else if(swing > 120) mood = "Güzel hamle! Rüzgâr senden yana döndü.";
-  else if(swing < -120) mood = "Aman yiğit… Bu hamle bir gedik açtı; dikkat et.";
-  else mood = "İşin özü: tedbirle yürü.";
-  return `${pick(DEDE_USLUP)}<br><br>Hamle: <b>${san}</b>. ${mood}`;
-}
-
-function dedePlanComment(state){
-  const us = state.turn;
-  const them = us==="w" ? "b" : "w";
-  const inC = inCheck(state, them);
-  const lm = legalMoves(state).length;
-  const ksq = findKing(state, them);
-  const {r}=sqToRC(ksq);
-
-  let plan = [];
-  if(inC) plan.push("Şah çekilmiş! Kaçış karelerini kapat, baskıyı artır.");
-  if(lm <= 8) plan.push("Rakibin yolu daraldı; mat ağı kur.");
-  if((them==="b" && r===0) || (them==="w" && r===7)) plan.push("Tema: Arka sıra zayıflığını ara (kale/vezir baskısı).");
-  plan.push("Açık hat aç; taşlarını uyumla; sonra vur.");
-  return plan.join(" ");
-}
-
-/* Dede dersleri */
-const DEDE_LESSONS = {
-  history: [
-    "Satranç, büyük ihtimalle Hindistan’da (Çaturanga) doğup İran üzerinden İslam dünyası ve Avrupa’ya yayıldı. Zamanla kurallar evrildi; modern satranç bugünkü hızını özellikle vezir/fil güçlenince kazandı.",
-    "Eski çağlarda satranç, savaş düzeni ve stratejinin bir temsili sayılırdı. “Açılış–oyun ortası–oyun sonu” üçlemesi, gerçek savaş gibi: hazırlık, çarpışma, sonuç.",
-    "Satranç kültürü, farklı coğrafyalarda farklı üsluplar doğurdu: bazı ekoller pozisyonel sabrı, bazıları saldırı ve taktiği öne çıkarır."
-  ],
-  pieces: [
-    "Taşlar: Piyon (P) ilerleyip terfi eder; At (N) çatal ustasıdır; Fil (B) çaprazın ruhudur; Kale (R) açık hat sever; Vezir (Q) güçlüdür ama erken gezdirilmez; Şah (K) kaybedilmez—mat olursa biter.",
-    "Taş değerleri (yaklaşık): P=1, N=3, B=3, R=5, Q=9. Ama konum bazen değeri değiştirir: aktif kale, pasif vezirden iyidir.",
-    "Önemli töre: Açılışta taş geliştirme + merkez + şah güvenliği. ‘Veziri erken çıkarma’ çoğu kez tempo kaybettirir."
-  ],
-  basic: [
-    "Açılış töresi: Merkeze piyon (e4/d4), atları çıkar, filler açılsın, sonra rok. Aynı taşı gereksiz yere iki kez oynama.",
-    "Şah güvenliği: Rok erken; açık hatta şah bırakma. Taşların birbirini korusun.",
-    "Plan: Zayıf kareleri hedefle; rakibin piyon yapısındaki gedikleri kullan."
-  ],
-  openings: [
-    "Bilinen: İspanyol (Ruy Lopez) — uzun vadeli baskı; Sicilya — asimetrik savaş; Vezir Gambiti — pozisyonel mücadele; Kral Hint — dinamik saldırı.",
-    "Az bilinen: Orangutan (1.b4) — kanattan baskı; Bird (1.f4) — ters Hollanda; Grob (1.g4) — riskli ama sürpriz.",
-    "Dede öğüdü: Açılış ezber değil; amaç taş geliştirmek ve şah güvenliğidir. Ezber yerine fikir öğren."
-  ],
-  endgames: [
-    "Oyun sonu altın kural: Şah bir savaşçıdır. Merkeze yürür. Piyonlar terfi için yürür; kale arkadan destekler.",
-    "Kale oyun sonu: ‘Kale piyonun arkasında’ çoğu zaman doğrudur. Geçer piyon yarat, şahını aktif et.",
-    "Basit matlar: K+Q vs K, K+R vs K (temel)."
-  ],
-  tactics: [
-    "Taktik 1: Çatal (özellikle at). İki hedefi aynı anda vur.",
-    "Taktik 2: Açmaz/Şiş: Taşın arkasındaki daha değerli taş yüzünden kıpırdayamaması.",
-    "Taktik 3: Saptırma: Savunmacıyı görevinden kopar."
-  ],
-  mate: [
-    "Mat planı: Arka sıra matı — piyonlar kaçışı kapatır, kale/vezir son sıraya girer.",
-    "Mat planı: Boğma mat — at ile; rakibin taşları şahı boğar.",
-    "Mat planı: Kutu matı — vezir/kale ile kaçış karelerini kapat."
-  ]
-};
-
-$("dedeLessonBtn").addEventListener("click", ()=>{
-  const mode = $("dedeMode").value;
-  if(mode==="off"){
-    $("dedeLessonText").textContent = "Dede susar; yiğit kendi yolunu bulur.";
-    return;
-  }
-  const arr = DEDE_LESSONS[mode] || [];
-  $("dedeLessonText").textContent = arr.length ? arr[Math.floor(Math.random()*arr.length)] : "Ders bulunamadı.";
-});
-
-/* =========================
-   6) UI / Game loop
+   5) UI / Render
 ========================= */
 let S = initialState();
 let flipped = false;
@@ -1045,7 +830,7 @@ const boardEl = $("board");
 
 function render(){
   const end = gameEnd(S);
-  if(end && !S.result){ S.result = end; onGameFinished(end); }
+  if(end && !S.result){ S.result = end; }
 
   $("turn").textContent = (S.turn==="w") ? "Beyaz" : "Siyah";
   $("status").textContent = S.result ? (S.result==="1/2-1/2" ? "Berabere" : "Oyun bitti") : "Hazır";
@@ -1068,8 +853,9 @@ function render(){
     const c = flipped ? (7 - vc) : vc;
     const sq = rcToSq(r,c);
 
-    // ✅ DOĞRU RENK: a1 koyu, h1 açık, a8 açık, h8 koyu
-    const isLight = ((r + c) % 2 === 1);
+    // ✅ DOĞRU: a8 açık, h1 açık, a1 koyu, h8 koyu
+    // r0c0 (a8) => açık; r7c7 (h1) => açık; bu durumda (r+c) çift => açık
+    const isLight = ((r + c) % 2 === 0);
 
     const d = document.createElement("div");
     d.className = "sq " + (isLight ? "light":"dark");
@@ -1078,29 +864,9 @@ function render(){
     if(last && (sq===last.from || sq===last.to)) d.classList.add("last");
     if(kingSq===sq) d.classList.add("check");
 
-    // ✅ Hamle noktaları (isteğe bağlı)
-    if(selected!=null && $("showHints").checked){
+    if(selected!=null){
       for(const m of legalCache){
         if(m.from===selected && m.to===sq){ d.classList.add("hint"); break; }
-      }
-    }
-
-    // ✅ Koordinat (isteğe bağlı)
-    if($("showCoords").checked){
-      const fileChar = "abcdefgh"[c];
-      const rankChar = String(8 - r);
-
-      if(r === 7){
-        const f = document.createElement("div");
-        f.className = "coordFile";
-        f.textContent = fileChar;
-        d.appendChild(f);
-      }
-      if(c === 0){
-        const rr = document.createElement("div");
-        rr.className = "coordRank";
-        rr.textContent = rankChar;
-        d.appendChild(rr);
       }
     }
 
@@ -1121,16 +887,6 @@ function render(){
   $("lastMove").textContent = S.last ? S.last.san : "-";
   $("kaganMini").textContent = (S.result ? "Tamam" : "Hazır");
   $("dedeMini").textContent = (S.result ? "Hüküm" : "Bekler");
-
-  if(!S.result){
-    const hint = getHintForUser();
-    if(hint){
-      $("kaganText").innerHTML = `${pick(KAGAN_EMIR)}<br><br>Buyruk: <b>${hint.san}</b> — ${algebra(hint.from)} → ${algebra(hint.to)}`;
-    }
-  }
-
-  resizeArrowCanvas();
-  maybeAutoHint();
 }
 
 function onSquareClick(e){
@@ -1168,9 +924,7 @@ function onSquareClick(e){
 }
 
 function playMove(mv){
-  const evalBefore = evalState(S);
   const san = sanForMove(S, mv);
-
   const after = makeMove(S, mv);
   after.last.san = san;
   S = after;
@@ -1178,123 +932,25 @@ function playMove(mv){
   sanHistory.push(san.replace(/[+#]$/,""));
   $("lastMove").textContent = san;
 
-  const evalAfter = evalState(S);
-  const extraPlan = ($("dedeMode")?.value && $("dedeMode").value!=="off")
-    ? (`<br><br><b>Mat/Taktik Yolu:</b> ${dedePlanComment(S)}`)
-    : "";
-
-  $("dedeText").innerHTML = dedeComment(san, evalBefore, evalAfter) + extraPlan;
+  $("dedeText").innerHTML = `Hamle: <b>${san}</b>.`;
 
   selected = null;
-  currentHint = null;
-  drawArrow(null);
-
   render();
   maybeAiReply();
 }
 
-/* =========================
-   7) Kağan ok (hint arrow)
-========================= */
-const arrowCv = document.getElementById("arrowCanvas");
-function resizeArrowCanvas(){
-  const layer = arrowCv.parentElement;
-  const rect = layer.getBoundingClientRect();
-  arrowCv.width = Math.max(1, Math.round(rect.width * devicePixelRatio));
-  arrowCv.height = Math.max(1, Math.round(rect.height * devicePixelRatio));
-  arrowCv.style.width = rect.width + "px";
-  arrowCv.style.height = rect.height + "px";
-}
-window.addEventListener("resize", ()=>{ resizeArrowCanvas(); drawArrow(currentHint); });
-
-function sqCenterOnScreen(sq){
-  const el = boardEl.querySelector(`[data-sq="${sq}"]`);
-  if(!el) return null;
-  const r = el.getBoundingClientRect();
-  const layer = arrowCv.getBoundingClientRect();
-  const cx = (r.left + r.right)/2 - layer.left;
-  const cy = (r.top + r.bottom)/2 - layer.top;
-  return {x:cx, y:cy};
-}
-
-let currentHint = null;
-function drawArrow(hint){
-  const ctx = arrowCv.getContext("2d");
-  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-  ctx.clearRect(0,0,arrowCv.width/devicePixelRatio, arrowCv.height/devicePixelRatio);
-  if(!hint || !$("showArrow").checked) return;
-
-  const a = sqCenterOnScreen(hint.from);
-  const b = sqCenterOnScreen(hint.to);
-  if(!a || !b) return;
-
-  ctx.lineWidth = 6;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = "rgba(74,163,255,.92)";
-  ctx.fillStyle = "rgba(74,163,255,.92)";
-
-  ctx.beginPath();
-  ctx.moveTo(a.x, a.y);
-  ctx.lineTo(b.x, b.y);
-  ctx.stroke();
-
-  const ang = Math.atan2(b.y-a.y, b.x-a.x);
-  const headLen = 18;
-  ctx.beginPath();
-  ctx.moveTo(b.x, b.y);
-  ctx.lineTo(b.x - headLen*Math.cos(ang - Math.PI/7), b.y - headLen*Math.sin(ang - Math.PI/7));
-  ctx.lineTo(b.x - headLen*Math.cos(ang + Math.PI/7), b.y - headLen*Math.sin(ang + Math.PI/7));
-  ctx.closePath();
-  ctx.fill();
-}
-
-function getHintForUser(){
-  if(S.result) return null;
-  const depth = 3;
-  const best = minimax(S, depth, -Infinity, Infinity).move;
-  if(!best) return null;
-  const san = sanForMove(S, best);
-  return {from: best.from, to: best.to, san};
-}
-
-$("hintBtn").addEventListener("click", ()=>{
-  if(S.result) return;
-  currentHint = getHintForUser();
-  if(!currentHint) return;
-  resizeArrowCanvas();
-  drawArrow(currentHint);
-});
-
-function maybeAutoHint(){
-  if(!$("autoHint").checked) return;
-  if(S.result) return;
-  if(S.turn !== "w") return; // kullanıcı beyaz varsayımı
-  currentHint = getHintForUser();
-  drawArrow(currentHint);
-}
-
-/* Checkbox değişince anında güncelle */
-$("showHints").addEventListener("change", render);
-$("showCoords").addEventListener("change", render);
-$("showArrow").addEventListener("change", ()=> drawArrow(currentHint));
-
-/* =========================
-   8) Buttons
-========================= */
 $("flipBtn").addEventListener("click", ()=>{ flipped=!flipped; render(); });
 $("resetBtn").addEventListener("click", ()=>{
   S = initialState();
   selected=null;
   sanHistory=[];
-  currentHint=null;
-  drawArrow(null);
-  $("kaganText").innerHTML = `Er meydanı kuruldu. Börüler düzen alsın. İlk hamleni yap.`;
-  $("dedeText").innerHTML = `Yiğit, ilk hamleni beklerim. Hamle gelince sözüm de gelir.`;
+  $("kaganText").innerHTML = `Törü bozulmaz. İlk hamleni yap.`;
+  $("dedeText").innerHTML = `Yiğit, hamle gelince sözüm de gelir.`;
   render();
 });
 
 /* =========================
-   9) AI
+   6) AI
 ========================= */
 function aiConfig(level){
   const map = {
@@ -1319,7 +975,7 @@ function pickWeakerMove(state, chance){
     return {m, score: evalState(s2)};
   });
 
-  scored.sort((a,b)=> a.score - b.score); // siyah minimize eder
+  scored.sort((a,b)=> a.score - b.score);
   const idx = Math.min(scored.length-1, 1 + Math.floor(Math.random()*Math.min(5, scored.length-1)));
   return scored[idx].m;
 }
@@ -1327,7 +983,7 @@ function maybeAiReply(){
   const lvl = $("aiLevel").value;
   if(lvl==="off") return;
   if(S.result) return;
-  if(S.turn!=="b") return; // AI siyah
+  if(S.turn!=="b") return;
 
   const cfg = aiConfig(lvl);
   $("status").textContent = "AI düşünüyor…";
@@ -1342,338 +998,9 @@ function maybeAiReply(){
 }
 
 /* =========================
-   10) Daily goal + success/fail history (1–10000)
+   7) Start
 ========================= */
-const LS_GOAL = "bozkurt_goal_v2";
-const LS_DAILY = "bozkurt_daily_v2";
-
-function loadGoal(){
-  const g = parseInt(localStorage.getItem(LS_GOAL)||"5",10);
-  return clamp(isNaN(g)?5:g, 1, 10000);
-}
-function saveGoal(g){ localStorage.setItem(LS_GOAL, String(g)); }
-
-function loadDaily(){
-  try{ return JSON.parse(localStorage.getItem(LS_DAILY) || "{}") || {}; }
-  catch{ return {}; }
-}
-function saveDaily(obj){ localStorage.setItem(LS_DAILY, JSON.stringify(obj)); }
-
-function getTodayObj(daily){
-  const key = nowDayKey();
-  daily[key] = daily[key] || { w:0, l:0, d:0, games:[] };
-  return daily[key];
-}
-
-function lastNDaysKeys(n=30){
-  const out=[];
-  const d=new Date();
-  for(let i=0;i<n;i++){
-    const dd=new Date(d);
-    dd.setDate(d.getDate()-i);
-    out.push(dd.toISOString().slice(0,10));
-  }
-  return out.reverse();
-}
-
-function winRate(w,l,d){
-  const total=w+l+d;
-  if(total<=0) return 0;
-  return (w + 0.5*d) / total;
-}
-
-function updateGoalUI(){
-  const daily = loadDaily();
-  const t = getTodayObj(daily);
-  const total = (t.w||0)+(t.l||0)+(t.d||0);
-
-  const g = loadGoal();
-  $("goalNum").textContent = g;
-  $("todayCount").textContent = total;
-
-  const pct = Math.floor((total / g) * 100);
-  $("goalPct").textContent = clamp(pct,0,999) + "%";
-}
-
-$("goalMinus").addEventListener("click", ()=>{
-  const g = clamp(loadGoal()-1,1,10000);
-  saveGoal(g); updateDailyUI();
-});
-$("goalPlus").addEventListener("click", ()=>{
-  const g = clamp(loadGoal()+1,1,10000);
-  saveGoal(g); updateDailyUI();
-});
-
-function addResult(resChar, meta={}){
-  const daily = loadDaily();
-  const t = getTodayObj(daily);
-
-  if(resChar==="W") t.w++;
-  else if(resChar==="L") t.l++;
-  else t.d++;
-
-  t.games.push({
-    t: new Date().toISOString(),
-    res: resChar,
-    ai: meta.ai || $("aiLevel").value
-  });
-
-  saveDaily(daily);
-  updateDailyUI();
-}
-
-function undoLastResult(){
-  const daily = loadDaily();
-  const key = nowDayKey();
-  const t = daily[key];
-  if(!t || !t.games || !t.games.length) return;
-
-  const last = t.games.pop();
-  if(last.res==="W") t.w = Math.max(0, (t.w||0)-1);
-  if(last.res==="L") t.l = Math.max(0, (t.l||0)-1);
-  if(last.res==="D") t.d = Math.max(0, (t.d||0)-1);
-
-  saveDaily(daily);
-  updateDailyUI();
-}
-
-function updateDailyUI(){
-  const daily = loadDaily();
-  const key = nowDayKey();
-  const t = daily[key] || {w:0,l:0,d:0,games:[]};
-
-  const goal = loadGoal();
-  const total = (t.w||0)+(t.l||0)+(t.d||0);
-
-  updateGoalUI();
-
-  const wr = winRate(t.w||0, t.l||0, t.d||0);
-  const done = total >= goal;
-  const remaining = Math.max(0, goal - total);
-
-  const successPct = (total>0) ? Math.round((t.w/total)*100) : 0;
-  const failPct = (total>0) ? Math.round((t.l/total)*100) : 0;
-  const drawPct = (total>0) ? Math.round((t.d/total)*100) : 0;
-
-  $("todaySummary").textContent =
-    `Bugün: ${total} oyun · ✅ ${t.w||0} (%${successPct}) · ❌ ${t.l||0} (%${failPct}) · ➖ ${t.d||0} (%${drawPct}) · Başarı Oranı: ${(wr*100).toFixed(0)}%`;
-
-  $("goalHint").textContent =
-    done ? "Bugünün hedefi tamam. Yiğitlik tamamlandı."
-         : `Hedefe ${remaining} oyun kaldı. Töre sabır ister.`;
-
-  // geçmiş (30 gün)
-  const keys = lastNDaysKeys(30);
-  let lines = [];
-  for(const k of keys){
-    const x = daily[k];
-    if(!x){
-      lines.push(`${k}: 0 oyun`);
-      continue;
-    }
-    const tt=(x.w||0)+(x.l||0)+(x.d||0);
-    const r = winRate(x.w||0,x.l||0,x.d||0);
-    lines.push(`${k}: ${tt} oyun · ✅${x.w||0} ❌${x.l||0} ➖${x.d||0} · ${(r*100).toFixed(0)}%`);
-  }
-  $("historyList").textContent = lines.join("\n");
-
-  // gelişim analizi (son 7 vs önceki 7)
-  const last14 = keys.slice(-14);
-  const first7 = last14.slice(0,7);
-  const last7  = last14.slice(7);
-
-  function sum(keysArr){
-    let w=0,l=0,d=0;
-    for(const k of keysArr){
-      const x = daily[k];
-      if(!x) continue;
-      w += x.w||0; l += x.l||0; d += x.d||0;
-    }
-    const t = w+l+d;
-    return {w,l,d,t, r: winRate(w,l,d)};
-  }
-  const a = sum(first7);
-  const b = sum(last7);
-  const delta = (b.r - a.r);
-
-  let verdict;
-  if(b.t < 3){
-    verdict = "Yeterli veri yok: Son 7 günde oyun sayısı az. (En az 3–5 oyun iyi olur.)";
-  }else if(delta > 0.08){
-    verdict = "GELİŞİM VAR: Başarı oranı anlamlı yükselmiş.";
-  }else if(delta < -0.08){
-    verdict = "DÜŞÜŞ VAR: Başarı oranı düşmüş. Açılış + taktik tekrar önerilir.";
-  }else{
-    verdict = "DENGE: Benzer performans. Oyun sayısını artırınca trend netleşir.";
-  }
-
-  const goalPct = Math.floor((total/goal)*100);
-  const goalDoneText = done ? "Hedef tamamlandı." : "Hedef tamamlanmadı.";
-
-  $("progressAnalysis").textContent =
-    `Bugün hedef: ${goal} · Bugün oynanan: ${total} · Tamamlanma: %${clamp(goalPct,0,999)} · ${goalDoneText}\n` +
-    `Bugün başarı oranı: ${(wr*100).toFixed(0)}%\n\n` +
-    `Önceki 7 gün: ${a.t} oyun · ${(a.r*100).toFixed(0)}%\n` +
-    `Son 7 gün:   ${b.t} oyun · ${(b.r*100).toFixed(0)}%\n` +
-    `Değişim: ${(delta*100).toFixed(0)} puan\n` +
-    `${verdict}`;
-}
-
-$("markWin").addEventListener("click", ()=> addResult("W"));
-$("markLoss").addEventListener("click", ()=> addResult("L"));
-$("markDraw").addEventListener("click", ()=> addResult("D"));
-$("undoLast").addEventListener("click", undoLastResult);
-
-function onGameFinished(result){
-  let msg="";
-  if(result==="1-0") msg="Beyaz MAT etti. Zafer beyazın.";
-  else if(result==="0-1") msg="Siyah MAT etti. Zafer siyahın.";
-  else msg="PAT / Berabere. Töre dengeyi yazdı.";
-
-  $("status").textContent = msg;
-  $("kaganText").innerHTML = `<span style="color:var(--good); font-weight:900;">Hüküm verildi.</span> ${msg}`;
-  $("dedeText").innerHTML = `${pick(DEDE_USLUP)}<br><br><b>${msg}</b>`;
-
-  if(result==="1-0") addResult("W", {ai:$("aiLevel").value});
-  else if(result==="0-1") addResult("L", {ai:$("aiLevel").value});
-  else addResult("D", {ai:$("aiLevel").value});
-}
-
-/* =========================
-   11) YouTube (LOCKED by videoId)
-========================= */
-const LS_SONGS = "bozkurt_songs_v1";
-let SONGS = [
-  { title: "Senin parça (m0fXYGf0bfw)", id: "m0fXYGf0bfw" },
-];
-
-function normalizeYouTubeId(urlOrId){
-  if(!urlOrId) return null;
-  const t = urlOrId.trim();
-  if(/^[a-zA-Z0-9_-]{11}$/.test(t)) return t;
-  try{
-    const u = new URL(t);
-    if(u.hostname.includes("youtu.be")){
-      const id = u.pathname.replace("/","").trim();
-      return (/^[a-zA-Z0-9_-]{11}$/.test(id)) ? id : null;
-    }
-    const v = u.searchParams.get("v");
-    if(v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
-    const m = u.pathname.match(/\/(embed|shorts)\/([a-zA-Z0-9_-]{11})/);
-    if(m) return m[2];
-    return null;
-  }catch{
-    return null;
-  }
-}
-
-function loadSongs(){
-  try{
-    const raw = localStorage.getItem(LS_SONGS);
-    if(!raw) return;
-    const arr = JSON.parse(raw);
-    if(Array.isArray(arr) && arr.length){
-      SONGS = arr.filter(x=>x && x.id && x.title);
-    }
-  }catch{}
-}
-function saveSongs(){ localStorage.setItem(LS_SONGS, JSON.stringify(SONGS)); }
-
-const songSelect = $("songSelect");
-function renderSongs(){
-  songSelect.innerHTML = "";
-  SONGS.forEach((s)=>{
-    const o=document.createElement("option");
-    o.value = s.id;
-    o.textContent = s.title;
-    songSelect.appendChild(o);
-  });
-}
-
-let ytPlayer=null, ytReady=false, currentIndex=0;
-function setYtStatus(t){ $("ytStatus").textContent = "Durum: " + t; }
-
-function playByIndex(i){
-  if(!SONGS.length) return setYtStatus("Liste boş");
-  currentIndex = (i + SONGS.length) % SONGS.length;
-  const s = SONGS[currentIndex];
-  songSelect.value = s.id;
-  if(!ytReady) return setYtStatus("Player hazır değil");
-  ytPlayer.loadVideoById(s.id);
-  setYtStatus("Çalıyor: " + s.title);
-}
-function playSelected(){
-  const id = songSelect.value;
-  const idx = SONGS.findIndex(x=>x.id===id);
-  playByIndex(idx>=0 ? idx : 0);
-}
-function playNext(){ playByIndex(currentIndex + 1); }
-function pauseYt(){ if(ytReady) ytPlayer.pauseVideo(); }
-
-$("playBtn").addEventListener("click", playSelected);
-$("pauseBtn").addEventListener("click", pauseYt);
-$("nextBtn").addEventListener("click", playNext);
-songSelect.addEventListener("change", playSelected);
-
-$("addBtn").addEventListener("click", ()=>{
-  const url = $("songUrl").value;
-  const id = normalizeYouTubeId(url);
-  if(!id){
-    setYtStatus("Link/ID okunamadı. 'watch?v=...' olmalı.");
-    return;
-  }
-  const title = prompt("Şarkı adı ne olsun?", "Yeni Parça");
-  if(!title) return;
-  if(SONGS.some(x=>x.id===id)){
-    setYtStatus("Bu parça zaten listede.");
-    return;
-  }
-  SONGS.push({title, id});
-  saveSongs();
-  renderSongs();
-  $("songUrl").value = "";
-  setYtStatus("Listeye eklendi: " + title);
-});
-
-function loadYouTubeAPI(){
-  const tag=document.createElement("script");
-  tag.src="https://www.youtube.com/iframe_api";
-  document.body.appendChild(tag);
-}
-window.onYouTubeIframeAPIReady = function(){
-  ytPlayer = new YT.Player("yt", {
-    height:"0", width:"0",
-    videoId: SONGS[0]?.id || "",
-    playerVars:{
-      autoplay:0, controls:0, rel:0, modestbranding:1, playsinline:1,
-      origin: location.origin
-    },
-    events:{
-      onReady: ()=>{
-        ytReady=true;
-        setYtStatus("Hazır. İlk kez ÇAL’a dokun.");
-      },
-      onStateChange: (ev)=>{
-        if(ev.data===YT.PlayerState.ENDED) playNext();
-        if(ev.data===YT.PlayerState.PLAYING) setYtStatus("Çalıyor");
-        if(ev.data===YT.PlayerState.PAUSED) setYtStatus("Duraklatıldı");
-      },
-      onError: (e)=>{
-        setYtStatus("Bu parça açılamadı (kod "+e.data+"). Sonraki parçaya geçiliyor…");
-        setTimeout(playNext, 700);
-      }
-    }
-  });
-};
-loadYouTubeAPI();
-
-/* =========================
-   12) Start
-========================= */
-loadSongs();
-renderSongs();
-updateDailyUI();
 render();
 </script>
 </body>
-</html>
+</html>jn
