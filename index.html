@@ -2,55 +2,71 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>TÜRKÜN TÖRESİ • Törü Satranç</title>
+
   <style>
     :root{
       --bg1:#0b1220;
       --bg2:#0f1b33;
-      --card:#121f3a;
-      --card2:#0f1a31;
+
+      --cardA: rgba(255,255,255,.06);
+      --cardB: rgba(255,255,255,.03);
+      --stroke: rgba(255,255,255,.10);
+
       --text:#eaf0ff;
       --muted:#a9b6d6;
+
       --accent:#ff7a3d;
       --accent2:#21d4a2;
       --danger:#ff4d6d;
-      --squareLight:#d9c7a3;
-      --squareDark:#8c6b3e;
-      --sqHi:#2dd4bf55;
+
+      /* Standart tahta renkleri */
+      --light:#d9c7a3;
+      --dark:#8c6b3e;
+
       --sqSel:#ff7a3d66;
+      --sqHi:#2dd4bf55;
       --sqCap:#ff4d6d55;
-      --border:#2a3a66;
+
       --shadow: 0 18px 60px rgba(0,0,0,.45);
+
+      /* En kritik kısım: kareler %100 eşit */
+      --sq: clamp(40px, 9.2vw, 66px);
     }
+
     *{box-sizing:border-box}
     html,body{height:100%}
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
       color:var(--text);
-      background: radial-gradient(1200px 600px at 30% 20%, #1a2b57 0%, rgba(26,43,87,0) 60%),
-                  radial-gradient(900px 500px at 80% 15%, #1b5b54 0%, rgba(27,91,84,0) 55%),
-                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      background:
+        radial-gradient(1200px 600px at 30% 20%, #1a2b57 0%, rgba(26,43,87,0) 60%),
+        radial-gradient(900px 500px at 80% 15%, #1b5b54 0%, rgba(27,91,84,0) 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
       overflow-x:hidden;
     }
+
     .wrap{
       max-width:1200px;
       margin: 22px auto;
       padding: 0 14px 28px;
     }
+
     .topbar{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
       margin-bottom:14px;
+      flex-wrap:wrap;
     }
+
     .brand{
       display:flex;
       align-items:center;
       gap:10px;
-      min-width: 240px;
     }
     .logo{
       width:46px;height:46px;border-radius:14px;
@@ -59,17 +75,11 @@
       box-shadow: var(--shadow);
       font-weight:900;
       letter-spacing:.5px;
+      user-select:none;
     }
-    .brand h1{
-      margin:0;
-      font-size: 18px;
-      line-height:1.1;
-    }
-    .brand .sub{
-      margin-top:2px;
-      font-size: 12px;
-      color: var(--muted);
-    }
+    .brand h1{margin:0;font-size:18px;line-height:1.1}
+    .brand .sub{margin-top:2px;font-size:12px;color:var(--muted);line-height:1.35}
+
     .pill{
       display:inline-flex;
       align-items:center;
@@ -85,9 +95,10 @@
     }
     .pill .dot{
       width:10px;height:10px;border-radius:50%;
-      background:#fbbf24;
-      box-shadow: 0 0 0 4px rgba(251,191,36,.18);
+      background:#21d4a2;
+      box-shadow: 0 0 0 4px rgba(33,212,162,.16);
     }
+
     .grid{
       display:grid;
       grid-template-columns: 1.15fr .85fr;
@@ -95,13 +106,11 @@
     }
     @media (max-width: 980px){
       .grid{grid-template-columns: 1fr;}
-      .brand{min-width:unset}
-      .topbar{flex-wrap:wrap}
     }
 
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border: 1px solid rgba(255,255,255,.10);
+      background: linear-gradient(180deg, var(--cardA), var(--cardB));
+      border: 1px solid var(--stroke);
       border-radius: 22px;
       box-shadow: var(--shadow);
       overflow:hidden;
@@ -114,6 +123,7 @@
       gap:10px;
       border-bottom:1px solid rgba(255,255,255,.08);
       background: rgba(0,0,0,.12);
+      flex-wrap:wrap;
     }
     .controls{
       display:flex;
@@ -121,9 +131,9 @@
       gap:8px;
       align-items:center;
     }
-    button, select, input[type="checkbox"]{
-      font: inherit;
-    }
+
+    button, select, input[type="checkbox"], input[type="range"]{font:inherit}
+
     .btn{
       border:1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
@@ -156,6 +166,7 @@
       background: linear-gradient(135deg, #ff4d6d, #ef4444);
       box-shadow: 0 10px 30px rgba(255,77,109,.18);
     }
+
     .select{
       padding: 9px 12px;
       border-radius: 14px;
@@ -164,6 +175,7 @@
       color: var(--text);
       cursor:pointer;
     }
+
     .toggle{
       display:inline-flex;
       align-items:center;
@@ -176,35 +188,23 @@
       user-select:none;
     }
     .toggle input{transform: scale(1.1)}
-    .row{
-      display:flex; gap:10px; align-items:center; justify-content:space-between;
-    }
 
-    /* Board */
-    .boardWrap{
-      padding: 14px;
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:12px;
-    }
-    .boardArea{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap:12px;
-    }
+    /* BOARD */
+    .boardWrap{ padding: 14px; display:grid; gap:12px; }
     .board{
-      width: 100%;
-      max-width: 560px;
-      aspect-ratio: 1 / 1;
+      width: calc(var(--sq) * 8);
+      height: calc(var(--sq) * 8);
+      margin: 0 auto;
       border-radius: 18px;
       overflow:hidden;
       border: 1px solid rgba(255,255,255,.12);
       box-shadow: 0 18px 60px rgba(0,0,0,.45);
-      margin: 0 auto;
       display:grid;
       grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
       user-select:none;
       background: #00000022;
+      touch-action: manipulation;
     }
     .sq{
       display:flex;
@@ -214,8 +214,8 @@
       cursor:pointer;
       -webkit-tap-highlight-color: transparent;
     }
-    .sq.light{background: var(--squareLight)}
-    .sq.dark{background: var(--squareDark)}
+    .sq.light{background: var(--light)}
+    .sq.dark{background: var(--dark)}
     .sq::after{
       content:"";
       position:absolute; inset:0;
@@ -225,28 +225,28 @@
     .sq.sel::after{background: var(--sqSel)}
     .sq.hi::after{background: var(--sqHi)}
     .sq.cap::after{background: var(--sqCap)}
+
     .piece{
-      font-size: clamp(28px, 6vw, 48px);
+      font-size: calc(var(--sq) * .74);
       line-height: 1;
       filter: drop-shadow(0 2px 2px rgba(0,0,0,.6));
       transform: translateY(-1px);
+      font-weight: 900;
     }
-    .piece.white{
-      text-shadow: 0 0 10px rgba(255,255,255,.18);
-    }
-    .piece.black{
-      text-shadow: 0 0 10px rgba(0,0,0,.25);
-    }
+    .piece.white{ text-shadow: 0 0 10px rgba(255,255,255,.18); }
+    .piece.black{ text-shadow: 0 0 10px rgba(0,0,0,.25); }
+
     .coord{
       position:absolute;
       font-size: 10px;
-      color: rgba(0,0,0,.55);
       bottom: 6px; left: 7px;
-      font-weight: 700;
+      font-weight: 800;
       pointer-events:none;
-      mix-blend-mode: multiply;
+      opacity:.82;
     }
-    .coord.darkish{ color: rgba(255,255,255,.72); mix-blend-mode: normal; }
+    .coord.darkish{ color: rgba(255,255,255,.82); }
+    .coord.lightish{ color: rgba(0,0,0,.62); }
+
     .statusbar{
       display:flex;
       gap:10px;
@@ -260,6 +260,7 @@
       color: var(--muted);
       font-size: 13px;
     }
+
     .clock{
       display:flex; gap:10px; align-items:center; flex-wrap:wrap;
       font-variant-numeric: tabular-nums;
@@ -277,11 +278,7 @@
     }
 
     /* Right panel */
-    .panel{
-      padding: 14px;
-      display:grid;
-      gap:12px;
-    }
+    .panel{ padding: 14px; display:grid; gap:12px; }
     .section{
       border: 1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.16);
@@ -290,13 +287,15 @@
     }
     .sectionHeader{
       padding: 10px 12px;
-      font-weight: 800;
+      font-weight: 900;
       display:flex;
       justify-content:space-between;
       align-items:center;
       color: var(--text);
       border-bottom: 1px solid rgba(255,255,255,.08);
       background: rgba(255,255,255,.04);
+      gap:10px;
+      flex-wrap:wrap;
     }
     .sectionBody{
       padding: 10px 12px;
@@ -309,32 +308,39 @@
       overflow:auto;
       padding-right: 4px;
     }
-    .moves table{
-      width:100%;
-      border-collapse:collapse;
-      font-variant-numeric: tabular-nums;
-    }
-    .moves td{
-      padding: 6px 4px;
-      border-bottom: 1px dashed rgba(255,255,255,.10);
-    }
+    .moves table{ width:100%; border-collapse:collapse; font-variant-numeric: tabular-nums; }
+    .moves td{ padding: 6px 4px; border-bottom: 1px dashed rgba(255,255,255,.10); }
     .moves td:nth-child(1){color: rgba(255,255,255,.70); width: 36px;}
     .moves td:nth-child(2){color: var(--text);}
     .moves td:nth-child(3){color: var(--text);}
+
     .mutedSmall{color: var(--muted); font-size: 12px;}
-    .kaganBox{
+
+    .speakerBox{
       padding: 10px 12px;
       border-radius: 16px;
       background: rgba(255,255,255,.05);
       border: 1px solid rgba(255,255,255,.10);
       color: var(--text);
     }
-    .kaganTitle{
-      font-weight: 900;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    .speakerTitle{
+      font-weight: 950;
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
     }
-    .kaganTitle span{color: var(--accent2)}
-    .kaganText{margin-top:8px; color: var(--muted); line-height:1.5}
+    .speakerTitle .name{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .runeTag{
+      font-weight: 900;
+      letter-spacing: .08em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      color: rgba(255,255,255,.82);
+      font-size: 12px;
+    }
+    .speakerText{margin-top:8px; color: var(--muted); line-height:1.55; white-space:pre-wrap;}
     .hint{
       padding: 10px 12px;
       border-radius: 16px;
@@ -342,7 +348,9 @@
       background: rgba(0,0,0,.14);
       color: var(--muted);
       font-size: 12px;
+      line-height:1.45;
     }
+
     .toast{
       position: fixed;
       left: 50%;
@@ -361,35 +369,80 @@
     }
     .toast.show{display:block}
     .hidden{display:none !important;}
-    a{color:#8fd3ff}
+
+    /* Intro overlay */
+    .intro{
+      position:fixed;
+      inset:0;
+      background: radial-gradient(900px 500px at 50% 20%, rgba(255,122,61,.18), rgba(0,0,0,.92));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      padding:18px;
+    }
+    .introBox{
+      width:min(820px, 100%);
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.45);
+      border-radius:22px;
+      padding:20px 18px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+    }
+    .introTitle{font-size:20px; font-weight:950; margin:0 0 10px}
+    .runes{
+      font-size: clamp(18px, 3.6vw, 28px);
+      letter-spacing: .08em;
+      line-height:1.7;
+      white-space:pre-wrap;
+      font-weight:900;
+      color: rgba(255,255,255,.92);
+    }
+    .introSub{margin-top:10px; color:rgba(255,255,255,.72); font-size:13px; line-height:1.45}
+    .fadeOut{animation: fadeOut .7s ease forwards;}
+    @keyframes fadeOut{to{opacity:0; transform: translateY(-6px)}}
   </style>
 </head>
+
 <body>
+  <!-- Intro -->
+  <div id="intro" class="intro" title="Dokununca geçer">
+    <div class="introBox">
+      <div class="introTitle">TÜRKÜN TÖRESİ • Törü Satranç</div>
+      <div class="runes" id="runeText"></div>
+      <div class="introSub">
+        Başlamak için dokun… (Ses için de ilk dokunuş gerekir.)
+      </div>
+    </div>
+  </div>
+
   <div class="wrap">
     <div class="topbar">
       <div class="brand">
         <div class="logo">TÖ</div>
         <div>
           <h1>TÜRKÜN TÖRESİ • Törü Satranç</h1>
-          <div class="sub" id="subtitle">“𐰉𐰃𐰼𐰚𐰀 𐱅𐰇𐰼𐰚 𐰖𐰆𐰺𐰃𐰴 𐰴𐰃𐰠𐰃𐰣” • Göktürkçe selâm</div>
+          <div class="sub" id="subtitle">
+            Kağan <span class="runeTag">𐰴𐰍𐰣</span> (Koç) • Dede <span class="runeTag">𐱅𐰑𐰀</span> (Analist)
+          </div>
         </div>
       </div>
 
-      <div class="pill" title="Sitede teknik bilgi göstermek istemiyorsan Ayarlar > 'Bilgi paneli' kapat.">
-        <span class="dot" id="siteDot"></span>
-        <span id="siteStatus">Durum: hazır</span>
+      <div class="pill">
+        <span class="dot"></span>
+        <span id="siteStatus">Durum: oyun hazır</span>
       </div>
     </div>
 
     <div class="grid">
-      <!-- Left: board -->
+      <!-- Left -->
       <div class="card">
         <div class="cardHeader">
           <div class="controls">
             <button class="btn primary" id="btnNew">Yeni Oyun</button>
             <button class="btn" id="btnFlip">Tahtayı Çevir</button>
             <button class="btn" id="btnUndo">Geri Al</button>
-            <button class="btn warn" id="btnHint">Kağan Dede Tavsiye</button>
+            <button class="btn warn" id="btnKagan">Kağan’dan Öneri</button>
           </div>
 
           <div class="controls">
@@ -412,69 +465,63 @@
               <option value="600">10 dk</option>
             </select>
 
-            <label class="toggle" title="Arka plan müziği (WebAudio)">
+            <label class="toggle" title="Arka plan müziği (dokunmadan başlamaz)">
               <input type="checkbox" id="musicTog">
               <span>Müzik</span>
+            </label>
+
+            <label class="toggle" title="Ses seviyesi">
+              <span>Ses</span>
+              <input type="range" id="musicVol" min="0" max="100" value="30" />
             </label>
           </div>
         </div>
 
         <div class="boardWrap">
-          <div class="boardArea">
-            <div class="board" id="board" aria-label="Satranç tahtası"></div>
+          <div class="board" id="board" aria-label="Satranç tahtası"></div>
 
-            <div class="statusbar">
-              <div>
-                <div><b id="turnText">Sıra:</b> <span id="turnSide" class="mutedSmall">Beyaz</span></div>
-                <div class="mutedSmall" id="gameState">Hazır. Bir taş seç ve hamle yap.</div>
-              </div>
-              <div class="clock">
-                <span class="badge" id="clkW">Beyaz: 05:00</span>
-                <span class="badge" id="clkB">Siyah: 05:00</span>
-              </div>
+          <div class="statusbar">
+            <div>
+              <div><b>Sıra:</b> <span id="turnSide" class="mutedSmall">Beyaz</span></div>
+              <div class="mutedSmall" id="gameState">Hazır. Bir taş seç ve hamle yap.</div>
+              <div class="mutedSmall" id="openingName">Açılış: —</div>
             </div>
+            <div class="clock">
+              <span class="badge" id="clkW">Beyaz: 05:00</span>
+              <span class="badge" id="clkB">Siyah: 05:00</span>
+            </div>
+          </div>
 
-            <div class="hint">
-              <b>İpucu:</b> Taşa tıkla → yeşil kareler yasal hamle. Kırmızı kare: alma.
-              “Kağan Dede” ve “Müzik” kapatılabilir.
-              <span class="mutedSmall">Online mod: yakında (sunucu gerekir).</span>
-            </div>
+          <div class="hint">
+            <b>İpucu:</b> Taşa tıkla → yeşil kareler yasal hamle. Kırmızı kare: alma.
+            “Kağan” koçtur, “Dede” analiz eder; ikisi de kapatılabilir.
           </div>
         </div>
       </div>
 
-      <!-- Right: panel -->
+      <!-- Right -->
       <div class="card">
         <div class="cardHeader">
-          <div style="font-weight:900">Oyun Paneli</div>
+          <div style="font-weight:950">Oyun Paneli</div>
           <div class="controls">
             <label class="toggle" title="Yasal hamleleri göster">
               <input type="checkbox" id="showLegal" checked>
-              <span>Yasal hamleleri göster</span>
+              <span>Yasal hamleler</span>
             </label>
-            <label class="toggle" title="Bilgi paneli (oyuncuyu ilgilendirmeyen) kapat">
-              <input type="checkbox" id="showInfo" checked>
-              <span>Bilgi paneli</span>
+
+            <label class="toggle" title="Kağan’ı aç/kapat">
+              <input type="checkbox" id="kaganTog" checked>
+              <span>Kağan</span>
+            </label>
+
+            <label class="toggle" title="Dede’yi aç/kapat">
+              <input type="checkbox" id="dedeTog" checked>
+              <span>Dede</span>
             </label>
           </div>
         </div>
 
         <div class="panel">
-          <div class="section" id="infoSection">
-            <div class="sectionHeader">
-              <span>Bilgiler</span>
-              <span class="mutedSmall" id="openingName">Açılış: —</span>
-            </div>
-            <div class="sectionBody">
-              <div><b>Mod:</b> <span id="modeText">Tek Kişilik (AI)</span></div>
-              <div><b>Site:</b> <span id="domainText">turkuntoresi.com</span></div>
-              <div class="mutedSmall" style="margin-top:6px">
-                Not: Kilit simgesi yoksa, HTTPS sertifikası henüz oturmamış olabilir.
-                GitHub Pages’te bazen 5–60 dk (nadiren daha uzun) sürebilir.
-              </div>
-            </div>
-          </div>
-
           <div class="section">
             <div class="sectionHeader">
               <span>Hamleler</span>
@@ -485,24 +532,36 @@
 
           <div class="section" id="kaganSection">
             <div class="sectionHeader">
-              <span>Kağan Dede</span>
-              <label class="toggle" style="margin:0">
-                <input type="checkbox" id="kaganTog" checked>
-                <span>Açık</span>
-              </label>
+              <span>Kağan <span class="runeTag">𐰴𐰍𐰣</span> • Koç</span>
+              <span class="mutedSmall" id="kaganInfo">Öneri hazır</span>
             </div>
             <div class="sectionBody">
-              <div class="kaganBox">
-                <div class="kaganTitle">
-                  <div>🧙‍♂️ <span>Kağan Dede</span></div>
-                  <div class="mutedSmall" id="evalText">Değerlendirme: 0.0</div>
+              <div class="speakerBox">
+                <div class="speakerTitle">
+                  <div class="name">🧭 Kağan <span class="runeTag">𐰴𐰍𐰣</span></div>
+                  <div class="mutedSmall" id="coachMove">Tavsiye: —</div>
                 </div>
-                <div class="kaganText" id="kaganText">
-                  “Töreyi unutma: Önce şah güvenliği, sonra taş etkinliği. Açılışta gereksiz piyon zayıflatma.”
+                <div class="speakerText" id="kaganText">
+                  “Töre: Önce şah güvenliği, sonra taş etkinliği. Merkez boş bırakılmaz.”
                 </div>
               </div>
-              <div class="mutedSmall" style="margin-top:8px">
-                İstersen kapat: sağ üstte “Açık” anahtarını kapat.
+            </div>
+          </div>
+
+          <div class="section" id="dedeSection">
+            <div class="sectionHeader">
+              <span>Dede <span class="runeTag">𐱅𐰑𐰀</span> • Analist</span>
+              <span class="mutedSmall" id="evalText">Değerlendirme: 0.0</span>
+            </div>
+            <div class="sectionBody">
+              <div class="speakerBox">
+                <div class="speakerTitle">
+                  <div class="name">🧠 Dede <span class="runeTag">𐱅𐰑𐰀</span></div>
+                  <div class="mutedSmall" id="planText">Plan: —</div>
+                </div>
+                <div class="speakerText" id="dedeText">
+                  “Hamle gelince sözüm gelir. Taşların birbiriyle konuşsun.”
+                </div>
               </div>
             </div>
           </div>
@@ -513,11 +572,10 @@
               <span class="mutedSmall">Sunucu gerekir</span>
             </div>
             <div class="sectionBody">
-              “Bozkurt Ordusu” çok oyunculu/online için WebSocket/Firebase gibi bir altyapı kurmamız gerekir.
-              İstersen sonra menüye “Oyun seçimi” ekranı ekleyip iki oyunu aynı sitede yayınlarız.
+              Online/multiplayer için WebSocket/Firebase gerekir.
+              İstersen “Bozkurt Ordusu” kodundaki yaklaşımı baz alıp bu siteye entegre ederiz.
             </div>
           </div>
-
         </div>
       </div>
     </div>
@@ -528,11 +586,8 @@
   <script type="module">
     import { Chess } from "https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/esm/chess.js";
 
-    /***********************
-     *  Helpers / UI
-     ***********************/
+    /************* helpers *************/
     const $ = (id) => document.getElementById(id);
-
     const toastEl = $("toast");
     let toastTimer = null;
     function toast(msg){
@@ -541,7 +596,6 @@
       clearTimeout(toastTimer);
       toastTimer = setTimeout(()=>toastEl.classList.remove("show"), 2200);
     }
-
     function pad2(n){ return String(n).padStart(2,"0"); }
     function fmtTime(sec){
       sec = Math.max(0, Math.floor(sec));
@@ -549,66 +603,169 @@
       const s = sec%60;
       return `${pad2(m)}:${pad2(s)}`;
     }
+    function escapeHtml(s){
+      return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+    }
 
-    /***********************
-     *  Music (WebAudio)
-     ***********************/
+    /************* Intro (Göktürkçe + töre sözleri) *************/
+    const INTRO_LINES = [
+      "𐰉𐰆𐰺𐰃𐰠𐰼 𐱅𐰇𐰔𐰇𐰤 𐰀𐰠𐰽𐰣",
+      "𐰴𐰍𐰣 𐰉𐰆𐰺𐰆𐰴 𐰋𐰃𐰠𐰏𐰃",
+      "𐱅𐰑𐰀 𐰖𐰆𐰺𐰢 𐰋𐰀𐰽𐰞𐰀𐰑𐰃",
+      "",
+      "Töre bozulmaz. Akıl kılavuz olur.",
+      "Önce şah güvenliği, sonra düzen.",
+      "Er meydanı kuruldu: Hamleni yap."
+    ].join("\\n");
+
+    (function introType(){
+      const el = $("runeText");
+      let i=0;
+      const t = setInterval(()=>{
+        el.textContent = INTRO_LINES.slice(0, i++);
+        if(i>INTRO_LINES.length){ clearInterval(t); }
+      }, 16);
+    })();
+
+    function hideIntro(){
+      const intro = $("intro");
+      if(!intro) return;
+      intro.classList.add("fadeOut");
+      setTimeout(()=> intro.style.display="none", 720);
+    }
+    $("intro").addEventListener("click", ()=>{
+      hideIntro();
+      // Audio unlock attempt
+      ensureAudioUnlocked();
+    }, {passive:true});
+    setTimeout(hideIntro, 2600);
+
+    /************* Music (WebAudio) — user gesture safe *************/
     let audioCtx = null;
-    let musicOn = false;
-    let osc = null;
-    let gain = null;
+    let masterGain = null;
+    let musicNodes = [];
+    let audioUnlocked = false;
 
-    function startMusic(){
+    function ensureAudioUnlocked(){
+      // Called on first user gesture
       try{
-        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if(!audioCtx){
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          masterGain = audioCtx.createGain();
+          masterGain.gain.value = 0.12;
+          masterGain.connect(audioCtx.destination);
+        }
         if(audioCtx.state === "suspended") audioCtx.resume();
-
-        if(osc) return; // already
-        osc = audioCtx.createOscillator();
-        gain = audioCtx.createGain();
-
-        // Basit, lo-fi bir drone: iki frekans arası yavaş salınım
-        osc.type = "sine";
-        osc.frequency.value = 110; // A2
-        gain.gain.value = 0.02; // düşük ses
-
-        const lfo = audioCtx.createOscillator();
-        const lfoGain = audioCtx.createGain();
-        lfo.type = "sine";
-        lfo.frequency.value = 0.08;
-        lfoGain.gain.value = 18; // 110 +- 18
-        lfo.connect(lfoGain);
-        lfoGain.connect(osc.frequency);
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        lfo.start();
-        osc.start();
+        audioUnlocked = true;
       }catch(e){
         console.warn(e);
-        toast("Müzik başlatılamadı (tarayıcı engeli olabilir).");
-        $("musicTog").checked = false;
+        audioUnlocked = false;
       }
     }
+
+    // also unlock on any click/tap once
+    window.addEventListener("pointerdown", function once(){
+      ensureAudioUnlocked();
+      window.removeEventListener("pointerdown", once);
+    }, {passive:true});
+
+    function setVolumeFromUI(){
+      const v = Number($("musicVol").value)/100;
+      if(masterGain) masterGain.gain.value = 0.4 * v; // scale
+    }
+    $("musicVol").addEventListener("input", setVolumeFromUI);
+
     function stopMusic(){
-      try{
-        if(osc){
-          osc.stop();
-          osc.disconnect();
-          osc = null;
-        }
-        if(gain){ gain.disconnect(); gain = null; }
-      }catch{}
+      for(const n of musicNodes){
+        try{ n.stop?.(); }catch{}
+        try{ n.disconnect?.(); }catch{}
+      }
+      musicNodes = [];
     }
 
-    /***********************
-     *  Chess core
-     ***********************/
+    function startMusic(){
+      ensureAudioUnlocked();
+      if(!audioUnlocked || !audioCtx || !masterGain){
+        toast("Ses açılamadı. Bir kez ekrana dokunup tekrar dene.");
+        $("musicTog").checked = false;
+        return;
+      }
+
+      stopMusic();
+      setVolumeFromUI();
+
+      // Basit 2 katman: drone + yumuşak pulse
+      const now = audioCtx.currentTime;
+
+      const drone = audioCtx.createOscillator();
+      drone.type = "sine";
+      drone.frequency.setValueAtTime(110, now); // A2
+
+      const drone2 = audioCtx.createOscillator();
+      drone2.type = "triangle";
+      drone2.frequency.setValueAtTime(220, now);
+
+      const droneGain = audioCtx.createGain();
+      droneGain.gain.setValueAtTime(0.18, now);
+
+      // LFO
+      const lfo = audioCtx.createOscillator();
+      lfo.type = "sine";
+      lfo.frequency.setValueAtTime(0.08, now);
+      const lfoGain = audioCtx.createGain();
+      lfoGain.gain.setValueAtTime(18, now);
+      lfo.connect(lfoGain);
+      lfoGain.connect(drone.frequency);
+
+      // pulse (soft beat)
+      const pulse = audioCtx.createOscillator();
+      pulse.type = "sine";
+      pulse.frequency.setValueAtTime(55, now);
+      const pulseGain = audioCtx.createGain();
+      pulseGain.gain.setValueAtTime(0.0, now);
+
+      // schedule pulse envelope repeatedly via interval
+      let pulseTimer = null;
+      function schedulePulse(){
+        const t = audioCtx.currentTime;
+        pulseGain.gain.cancelScheduledValues(t);
+        pulseGain.gain.setValueAtTime(0.0, t);
+        pulseGain.gain.linearRampToValueAtTime(0.16, t + 0.03);
+        pulseGain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      }
+      schedulePulse();
+      pulseTimer = setInterval(schedulePulse, 900);
+
+      // Clean up timer when stopMusic called
+      const timerNode = { stop(){ try{ clearInterval(pulseTimer); }catch{} } };
+
+      drone.connect(droneGain);
+      drone2.connect(droneGain);
+      droneGain.connect(masterGain);
+
+      pulse.connect(pulseGain);
+      pulseGain.connect(masterGain);
+
+      lfo.start();
+      drone.start();
+      drone2.start();
+      pulse.start();
+
+      musicNodes.push(timerNode, lfo, drone, drone2, pulse, droneGain, pulseGain);
+
+      toast("Müzik açıldı.");
+    }
+
+    $("musicTog").addEventListener("change", (e)=>{
+      if(e.target.checked) startMusic();
+      else { stopMusic(); toast("Müzik kapandı."); }
+    });
+
+    /************* Chess core *************/
     const game = new Chess();
 
-    // Board orientation
-    let perspective = "w"; // "w" => a1 bottom-left, "b" => black at bottom
+    // Orientation & sides
+    let perspective = "w";
     let humanSide = "w";
     let aiSide = "b";
 
@@ -619,19 +776,20 @@
     let showLegal = true;
 
     // Clocks
-    let baseTime = 300; // 5 min default
+    let baseTime = 300;
     let timeW = baseTime, timeB = baseTime;
     let ticking = false;
     let tickTimer = null;
 
     // AI
-    let aiLevel = 2; // 1..4
+    let aiLevel = 2;
     let aiBusy = false;
 
-    // Dede
+    // Kağan/Dede toggles
     let kaganOn = true;
+    let dedeOn = true;
 
-    // Basic opening recognition (minimal set; genişletilebilir)
+    // Opening recognition (minimal)
     const OPENINGS = [
       { name: "İtalyan Açılışı", moves: ["e4","e5","Nf3","Nc6","Bc4"] },
       { name: "İspanyol (Ruy Lopez)", moves: ["e4","e5","Nf3","Nc6","Bb5"] },
@@ -639,367 +797,41 @@
       { name: "Fransız Savunması", moves: ["e4","e6"] },
       { name: "Caro-Kann", moves: ["e4","c6"] },
       { name: "İskandinav", moves: ["e4","d5"] },
-      { name: "Kral Gambiti", moves: ["e4","e5","f4"] },
       { name: "Vezir Gambiti", moves: ["d4","d5","c4"] },
-      { name: "Hint Savunmaları (genel)", moves: ["d4","Nf6"] },
       { name: "İngiliz Açılışı", moves: ["c4"] },
     ];
-
     function currentOpeningName(){
-      const hist = game.history(); // SAN
-      // SAN'den basit LAN benzeri açılış hamlesi çıkarma:
-      // piyon hamlesi "e4", at "Nf3" vs zaten SAN.
-      // karşılaştırmayı ilk N hamlede yapalım.
+      const hist = game.history();
       for(const op of OPENINGS){
         if(hist.length < op.moves.length) continue;
         let ok = true;
         for(let i=0;i<op.moves.length;i++){
-          // SAN bazen "e4" veya "e4+" olabilir; +/# temizle
           const a = hist[i].replace(/[+#]/g,"");
-          const b = op.moves[i];
-          if(a !== b){ ok = false; break; }
+          if(a !== op.moves[i]){ ok=false; break; }
         }
         if(ok) return op.name;
       }
       return "—";
     }
 
-    /***********************
-     *  Rendering
-     ***********************/
-    const boardEl = $("board");
-
-    // Unicode pieces
-    const U = {
-      wp:"♙", wn:"♘", wb:"♗", wr:"♖", wq:"♕", wk:"♔",
-      bp:"♟", bn:"♞", bb:"♝", br:"♜", bq:"♛", bk:"♚",
-    };
-
-    function sqColor(fileIdx, rankIdx){
-      // fileIdx 0=a..7=h, rankIdx 0=1..7=8
-      const isLight = (fileIdx + rankIdx) % 2 === 0;
-      return isLight ? "light" : "dark";
-    }
-
-    function orientedSquares(){
-      // returns array of squares in render order
-      const files = ["a","b","c","d","e","f","g","h"];
-      const ranks = ["1","2","3","4","5","6","7","8"];
-      const out = [];
-      if(perspective === "w"){
-        for(let r=7;r>=0;r--){
-          for(let f=0;f<8;f++){
-            out.push(files[f]+ranks[r]);
-          }
-        }
-      }else{
-        for(let r=0;r<8;r++){
-          for(let f=7;f>=0;f--){
-            out.push(files[f]+ranks[r]);
-          }
-        }
-      }
-      return out;
-    }
-
-    function renderBoard(){
-      const squares = orientedSquares();
-      boardEl.innerHTML = "";
-
-      const files = ["a","b","c","d","e","f","g","h"];
-      for(let i=0;i<squares.length;i++){
-        const sq = squares[i];
-        const file = sq[0];
-        const rank = sq[1];
-        const fileIdx = files.indexOf(file);
-        const rankIdx = Number(rank)-1;
-
-        const div = document.createElement("div");
-        div.className = "sq " + sqColor(fileIdx, rankIdx);
-        div.dataset.sq = sq;
-
-        if(selectedSq === sq) div.classList.add("sel");
-
-        if(showLegal && legalTargets.includes(sq)) div.classList.add("hi");
-        if(showLegal && captureTargets.includes(sq)) div.classList.add("cap");
-
-        // piece
-        const p = game.get(sq); // {type:'p', color:'w'}
-        if(p){
-          const span = document.createElement("span");
-          span.className = "piece " + (p.color === "w" ? "white":"black");
-          span.textContent = U[p.color + p.type];
-          div.appendChild(span);
-        }
-
-        // coords (only on a1 corner squares style)
-        // show rank on file a, show file on rank 1 (depending orientation)
-        const showRank = (perspective === "w") ? (file === "a") : (file === "h");
-        const showFile = (perspective === "w") ? (rank === "1") : (rank === "8");
-        if(showRank || showFile){
-          const c = document.createElement("div");
-          c.className = "coord";
-          const isDark = div.classList.contains("dark");
-          if(isDark) c.classList.add("darkish");
-          c.textContent = showRank ? rank : file;
-          div.appendChild(c);
-        }
-
-        div.addEventListener("click", ()=>onSquareClick(sq));
-        boardEl.appendChild(div);
-      }
-
-      renderMoves();
-      renderStatus();
-      renderOpening();
-      if(kaganOn) updateKagan(false);
-    }
-
-    function renderMoves(){
-      const hist = game.history(); // SAN list
-      $("plyCount").textContent = `${hist.length} yarım hamle`;
-      const rows = [];
-      for(let i=0;i<hist.length;i+=2){
-        const no = (i/2)+1;
-        const w = hist[i] ?? "";
-        const b = hist[i+1] ?? "";
-        rows.push(`<tr><td>${no}.</td><td>${escapeHtml(w)}</td><td>${escapeHtml(b)}</td></tr>`);
-      }
-      $("movesBox").innerHTML =
-        `<table><tbody>${rows.join("") || `<tr><td class="mutedSmall">—</td><td class="mutedSmall">Henüz hamle yok</td><td></td></tr>`}</tbody></table>`;
-    }
-
-    function renderOpening(){
-      $("openingName").textContent = "Açılış: " + currentOpeningName();
-    }
-
-    function renderStatus(){
-      const turn = game.turn(); // 'w' or 'b'
-      $("turnSide").textContent = (turn === "w" ? "Beyaz" : "Siyah");
-      $("turnText").textContent = "Sıra:";
-      const over = game.isGameOver();
-
-      let state = "Hazır. Bir taş seç ve hamle yap.";
-      if(over){
-        if(game.isCheckmate()){
-          const winner = (turn === "w") ? "Siyah" : "Beyaz";
-          state = `Şah mat! Kazanan: ${winner}`;
-        } else if(game.isDraw()){
-          state = "Berabere (pat / 50 hamle / tekrar / yetersiz materyal).";
-        } else {
-          state = "Oyun bitti.";
-        }
-        stopClock();
-      } else {
-        if(game.isCheck()) state = "Şah!";
-        if(aiBusy) state = "AI düşünüyor…";
-      }
-      $("gameState").textContent = state;
-
-      // clock badges
-      $("clkW").textContent = `Beyaz: ${fmtTime(timeW)}`;
-      $("clkB").textContent = `Siyah: ${fmtTime(timeB)}`;
-      $("clkW").classList.toggle("active", ticking && game.turn() === "w");
-      $("clkB").classList.toggle("active", ticking && game.turn() === "b");
-    }
-
-    function escapeHtml(s){
-      return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
-    }
-
-    /***********************
-     *  Interaction
-     ***********************/
-    function clearSelection(){
-      selectedSq = null;
-      legalTargets = [];
-      captureTargets = [];
-    }
-
-    function setSelection(sq){
-      selectedSq = sq;
-      legalTargets = [];
-      captureTargets = [];
-      const moves = game.moves({ square: sq, verbose: true });
-      for(const m of moves){
-        if(m.captured) captureTargets.push(m.to);
-        else legalTargets.push(m.to);
-      }
-    }
-
-    function isHumansTurn(){
-      return game.turn() === humanSide;
-    }
-
-    function onSquareClick(sq){
-      if(game.isGameOver()) return;
-      if(aiBusy) return;
-      if(!isHumansTurn()){
-        toast("Sıra AI’da.");
-        return;
-      }
-
-      const p = game.get(sq);
-      if(selectedSq){
-        // try move
-        const move = tryMove(selectedSq, sq);
-        if(move){
-          clearSelection();
-          renderBoard();
-          startClockIfNeeded();
-          maybeAiMove();
-          return;
-        }
-      }
-
-      // if clicked own piece => select
-      if(p && p.color === humanSide){
-        setSelection(sq);
-        renderBoard();
-      }else{
-        clearSelection();
-        renderBoard();
-      }
-    }
-
-    function tryMove(from, to){
-      const move = game.move({ from, to, promotion: "q" }); // default queen
-      if(move){
-        // If time is enabled and not ticking, start
-        return move;
-      }
-      return null;
-    }
-
-    /***********************
-     *  Clocks
-     ***********************/
-    function resetClock(){
-      baseTime = Number($("timeSel").value);
-      timeW = baseTime || 0;
-      timeB = baseTime || 0;
-      stopClock();
-      renderStatus();
-    }
-
-    function startClockIfNeeded(){
-      if(baseTime === 0) return;
-      if(ticking) return;
-      ticking = true;
-      tickTimer = setInterval(()=>{
-        if(game.isGameOver()){ stopClock(); return; }
-        const t = game.turn();
-        if(t === "w") timeW -= 1;
-        else timeB -= 1;
-
-        if(timeW <= 0 || timeB <= 0){
-          // time out
-          const winner = timeW <= 0 ? "Siyah" : "Beyaz";
-          toast(`Süre bitti! Kazanan: ${winner}`);
-          stopClock();
-        }
-        renderStatus();
-      }, 1000);
-      renderStatus();
-    }
-
-    function stopClock(){
-      ticking = false;
-      if(tickTimer){
-        clearInterval(tickTimer);
-        tickTimer = null;
-      }
-      renderStatus();
-    }
-
-    /***********************
-     *  AI
-     *  - MiniMax + alpha-beta
-     *  - Level -> depth & time cap
-     ***********************/
-    function aiConfig(level){
-      // Daha hızlı ama daha güçlü: depth + node/time cap
-      // Usta: depth 4 (bazı pozisyonlarda ağır olabilir; time cap koyuyoruz)
-      if(level === 1) return { depth: 1, timeMs: 150 };
-      if(level === 2) return { depth: 2, timeMs: 350 };
-      if(level === 3) return { depth: 3, timeMs: 700 };
-      return { depth: 4, timeMs: 1200 };
-    }
-
-    const PST = {
-      // basit piece-square tables (white perspective). Black mirror.
-      p: [
-        0,0,0,0,0,0,0,0,
-        5,6,6,7,7,6,6,5,
-        2,3,3,5,5,3,3,2,
-        1,2,2,4,4,2,2,1,
-        0,1,1,3,3,1,1,0,
-        0,0,0,2,2,0,0,0,
-        1,1,1,-2,-2,1,1,1,
-        0,0,0,0,0,0,0,0
-      ],
-      n: [
-        -5,-3,-2,-2,-2,-2,-3,-5,
-        -3,-1,0,0,0,0,-1,-3,
-        -2,0,1,1.5,1.5,1,0,-2,
-        -2,0.5,1.5,2,2,1.5,0.5,-2,
-        -2,0,1.5,2,2,1.5,0,-2,
-        -2,0.5,1,1.5,1.5,1,0.5,-2,
-        -3,-1,0.5,0.5,0.5,0.5,-1,-3,
-        -5,-3,-2,-2,-2,-2,-3,-5
-      ],
-      b: [
-        -2,-1,-1,-1,-1,-1,-1,-2,
-        -1,0,0,0,0,0,0,-1,
-        -1,0,0.5,1,1,0.5,0,-1,
-        -1,0.5,0.5,1,1,0.5,0.5,-1,
-        -1,0,1,1,1,1,0,-1,
-        -1,1,1,1,1,1,1,-1,
-        -1,0.5,0,0,0,0,0.5,-1,
-        -2,-1,-1,-1,-1,-1,-1,-2
-      ],
-      r: [
-        0,0,0,0,0,0,0,0,
-        0.5,1,1,1,1,1,1,0.5,
-        -0.5,0,0,0,0,0,0,-0.5,
-        -0.5,0,0,0,0,0,0,-0.5,
-        -0.5,0,0,0,0,0,0,-0.5,
-        -0.5,0,0,0,0,0,0,-0.5,
-        -0.5,0,0,0,0,0,0,-0.5,
-        0,0,0,0.5,0.5,0,0,0
-      ],
-      q: [
-        -2,-1,-1,-0.5,-0.5,-1,-1,-2,
-        -1,0,0,0,0,0,0,-1,
-        -1,0,0.5,0.5,0.5,0.5,0,-1,
-        -0.5,0,0.5,0.5,0.5,0.5,0,-0.5,
-        0,0,0.5,0.5,0.5,0.5,0,-0.5,
-        -1,0.5,0.5,0.5,0.5,0.5,0,-1,
-        -1,0,0.5,0,0,0,0,-1,
-        -2,-1,-1,-0.5,-0.5,-1,-1,-2
-      ],
-      k: [
-        -3,-4,-4,-5,-5,-4,-4,-3,
-        -3,-4,-4,-5,-5,-4,-4,-3,
-        -3,-4,-4,-5,-5,-4,-4,-3,
-        -3,-4,-4,-5,-5,-4,-4,-3,
-        -2,-3,-3,-4,-4,-3,-3,-2,
-        -1,-2,-2,-2,-2,-2,-2,-1,
-        2,2,0,0,0,0,2,2,
-        2,3,1,0,0,1,3,2
-      ]
-    };
-
+    /************* Evaluation (used by AI + Dede) *************/
     const PIECE_VALUE = { p:100, n:320, b:330, r:500, q:900, k:0 };
 
+    const PST = {
+      p:[0,0,0,0,0,0,0,0, 5,6,6,7,7,6,6,5, 2,3,3,5,5,3,3,2, 1,2,2,4,4,2,2,1, 0,1,1,3,3,1,1,0, 0,0,0,2,2,0,0,0, 1,1,1,-2,-2,1,1,1, 0,0,0,0,0,0,0,0],
+      n:[-5,-3,-2,-2,-2,-2,-3,-5, -3,-1,0,0,0,0,-1,-3, -2,0,1,1.5,1.5,1,0,-2, -2,0.5,1.5,2,2,1.5,0.5,-2, -2,0,1.5,2,2,1.5,0,-2, -2,0.5,1,1.5,1.5,1,0.5,-2, -3,-1,0.5,0.5,0.5,0.5,-1,-3, -5,-3,-2,-2,-2,-2,-3,-5],
+      b:[-2,-1,-1,-1,-1,-1,-1,-2, -1,0,0,0,0,0,0,-1, -1,0,0.5,1,1,0.5,0,-1, -1,0.5,0.5,1,1,0.5,0.5,-1, -1,0,1,1,1,1,0,-1, -1,1,1,1,1,1,1,-1, -1,0.5,0,0,0,0,0.5,-1, -2,-1,-1,-1,-1,-1,-1,-2],
+      r:[0,0,0,0,0,0,0,0, 0.5,1,1,1,1,1,1,0.5, -0.5,0,0,0,0,0,0,-0.5, -0.5,0,0,0,0,0,0,-0.5, -0.5,0,0,0,0,0,0,-0.5, -0.5,0,0,0,0,0,0,-0.5, -0.5,0,0,0,0,0,0,-0.5, 0,0,0,0.5,0.5,0,0,0],
+      q:[-2,-1,-1,-0.5,-0.5,-1,-1,-2, -1,0,0,0,0,0,0,-1, -1,0,0.5,0.5,0.5,0.5,0,-1, -0.5,0,0.5,0.5,0.5,0.5,0,-0.5, 0,0,0.5,0.5,0.5,0.5,0,-0.5, -1,0.5,0.5,0.5,0.5,0.5,0,-1, -1,0,0.5,0,0,0,0,-1, -2,-1,-1,-0.5,-0.5,-1,-1,-2],
+      k:[-3,-4,-4,-5,-5,-4,-4,-3, -3,-4,-4,-5,-5,-4,-4,-3, -3,-4,-4,-5,-5,-4,-4,-3, -3,-4,-4,-5,-5,-4,-4,-3, -2,-3,-3,-4,-4,-3,-3,-2, -1,-2,-2,-2,-2,-2,-2,-1, 2,2,0,0,0,0,2,2, 2,3,1,0,0,1,3,2],
+    };
+
     function squareIndex(sq){
-      const file = sq.charCodeAt(0) - 97; // a=0
-      const rank = Number(sq[1]) - 1; // 0..7
-      // index from a1=0 to h8=63
-      return rank*8 + file;
+      const file = sq.charCodeAt(0) - 97;
+      const rank = Number(sq[1]) - 1;
+      return rank*8 + file; // a1=0
     }
     function mirrorIndex(i){
-      // mirror vertically for black
       const rank = Math.floor(i/8);
       const file = i%8;
       const mr = 7-rank;
@@ -1007,18 +839,14 @@
     }
 
     function evaluate(){
-      // Positive => advantage for White
-      // material + PST
       let score = 0;
-      const board = game.board(); // 8x8, rank8..rank1
+      const board = game.board(); // rank8..rank1
       for(let r=0;r<8;r++){
         for(let f=0;f<8;f++){
           const p = board[r][f];
           if(!p) continue;
           const type = p.type;
           const color = p.color;
-          // convert to index a1..h8
-          // board() is rank8 at r=0 -> rank = 8-r
           const rank = 8 - r;
           const file = String.fromCharCode(97 + f);
           const sq = file + String(rank);
@@ -1029,37 +857,34 @@
           score += (color === "w") ? val : -val;
         }
       }
-      // small mobility bonus
-      const mob = game.moves().length;
-      score += (game.turn() === "w" ? mob : -mob) * 0.5;
-      return score;
+      return score; // centipawns-ish
     }
 
     function orderMoves(moves){
-      // Captures first, then checks, then others
-      // moves are verbose
       return moves.sort((a,b)=>{
         const ac = a.captured ? 1 : 0;
         const bc = b.captured ? 1 : 0;
         if(ac !== bc) return bc-ac;
-        const ap = a.promotion ? 1 : 0;
-        const bp = b.promotion ? 1 : 0;
-        if(ap !== bp) return bp-ap;
         const ach = a.san.includes("+") ? 1 : 0;
         const bch = b.san.includes("+") ? 1 : 0;
         return bch-ach;
       });
     }
 
-    function minimax(depth, alpha, beta, maximizing, startTime, timeMs){
-      // time cutoff
-      if(performance.now() - startTime > timeMs) return { score: evaluate(), cut: true };
+    function aiConfig(level){
+      if(level === 1) return { depth: 1, timeMs: 160 };
+      if(level === 2) return { depth: 2, timeMs: 420 };
+      if(level === 3) return { depth: 3, timeMs: 850 };
+      return { depth: 4, timeMs: 1400 };
+    }
 
+    function minimax(depth, alpha, beta, maximizing, startTime, timeMs){
+      if(performance.now() - startTime > timeMs){
+        return { score: evaluate(), cut: true };
+      }
       if(depth === 0 || game.isGameOver()){
         let s = evaluate();
-        // checkmate huge
         if(game.isCheckmate()){
-          // side to move is mated
           const turn = game.turn();
           s = (turn === "w") ? -999999 : 999999;
         }
@@ -1102,14 +927,13 @@
       }
     }
 
-    function chooseAiMove(){
-      const cfg = aiConfig(aiLevel);
+    function chooseBestMoveFor(sideColor, levelBoost=0, timeCapMs=null){
+      const lvl = Math.min(4, Math.max(1, aiLevel + levelBoost));
+      const cfg = aiConfig(lvl);
       const start = performance.now();
-
-      const maximizing = (aiSide === "w"); // AI is white => maximize eval, else minimize
-      const res = minimax(cfg.depth, -Infinity, Infinity, maximizing, start, cfg.timeMs);
-
-      // fallback if null
+      const timeMs = timeCapMs ?? cfg.timeMs;
+      const maximizing = (sideColor === "w");
+      const res = minimax(cfg.depth, -Infinity, Infinity, maximizing, start, timeMs);
       if(!res.move){
         const ms = game.moves({ verbose:true });
         return ms[Math.floor(Math.random()*ms.length)];
@@ -1117,6 +941,216 @@
       return res.move;
     }
 
+    /************* Board rendering *************/
+    const boardEl = $("board");
+
+    const U = {
+      wp:"♙", wn:"♘", wb:"♗", wr:"♖", wq:"♕", wk:"♔",
+      bp:"♟", bn:"♞", bb:"♝", br:"♜", bq:"♛", bk:"♚",
+    };
+
+    function sqColor(fileIdx, rankIdx){
+      return ((fileIdx + rankIdx) % 2 === 0) ? "light" : "dark";
+    }
+
+    function orientedSquares(){
+      const files = ["a","b","c","d","e","f","g","h"];
+      const ranks = ["1","2","3","4","5","6","7","8"];
+      const out = [];
+      if(perspective === "w"){
+        for(let r=7;r>=0;r--){
+          for(let f=0;f<8;f++){
+            out.push(files[f]+ranks[r]);
+          }
+        }
+      }else{
+        for(let r=0;r<8;r++){
+          for(let f=7;f>=0;f--){
+            out.push(files[f]+ranks[r]);
+          }
+        }
+      }
+      return out;
+    }
+
+    function renderBoard(){
+      const squares = orientedSquares();
+      boardEl.innerHTML = "";
+
+      const files = ["a","b","c","d","e","f","g","h"];
+      for(const sq of squares){
+        const file = sq[0];
+        const rank = sq[1];
+        const fileIdx = files.indexOf(file);
+        const rankIdx = Number(rank)-1;
+
+        const div = document.createElement("div");
+        div.className = "sq " + sqColor(fileIdx, rankIdx);
+        div.dataset.sq = sq;
+
+        if(selectedSq === sq) div.classList.add("sel");
+        if(showLegal && legalTargets.includes(sq)) div.classList.add("hi");
+        if(showLegal && captureTargets.includes(sq)) div.classList.add("cap");
+
+        const p = game.get(sq);
+        if(p){
+          const span = document.createElement("span");
+          span.className = "piece " + (p.color === "w" ? "white":"black");
+          span.textContent = U[p.color + p.type];
+          div.appendChild(span);
+        }
+
+        // Coords
+        const showRank = (perspective === "w") ? (file === "a") : (file === "h");
+        const showFile = (perspective === "w") ? (rank === "1") : (rank === "8");
+        if(showRank || showFile){
+          const c = document.createElement("div");
+          c.className = "coord " + (div.classList.contains("dark") ? "darkish":"lightish");
+          c.textContent = showRank ? rank : file;
+          div.appendChild(c);
+        }
+
+        div.addEventListener("click", ()=>onSquareClick(sq));
+        boardEl.appendChild(div);
+      }
+
+      renderMoves();
+      renderStatus();
+      renderOpening();
+      if(dedeOn) updateDede(false);
+      if(kaganOn) updateKaganText(false);
+    }
+
+    function renderMoves(){
+      const hist = game.history();
+      $("plyCount").textContent = `${hist.length} yarım hamle`;
+      const rows = [];
+      for(let i=0;i<hist.length;i+=2){
+        const no = (i/2)+1;
+        const w = hist[i] ?? "";
+        const b = hist[i+1] ?? "";
+        rows.push(`<tr><td>${no}.</td><td>${escapeHtml(w)}</td><td>${escapeHtml(b)}</td></tr>`);
+      }
+      $("movesBox").innerHTML =
+        `<table><tbody>${rows.join("") || `<tr><td class="mutedSmall">—</td><td class="mutedSmall">Henüz hamle yok</td><td></td></tr>`}</tbody></table>`;
+    }
+
+    function renderOpening(){
+      $("openingName").textContent = "Açılış: " + currentOpeningName();
+    }
+
+    function renderStatus(){
+      const turn = game.turn();
+      $("turnSide").textContent = (turn === "w" ? "Beyaz" : "Siyah");
+
+      let state = "Hazır. Bir taş seç ve hamle yap.";
+      if(game.isGameOver()){
+        if(game.isCheckmate()){
+          const winner = (turn === "w") ? "Siyah" : "Beyaz";
+          state = `Şah mat! Kazanan: ${winner}`;
+        } else if(game.isDraw()){
+          state = "Berabere (pat / tekrar / 50 hamle / yetersiz materyal).";
+        } else state = "Oyun bitti.";
+        stopClock();
+      } else {
+        if(game.isCheck()) state = "Şah!";
+        if(aiBusy) state = "AI düşünüyor…";
+      }
+      $("gameState").textContent = state;
+
+      $("clkW").textContent = `Beyaz: ${fmtTime(timeW)}`;
+      $("clkB").textContent = `Siyah: ${fmtTime(timeB)}`;
+      $("clkW").classList.toggle("active", ticking && game.turn() === "w");
+      $("clkB").classList.toggle("active", ticking && game.turn() === "b");
+    }
+
+    /************* Interaction *************/
+    function clearSelection(){
+      selectedSq = null;
+      legalTargets = [];
+      captureTargets = [];
+    }
+    function setSelection(sq){
+      selectedSq = sq;
+      legalTargets = [];
+      captureTargets = [];
+      const moves = game.moves({ square: sq, verbose: true });
+      for(const m of moves){
+        if(m.captured) captureTargets.push(m.to);
+        else legalTargets.push(m.to);
+      }
+    }
+    function isHumansTurn(){ return game.turn() === humanSide; }
+
+    function tryMove(from, to){
+      const move = game.move({ from, to, promotion: "q" });
+      return move || null;
+    }
+
+    function onSquareClick(sq){
+      if(game.isGameOver() || aiBusy) return;
+      if(!isHumansTurn()){ toast("Sıra AI’da."); return; }
+
+      const p = game.get(sq);
+      if(selectedSq){
+        const move = tryMove(selectedSq, sq);
+        if(move){
+          clearSelection();
+          renderBoard();
+          startClockIfNeeded();
+          maybeAiMove();
+          return;
+        }
+      }
+
+      if(p && p.color === humanSide){
+        setSelection(sq);
+        renderBoard();
+      }else{
+        clearSelection();
+        renderBoard();
+      }
+    }
+
+    /************* Clocks *************/
+    function resetClock(){
+      baseTime = Number($("timeSel").value);
+      timeW = baseTime || 0;
+      timeB = baseTime || 0;
+      stopClock();
+      renderStatus();
+    }
+
+    function startClockIfNeeded(){
+      if(baseTime === 0) return;
+      if(ticking) return;
+      ticking = true;
+      tickTimer = setInterval(()=>{
+        if(game.isGameOver()){ stopClock(); return; }
+        const t = game.turn();
+        if(t === "w") timeW -= 1;
+        else timeB -= 1;
+
+        if(timeW <= 0 || timeB <= 0){
+          const winner = timeW <= 0 ? "Siyah" : "Beyaz";
+          toast(`Süre bitti! Kazanan: ${winner}`);
+          stopClock();
+        }
+        renderStatus();
+      }, 1000);
+      renderStatus();
+    }
+
+    function stopClock(){
+      ticking = false;
+      if(tickTimer){
+        clearInterval(tickTimer);
+        tickTimer = null;
+      }
+      renderStatus();
+    }
+
+    /************* AI *************/
     async function maybeAiMove(){
       if(game.isGameOver()) return;
       if(game.turn() !== aiSide) return;
@@ -1124,80 +1158,109 @@
       aiBusy = true;
       renderStatus();
 
-      // kısa bekleme: UI donmasın
       await new Promise(r => setTimeout(r, 40));
 
-      const m = chooseAiMove();
-      if(m){
-        game.move(m);
-      }
+      const m = chooseBestMoveFor(aiSide, 0, null);
+      if(m) game.move(m);
+
       aiBusy = false;
       clearSelection();
       renderBoard();
       startClockIfNeeded();
     }
 
-    /***********************
-     *  Kağan Dede
-     ***********************/
-    function updateKagan(forceToast){
-      const score = evaluate()/100; // pawn units
-      const asText = (score>=0 ? "+" : "") + score.toFixed(1);
-      $("evalText").textContent = `Değerlendirme: ${asText}`;
+    /************* Kağan (Coach) *************/
+    const KAGAN_LINES = [
+      "Töre: Şah güvenliği bozulursa düzen bozulur.",
+      "Merkez boş bırakılmaz; taşlar birlikte yürür.",
+      "Gereksiz hamle tempo kaybıdır.",
+      "Atlarını geliştir; fillerine yol aç.",
+      "Zayıf kareyi tut; baskıyı sürdür."
+    ];
 
-      let advice = "";
-      const turn = game.turn();
-      const op = currentOpeningName();
+    function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
-      // basic advice rules
-      if(game.isCheck()){
-        advice = "“Şahın tehlikede! Önce şahı kurtar, sonra töre konuşur.”";
-      } else if(game.history().length < 6){
-        advice = `“Açılışta taşlarını geliştir, merkeze hâkim ol. (${op !== "—" ? op : "Açılış"} çizgisinde sakin ilerle.)”`;
-      } else {
-        // evaluate material and suggest
-        const s = score;
-        if(s > 1.5) advice = "“Üstünlük sende. Acele etme: taşlarını aktif tut, gereksiz fedadan kaçın.”";
-        else if(s < -1.5) advice = "“Geri düştün. Taş değişimini azalt, şah güvenliğini sağlamlaştır, karşı oyun ara.”";
-        else advice = "“Denge var. Zayıf kareleri hedefle, atlarını ileri karakol yap. Piyonlarını gereksiz zayıflatma.”";
+    function updateKaganText(forceToast){
+      if(!kaganOn) return;
+      const sideToMove = game.turn();
+      if(game.isGameOver()){
+        $("kaganInfo").textContent = "Oyun bitti";
+        $("coachMove").textContent = "Tavsiye: —";
+        $("kaganText").textContent = "“Hüküm verildi. Töre yazıldı.”";
+        return;
       }
 
-      // add small tactical hint: best move suggestion from AI (as coach)
-      let coach = "";
-      try{
-        const cfg = aiConfig(Math.min(4, aiLevel+1));
-        const start = performance.now();
-        const maximizing = (turn === "w");
-        const res = minimax(Math.min(3,cfg.depth), -Infinity, Infinity, maximizing, start, 350);
-        if(res.move){
-          coach = `\n\nTavsiye hamle: ${res.move.san} (fikri: ${res.move.captured ? "taş kazanımı / takas" : "gelişim & baskı"})`;
-        }
-      }catch{}
+      const best = chooseBestMoveFor(sideToMove, +1, 450); // biraz daha koç gibi
+      const san = best?.san || "—";
+      $("kaganInfo").textContent = "Koç hazır";
+      $("coachMove").textContent = `Tavsiye: ${san}`;
 
-      $("kaganText").textContent = advice + coach;
+      const msg =
+        pick(KAGAN_LINES) +
+        `\n\nÖneri hamle: ${san}\nFikir: ${best?.captured ? "taş kazanımı / takas" : "gelişim & baskı"}`;
+      $("kaganText").textContent = msg;
 
-      if(forceToast){
-        toast("Kağan Dede konuştu: panelde tavsiyeyi gör.");
-      }
+      if(forceToast) toast("Kağan önerisini güncelledi.");
     }
 
-    /***********************
-     *  New game / Undo / Flip
-     ***********************/
+    /************* Dede (Analyst) *************/
+    const DEDE_LINES = [
+      "Taşlar yalnız kalmasın; birbirini korusun.",
+      "Şah güvenliği töredir. Rok gecikirse dert büyür.",
+      "Plan: zayıfları hedefle, taşları etkinleştir.",
+      "Taktik fırsat doğarsa, gereksiz risk alma—hesapla.",
+      "Dengeyi bozmak için açık hat ve zayıf kare ara."
+    ];
+
+    function updateDede(forceToast){
+      if(!dedeOn) return;
+
+      const cp = evaluate(); // + white
+      const pawns = cp/100;
+      const asText = (pawns>=0?"+":"") + pawns.toFixed(1);
+      $("evalText").textContent = `Değerlendirme: ${asText}`;
+
+      let plan = "—";
+      if(game.isGameOver()){
+        plan = "Töre yazıldı.";
+      } else if(game.isCheck()){
+        plan = "Şah tehdidi var: önce şahı kurtar, sonra plan kur.";
+      } else {
+        const op = currentOpeningName();
+        if(game.history().length < 6) plan = `Açılış planı: gelişim + merkez + rok (${op !== "—" ? op : "genel"}).`;
+        else if(pawns > 1.2) plan = "Üstünlük sende: taş değişimini akıllı yap, baskıyı sürdür.";
+        else if(pawns < -1.2) plan = "Geridesin: savunmayı sıkı tut, karşı oyun ve taktik ara.";
+        else plan = "Denge: zayıf kareleri hedefle, taş koordinasyonunu artır.";
+      }
+      $("planText").textContent = `Plan: ${plan}`;
+
+      // Hamle yorumu: son hamle üzerinden kısa yorum
+      const hist = game.history({ verbose:true });
+      const last = hist[hist.length - 1];
+      let comment = pick(DEDE_LINES);
+      if(last){
+        const took = last.captured ? ` (${last.captured} alındı)` : "";
+        comment = `Son hamle: ${last.san}${took}\n\n` + comment + `\n\nPlan: ${plan}`;
+      } else {
+        comment = "Yiğit, ilk hamleni beklerim.\n\n" + pick(DEDE_LINES) + `\n\nPlan: ${plan}`;
+      }
+      $("dedeText").textContent = comment;
+
+      if(forceToast) toast("Dede analizini güncelledi.");
+    }
+
+    /************* New / Undo / Flip *************/
     function newGame(){
       game.reset();
       clearSelection();
       resetClock();
 
-      // set sides
       humanSide = $("sideSel").value;
       aiSide = (humanSide === "w") ? "b" : "w";
-
-      // default perspective: human at bottom
       perspective = humanSide;
+
       renderBoard();
 
-      // if human chose black, AI plays first
       if(aiSide === "w"){
         startClockIfNeeded();
         maybeAiMove();
@@ -1207,14 +1270,11 @@
 
     function undo(){
       if(aiBusy) return;
-      // Undo last ply; if AI just moved, also undo one more ply (player move)
       const h = game.history();
       if(h.length === 0){ toast("Geri alınacak hamle yok."); return; }
 
-      // Typically we undo twice to return control to human (like common chess apps)
       game.undo();
       if(game.history().length > 0 && game.turn() !== humanSide){
-        // ensure it's human's turn
         game.undo();
       }
       clearSelection();
@@ -1227,16 +1287,14 @@
       renderBoard();
     }
 
-    /***********************
-     *  Hook UI
-     ***********************/
+    /************* UI hooks *************/
     $("btnNew").addEventListener("click", newGame);
     $("btnUndo").addEventListener("click", undo);
     $("btnFlip").addEventListener("click", flipBoard);
 
-    $("btnHint").addEventListener("click", ()=>{
-      if(!kaganOn){ toast("Kağan Dede kapalı. Sağdan açabilirsin."); return; }
-      updateKagan(true);
+    $("btnKagan").addEventListener("click", ()=>{
+      if(!kaganOn){ toast("Kağan kapalı. Panelden açabilirsin."); return; }
+      updateKaganText(true);
     });
 
     $("showLegal").addEventListener("change", (e)=>{
@@ -1244,69 +1302,45 @@
       renderBoard();
     });
 
-    $("showInfo").addEventListener("change", (e)=>{
-      const on = e.target.checked;
-      $("infoSection").classList.toggle("hidden", !on);
-    });
-
     $("kaganTog").addEventListener("change", (e)=>{
       kaganOn = e.target.checked;
       $("kaganSection").classList.toggle("hidden", !kaganOn);
-      if(kaganOn) updateKagan(false);
+      if(kaganOn) updateKaganText(false);
+    });
+
+    $("dedeTog").addEventListener("change", (e)=>{
+      dedeOn = e.target.checked;
+      $("dedeSection").classList.toggle("hidden", !dedeOn);
+      if(dedeOn) updateDede(false);
     });
 
     $("aiSel").addEventListener("change", (e)=>{
       aiLevel = Number(e.target.value);
       toast("AI seviyesi güncellendi.");
+      if(kaganOn) updateKaganText(false);
+      if(dedeOn) updateDede(false);
     });
 
     $("sideSel").addEventListener("change", ()=>{
       toast("Taraf seçimi yeni oyunda uygulanır (Yeni Oyun).");
     });
-
     $("timeSel").addEventListener("change", ()=>{
       toast("Zaman ayarı yeni oyunda uygulanır (Yeni Oyun).");
     });
 
-    $("musicTog").addEventListener("change", (e)=>{
-      musicOn = e.target.checked;
-      if(musicOn){
-        startMusic();
-        toast("Müzik açıldı.");
-      }else{
-        stopMusic();
-        toast("Müzik kapandı.");
-      }
-    });
-
-    // init status pill (player-facing; teknik detay yok)
-    function setSitePill(ok){
-      const dot = $("siteDot");
-      const txt = $("siteStatus");
-      if(ok){
-        dot.style.background = "#21d4a2";
-        dot.style.boxShadow = "0 0 0 4px rgba(33,212,162,.16)";
-        txt.textContent = "Durum: oyun hazır";
-      }else{
-        dot.style.background = "#fbbf24";
-        dot.style.boxShadow = "0 0 0 4px rgba(251,191,36,.16)";
-        txt.textContent = "Durum: hazırlanıyor";
-      }
-    }
-    setSitePill(true);
-
-    /***********************
-     *  Start
-     ***********************/
-    // default settings
+    /************* init *************/
     showLegal = $("showLegal").checked;
-    $("domainText").textContent = location.hostname || "turkuntoresi.com";
+    aiLevel = Number($("aiSel").value);
 
     resetClock();
     renderBoard();
-    updateKagan(false);
+    updateKaganText(false);
+    updateDede(false);
 
-    // If user clicks anywhere and music was requested but blocked, they can toggle again.
+    // If music is toggled ON before unlock, guide user
+    if($("musicTog").checked && !audioUnlocked){
+      toast("Müzik için ekrana bir kez dokun.");
+    }
   </script>
 </body>
 </html>
