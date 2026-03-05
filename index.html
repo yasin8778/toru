@@ -2,409 +2,522 @@
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>TÖRÜ SATRANÇ • Kurallı + Güçlü AI</title>
-
-  <!-- Chess rules/legality -->
-  <script src="https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/cjs/chess.min.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TÜRKÜN TÖRESİ • Törü Satranç</title>
   <style>
     :root{
-      --bg:#0b1220;
-      --panel:#0f1b33;
-      --card:#0d162c;
-      --soft:#132244;
-      --text:#e9f0ff;
-      --muted:#a8b6d6;
-      --acc:#ff6a3d;
-      --acc2:#33d17a;
-      --warn:#ffcc66;
+      --bg1:#0b1220;
+      --bg2:#0f1b33;
+      --card:#121f3a;
+      --card2:#0f1a31;
+      --text:#eaf0ff;
+      --muted:#a9b6d6;
+      --accent:#ff7a3d;
+      --accent2:#21d4a2;
       --danger:#ff4d6d;
-      --sqLight:#E8D8C4;
-      --sqDark:#B48E6A;
-      --sqLight2:#F2E6D6;
-      --sqDark2:#A77D57;
-      --shadow: 0 14px 40px rgba(0,0,0,.35);
-      --radius: 18px;
+      --squareLight:#d9c7a3;
+      --squareDark:#8c6b3e;
+      --sqHi:#2dd4bf55;
+      --sqSel:#ff7a3d66;
+      --sqCap:#ff4d6d55;
+      --border:#2a3a66;
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
     }
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
       color:var(--text);
-      background: radial-gradient(1000px 600px at 20% 10%, #182a57 0%, transparent 55%),
-                  radial-gradient(900px 700px at 80% 25%, #2a1643 0%, transparent 55%),
-                  var(--bg);
-      min-height:100vh;
-      padding:18px;
+      background: radial-gradient(1200px 600px at 30% 20%, #1a2b57 0%, rgba(26,43,87,0) 60%),
+                  radial-gradient(900px 500px at 80% 15%, #1b5b54 0%, rgba(27,91,84,0) 55%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      overflow-x:hidden;
     }
     .wrap{
       max-width:1200px;
-      margin:0 auto;
-      display:grid;
-      grid-template-columns: 1.35fr 1fr;
-      gap:16px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .wrap{grid-template-columns:1fr}
+      margin: 22px auto;
+      padding: 0 14px 28px;
     }
     .topbar{
-      grid-column:1/-1;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:12px;
-      padding:14px 14px;
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      margin-bottom:14px;
     }
     .brand{
-      display:flex; align-items:center; gap:10px;
-      min-width: 260px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 240px;
     }
     .logo{
-      width:42px;height:42px;border-radius:12px;
+      width:46px;height:46px;border-radius:14px;
+      background: linear-gradient(135deg, #ff7a3d, #ff4d6d);
       display:grid;place-items:center;
-      background: radial-gradient(circle at 30% 20%, #ffb07a, #ff6a3d 55%, #c83a1e);
-      box-shadow: 0 10px 18px rgba(255,106,61,.22);
-      font-weight:800;
+      box-shadow: var(--shadow);
+      font-weight:900;
+      letter-spacing:.5px;
     }
     .brand h1{
-      font-size:16px; margin:0; line-height:1.1;
+      margin:0;
+      font-size: 18px;
+      line-height:1.1;
     }
-    .brand p{
-      margin:2px 0 0; font-size:12px; color:var(--muted);
+    .brand .sub{
+      margin-top:2px;
+      font-size: 12px;
+      color: var(--muted);
     }
-
-    .btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end}
-    button, .chip{
-      border:1px solid rgba(255,255,255,.10);
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
       background: rgba(255,255,255,.06);
-      color:var(--text);
-      padding:10px 12px;
-      border-radius: 12px;
-      cursor:pointer;
-      transition: transform .06s ease, background .15s ease, border-color .15s ease;
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--muted);
+      font-size: 12px;
       user-select:none;
-      font-weight:700;
-      font-size:13px;
+      white-space:nowrap;
     }
-    button:hover{background: rgba(255,255,255,.10)}
-    button:active{transform: translateY(1px)}
-    .primary{background: linear-gradient(180deg, rgba(255,106,61,.95), rgba(200,58,30,.95)); border-color: rgba(255,106,61,.55)}
-    .primary:hover{background: linear-gradient(180deg, rgba(255,106,61,1), rgba(200,58,30,1))}
-    .ok{background: linear-gradient(180deg, rgba(51,209,122,.92), rgba(35,140,82,.92)); border-color: rgba(51,209,122,.55)}
-    .danger{background: linear-gradient(180deg, rgba(255,77,109,.92), rgba(160,40,65,.92)); border-color: rgba(255,77,109,.55)}
-    .ghost{background: rgba(255,255,255,.06)}
-    .mini{padding:8px 10px; font-size:12px; border-radius:10px}
+    .pill .dot{
+      width:10px;height:10px;border-radius:50%;
+      background:#fbbf24;
+      box-shadow: 0 0 0 4px rgba(251,191,36,.18);
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns: 1fr;}
+      .brand{min-width:unset}
+      .topbar{flex-wrap:wrap}
+    }
 
-    .panel{
-      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius);
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 22px;
       box-shadow: var(--shadow);
       overflow:hidden;
     }
-    .panel .head{
-      padding:12px 14px;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      border-bottom:1px solid rgba(255,255,255,.07);
-      background: rgba(0,0,0,.18);
+    .cardHeader{
+      padding: 12px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.12);
     }
-    .panel .head .title{
-      font-weight:900;
-      letter-spacing:.2px;
-      display:flex; gap:10px; align-items:center;
+    .controls{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
     }
-    .panel .body{
-      padding:14px;
+    button, select, input[type="checkbox"]{
+      font: inherit;
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      transition: transform .06s ease, background .2s ease;
+      user-select:none;
+    }
+    .btn:hover{background: rgba(255,255,255,.10)}
+    .btn:active{transform: translateY(1px)}
+    .btn.primary{
+      border:none;
+      background: linear-gradient(135deg, #ff7a3d, #ff4d6d);
+      box-shadow: 0 10px 30px rgba(255,122,61,.22);
+    }
+    .btn.good{
+      border:none;
+      background: linear-gradient(135deg, #21d4a2, #12b981);
+      box-shadow: 0 10px 30px rgba(33,212,162,.18);
+    }
+    .btn.warn{
+      border:none;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      box-shadow: 0 10px 30px rgba(245,158,11,.18);
+    }
+    .btn.danger{
+      border:none;
+      background: linear-gradient(135deg, #ff4d6d, #ef4444);
+      box-shadow: 0 10px 30px rgba(255,77,109,.18);
+    }
+    .select{
+      padding: 9px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor:pointer;
+    }
+    .toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 9px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      user-select:none;
+    }
+    .toggle input{transform: scale(1.1)}
+    .row{
+      display:flex; gap:10px; align-items:center; justify-content:space-between;
     }
 
     /* Board */
     .boardWrap{
-      display:flex; gap:14px; align-items:flex-start; justify-content:center;
-      flex-wrap:wrap;
+      padding: 14px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+    .boardArea{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
     }
     .board{
-      width: min(540px, 92vw);
-      aspect-ratio: 1/1;
-      border-radius: 16px;
+      width: 100%;
+      max-width: 560px;
+      aspect-ratio: 1 / 1;
+      border-radius: 18px;
       overflow:hidden;
-      border:1px solid rgba(255,255,255,.10);
-      box-shadow: 0 16px 30px rgba(0,0,0,.35);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      margin: 0 auto;
       display:grid;
       grid-template-columns: repeat(8, 1fr);
-      position:relative;
-      background: rgba(0,0,0,.10);
+      user-select:none;
+      background: #00000022;
     }
     .sq{
-      display:grid;
-      place-items:center;
-      font-size: clamp(24px, 5.5vw, 44px);
-      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       position:relative;
-      user-select:none;
-      touch-action: manipulation;
+      cursor:pointer;
+      -webkit-tap-highlight-color: transparent;
     }
-    .light{background: linear-gradient(180deg, var(--sqLight2), var(--sqLight))}
-    .dark{background: linear-gradient(180deg, var(--sqDark2), var(--sqDark))}
-    .sq:hover{filter:brightness(1.05)}
+    .sq.light{background: var(--squareLight)}
+    .sq.dark{background: var(--squareDark)}
+    .sq::after{
+      content:"";
+      position:absolute; inset:0;
+      background: transparent;
+      transition: background .12s ease;
+    }
+    .sq.sel::after{background: var(--sqSel)}
+    .sq.hi::after{background: var(--sqHi)}
+    .sq.cap::after{background: var(--sqCap)}
+    .piece{
+      font-size: clamp(28px, 6vw, 48px);
+      line-height: 1;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,.6));
+      transform: translateY(-1px);
+    }
+    .piece.white{
+      text-shadow: 0 0 10px rgba(255,255,255,.18);
+    }
+    .piece.black{
+      text-shadow: 0 0 10px rgba(0,0,0,.25);
+    }
     .coord{
       position:absolute;
-      font-size:10px;
-      opacity:.7;
+      font-size: 10px;
       color: rgba(0,0,0,.55);
-      bottom:4px; right:5px;
-      font-weight:800;
+      bottom: 6px; left: 7px;
+      font-weight: 700;
+      pointer-events:none;
+      mix-blend-mode: multiply;
     }
-    .hlSel{
-      outline: 3px solid rgba(255,255,255,.7);
-      outline-offset: -3px;
-    }
-    .hlMove::after{
-      content:"";
-      position:absolute;
-      width: 18%;
-      aspect-ratio:1/1;
-      border-radius:999px;
-      background: rgba(51,209,122,.85);
-      box-shadow: 0 0 0 8px rgba(51,209,122,.18);
-    }
-    .hlCap::after{
-      content:"";
-      position:absolute;
-      width: 72%;
-      height:72%;
-      border-radius: 999px;
-      border: 3px solid rgba(255,77,109,.9);
-      box-shadow: 0 0 0 10px rgba(255,77,109,.14);
-    }
-    .lastFrom{outline: 3px solid rgba(255,204,102,.75); outline-offset:-3px}
-    .lastTo{outline: 3px solid rgba(255,204,102,.95); outline-offset:-3px}
-    .checkGlow{
-      box-shadow: inset 0 0 0 4px rgba(255,77,109,.8);
-    }
-
-    /* Right panel controls */
-    .grid{
-      display:grid;
+    .coord.darkish{ color: rgba(255,255,255,.72); mix-blend-mode: normal; }
+    .statusbar{
+      display:flex;
       gap:10px;
-    }
-    .row{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between;
-      padding:10px 12px;
-      background: rgba(255,255,255,.04);
-      border:1px solid rgba(255,255,255,.07);
-      border-radius: 14px;
-    }
-    label{font-size:13px; font-weight:800}
-    .muted{color:var(--muted); font-weight:700; font-size:12px}
-    select, input[type="range"]{
-      width: 100%;
-      max-width: 280px;
-    }
-    select{
-      padding:10px 12px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.25);
-      color:var(--text);
-      font-weight:800;
-    }
-    .tog{
-      display:flex; align-items:center; gap:10px;
-    }
-    input[type="checkbox"]{
-      width:18px;height:18px;
-      accent-color: var(--acc2);
-    }
-
-    .moves{
-      height: 320px;
-      overflow:auto;
-      padding:12px;
-      background: rgba(0,0,0,.20);
-      border:1px solid rgba(255,255,255,.08);
-      border-radius: 14px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--muted);
       font-size: 13px;
-      line-height: 1.55;
     }
-    .status{
-      padding:10px 12px;
-      border-radius: 14px;
-      border:1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.22);
-      display:flex; gap:10px; flex-wrap:wrap; justify-content:space-between; align-items:center;
+    .clock{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      font-variant-numeric: tabular-nums;
     }
-    .pill{
-      padding:7px 10px;
-      border-radius:999px;
+    .clock .badge{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
-      border:1px solid rgba(255,255,255,.10);
-      font-weight:900;
-      font-size:12px;
-      color:var(--text);
-      white-space:nowrap;
+      color: var(--text);
     }
-    .pill.ok{background: rgba(51,209,122,.16); border-color: rgba(51,209,122,.35)}
-    .pill.warn{background: rgba(255,204,102,.16); border-color: rgba(255,204,102,.35)}
-    .pill.dng{background: rgba(255,77,109,.16); border-color: rgba(255,77,109,.35)}
-    .footerBtns{
-      display:flex; gap:10px; flex-wrap:wrap;
+    .clock .badge.active{
+      border: 1px solid rgba(33,212,162,.55);
+      box-shadow: 0 0 0 4px rgba(33,212,162,.12);
     }
 
-    .note{
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.35;
-      margin-top:10px;
+    /* Right panel */
+    .panel{
+      padding: 14px;
+      display:grid;
+      gap:12px;
     }
-
+    .section{
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+      border-radius: 18px;
+      overflow:hidden;
+    }
+    .sectionHeader{
+      padding: 10px 12px;
+      font-weight: 800;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      color: var(--text);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+    }
+    .sectionBody{
+      padding: 10px 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .moves{
+      max-height: 240px;
+      overflow:auto;
+      padding-right: 4px;
+    }
+    .moves table{
+      width:100%;
+      border-collapse:collapse;
+      font-variant-numeric: tabular-nums;
+    }
+    .moves td{
+      padding: 6px 4px;
+      border-bottom: 1px dashed rgba(255,255,255,.10);
+    }
+    .moves td:nth-child(1){color: rgba(255,255,255,.70); width: 36px;}
+    .moves td:nth-child(2){color: var(--text);}
+    .moves td:nth-child(3){color: var(--text);}
+    .mutedSmall{color: var(--muted); font-size: 12px;}
+    .kaganBox{
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--text);
+    }
+    .kaganTitle{
+      font-weight: 900;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .kaganTitle span{color: var(--accent2)}
+    .kaganText{margin-top:8px; color: var(--muted); line-height:1.5}
+    .hint{
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      color: var(--muted);
+      font-size: 12px;
+    }
     .toast{
       position: fixed;
       left: 50%;
       bottom: 18px;
       transform: translateX(-50%);
       background: rgba(0,0,0,.75);
-      border:1px solid rgba(255,255,255,.10);
-      border-radius: 999px;
-      padding:10px 14px;
-      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.18);
       color: var(--text);
-      font-weight: 900;
+      padding: 10px 12px;
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      display:none;
+      max-width: min(720px, 92vw);
+      z-index: 999;
       font-size: 13px;
-      opacity: 0;
-      pointer-events:none;
-      transition: opacity .18s ease, transform .18s ease;
     }
-    .toast.show{
-      opacity: 1;
-      transform: translateX(-50%) translateY(-3px);
-    }
+    .toast.show{display:block}
+    .hidden{display:none !important;}
+    a{color:#8fd3ff}
   </style>
 </head>
-
 <body>
   <div class="wrap">
     <div class="topbar">
       <div class="brand">
         <div class="logo">TÖ</div>
         <div>
-          <h1>TÖRÜ SATRANÇ</h1>
-          <p>Kurallı satranç • Güçlü AI (Stockfish)</p>
+          <h1>TÜRKÜN TÖRESİ • Törü Satranç</h1>
+          <div class="sub" id="subtitle">“𐰉𐰃𐰼𐰚𐰀 𐱅𐰇𐰼𐰚 𐰖𐰆𐰺𐰃𐰴 𐰴𐰃𐰠𐰃𐰣” • Göktürkçe selâm</div>
         </div>
       </div>
 
-      <div class="btns">
-        <button class="primary" id="btnNew">Yeni Oyun</button>
-        <button class="ghost" id="btnFlip">Tahtayı Çevir</button>
-        <button class="ghost" id="btnUndo">Geri Al</button>
-        <button class="ghost" id="btnHint">İpucu</button>
-        <button class="danger" id="btnReset">Sıfırla</button>
+      <div class="pill" title="Sitede teknik bilgi göstermek istemiyorsan Ayarlar > 'Bilgi paneli' kapat.">
+        <span class="dot" id="siteDot"></span>
+        <span id="siteStatus">Durum: hazır</span>
       </div>
     </div>
 
-    <!-- Left: Board -->
-    <div class="panel">
-      <div class="head">
-        <div class="title">♟️ Oyun Tahtası</div>
-        <div class="muted" id="engineBadge">AI: hazırlanıyor…</div>
-      </div>
-      <div class="body">
-        <div class="boardWrap">
-          <div class="board" id="board"></div>
-        </div>
+    <div class="grid">
+      <!-- Left: board -->
+      <div class="card">
+        <div class="cardHeader">
+          <div class="controls">
+            <button class="btn primary" id="btnNew">Yeni Oyun</button>
+            <button class="btn" id="btnFlip">Tahtayı Çevir</button>
+            <button class="btn" id="btnUndo">Geri Al</button>
+            <button class="btn warn" id="btnHint">Kağan Dede Tavsiye</button>
+          </div>
 
-        <div style="margin-top:12px" class="status">
-          <div class="pill" id="pillTurn">Sıra: -</div>
-          <div class="pill warn" id="pillState">Durum: -</div>
-          <div class="pill ok" id="pillMode">Mod: -</div>
-        </div>
-
-        <div class="note" id="miniHelp">
-          İpucu: Taşa tıkla → yeşil noktalar yasal hamlelerdir. Rakip taş üzerindeki kırmızı halka = alma.
-        </div>
-      </div>
-    </div>
-
-    <!-- Right: Controls + Moves -->
-    <div class="panel">
-      <div class="head">
-        <div class="title">🧠 Ayarlar & Hamleler</div>
-        <div class="muted" id="aiThink">AI beklemede</div>
-      </div>
-      <div class="body">
-        <div class="grid">
-          <div class="row">
-            <div style="min-width:160px">
-              <label>Taraf</label>
-              <div class="muted">Beyaz mı Siyah mı?</div>
-            </div>
-            <select id="selSide">
+          <div class="controls">
+            <select class="select" id="sideSel" title="Taraf seçimi">
               <option value="w">Beyaz (Sen)</option>
               <option value="b">Siyah (Sen)</option>
-              <option value="none">2 Oyuncu (AI kapalı)</option>
             </select>
-          </div>
 
-          <div class="row">
-            <div style="min-width:160px">
-              <label>AI Seviye</label>
-              <div class="muted">Skill + Depth</div>
-            </div>
-            <select id="selLevel">
-              <option value="1">Çok Kolay</option>
-              <option value="3">Kolay</option>
-              <option value="6">Orta</option>
-              <option value="10" selected>Zor</option>
-              <option value="14">Çok Zor</option>
-              <option value="18">Usta</option>
-              <option value="20">Efsane</option>
+            <select class="select" id="aiSel" title="AI seviyesi">
+              <option value="1">AI: Kolay</option>
+              <option value="2" selected>AI: Orta</option>
+              <option value="3">AI: Zor</option>
+              <option value="4">AI: Usta</option>
             </select>
+
+            <select class="select" id="timeSel" title="Zaman kontrolü">
+              <option value="0">Süresiz</option>
+              <option value="180">3 dk</option>
+              <option value="300" selected>5 dk</option>
+              <option value="600">10 dk</option>
+            </select>
+
+            <label class="toggle" title="Arka plan müziği (WebAudio)">
+              <input type="checkbox" id="musicTog">
+              <span>Müzik</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="boardWrap">
+          <div class="boardArea">
+            <div class="board" id="board" aria-label="Satranç tahtası"></div>
+
+            <div class="statusbar">
+              <div>
+                <div><b id="turnText">Sıra:</b> <span id="turnSide" class="mutedSmall">Beyaz</span></div>
+                <div class="mutedSmall" id="gameState">Hazır. Bir taş seç ve hamle yap.</div>
+              </div>
+              <div class="clock">
+                <span class="badge" id="clkW">Beyaz: 05:00</span>
+                <span class="badge" id="clkB">Siyah: 05:00</span>
+              </div>
+            </div>
+
+            <div class="hint">
+              <b>İpucu:</b> Taşa tıkla → yeşil kareler yasal hamle. Kırmızı kare: alma.
+              “Kağan Dede” ve “Müzik” kapatılabilir.
+              <span class="mutedSmall">Online mod: yakında (sunucu gerekir).</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: panel -->
+      <div class="card">
+        <div class="cardHeader">
+          <div style="font-weight:900">Oyun Paneli</div>
+          <div class="controls">
+            <label class="toggle" title="Yasal hamleleri göster">
+              <input type="checkbox" id="showLegal" checked>
+              <span>Yasal hamleleri göster</span>
+            </label>
+            <label class="toggle" title="Bilgi paneli (oyuncuyu ilgilendirmeyen) kapat">
+              <input type="checkbox" id="showInfo" checked>
+              <span>Bilgi paneli</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="section" id="infoSection">
+            <div class="sectionHeader">
+              <span>Bilgiler</span>
+              <span class="mutedSmall" id="openingName">Açılış: —</span>
+            </div>
+            <div class="sectionBody">
+              <div><b>Mod:</b> <span id="modeText">Tek Kişilik (AI)</span></div>
+              <div><b>Site:</b> <span id="domainText">turkuntoresi.com</span></div>
+              <div class="mutedSmall" style="margin-top:6px">
+                Not: Kilit simgesi yoksa, HTTPS sertifikası henüz oturmamış olabilir.
+                GitHub Pages’te bazen 5–60 dk (nadiren daha uzun) sürebilir.
+              </div>
+            </div>
           </div>
 
-          <div class="row">
-            <div class="tog">
-              <input type="checkbox" id="chkLegal" checked />
-              <label for="chkLegal">Yasal hamleleri göster</label>
+          <div class="section">
+            <div class="sectionHeader">
+              <span>Hamleler</span>
+              <span class="mutedSmall" id="plyCount">0 yarım hamle</span>
             </div>
-            <div class="tog">
-              <input type="checkbox" id="chkSound" />
-              <label for="chkSound">Ses</label>
+            <div class="sectionBody moves" id="movesBox"></div>
+          </div>
+
+          <div class="section" id="kaganSection">
+            <div class="sectionHeader">
+              <span>Kağan Dede</span>
+              <label class="toggle" style="margin:0">
+                <input type="checkbox" id="kaganTog" checked>
+                <span>Açık</span>
+              </label>
+            </div>
+            <div class="sectionBody">
+              <div class="kaganBox">
+                <div class="kaganTitle">
+                  <div>🧙‍♂️ <span>Kağan Dede</span></div>
+                  <div class="mutedSmall" id="evalText">Değerlendirme: 0.0</div>
+                </div>
+                <div class="kaganText" id="kaganText">
+                  “Töreyi unutma: Önce şah güvenliği, sonra taş etkinliği. Açılışta gereksiz piyon zayıflatma.”
+                </div>
+              </div>
+              <div class="mutedSmall" style="margin-top:8px">
+                İstersen kapat: sağ üstte “Açık” anahtarını kapat.
+              </div>
             </div>
           </div>
 
-          <div class="row">
-            <div class="tog">
-              <input type="checkbox" id="chkAutoFlip" checked />
-              <label for="chkAutoFlip">Sıra değişince otomatik çevir</label>
+          <div class="section">
+            <div class="sectionHeader">
+              <span>Online (Yakında)</span>
+              <span class="mutedSmall">Sunucu gerekir</span>
             </div>
-            <div class="tog">
-              <input type="checkbox" id="chkCoords" />
-              <label for="chkCoords">Koordinat göster</label>
-            </div>
-          </div>
-
-          <div class="row">
-            <div style="min-width:160px">
-              <label>Hamleler</label>
-              <div class="muted">SAN notasyonu</div>
-            </div>
-            <div class="footerBtns">
-              <button class="mini" id="btnCopyPGN">PGN Kopyala</button>
-              <button class="mini" id="btnCopyFEN">FEN Kopyala</button>
+            <div class="sectionBody">
+              “Bozkurt Ordusu” çok oyunculu/online için WebSocket/Firebase gibi bir altyapı kurmamız gerekir.
+              İstersen sonra menüye “Oyun seçimi” ekranı ekleyip iki oyunu aynı sitede yayınlarız.
             </div>
           </div>
 
-          <div class="moves" id="moves"></div>
-
-          <div class="note">
-            Not: Bu sürümde “kurulum/domain/teknik durum” gibi oyuncuyu ilgilendirmeyen bilgiler gösterilmez. Sadece oyun.
-          </div>
         </div>
       </div>
     </div>
@@ -412,568 +525,788 @@
 
   <div class="toast" id="toast"></div>
 
-<script>
-(() => {
-  // ---------- Helpers ----------
-  const $ = (id) => document.getElementById(id);
-  const toastEl = $("toast");
-  let toastTimer = null;
-  function toast(msg){
-    toastEl.textContent = msg;
-    toastEl.classList.add("show");
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(()=>toastEl.classList.remove("show"), 1400);
-  }
+  <script type="module">
+    import { Chess } from "https://cdn.jsdelivr.net/npm/chess.js@1.0.0/dist/esm/chess.js";
 
-  // Basic click sound (optional)
-  const audioCtx = (() => {
-    try { return new (window.AudioContext || window.webkitAudioContext)(); } catch { return null; }
-  })();
-  function beep(freq=520, ms=50){
-    if(!$("chkSound").checked || !audioCtx) return;
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.frequency.value = freq;
-    o.connect(g); g.connect(audioCtx.destination);
-    g.gain.setValueAtTime(0.06, audioCtx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + ms/1000);
-    o.start(); o.stop(audioCtx.currentTime + ms/1000);
-  }
+    /***********************
+     *  Helpers / UI
+     ***********************/
+    const $ = (id) => document.getElementById(id);
 
-  // ---------- Chess State ----------
-  const game = new Chess();
-  let orientation = "w";          // board display orientation: "w" bottom or "b" bottom
-  let selectedSq = null;
-  let legalTargets = [];
-  let lastMove = null;            // {from,to}
-  let playerSide = "w";           // "w" or "b" or "none"
-  let aiBusy = false;
-  let hintBusy = false;
+    const toastEl = $("toast");
+    let toastTimer = null;
+    function toast(msg){
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>toastEl.classList.remove("show"), 2200);
+    }
 
-  // ---------- Pieces (Unicode) ----------
-  const P = {
-    w: { k:"♔", q:"♕", r:"♖", b:"♗", n:"♘", p:"♙" },
-    b: { k:"♚", q:"♛", r:"♜", b:"♝", n:"♞", p:"♟" }
-  };
+    function pad2(n){ return String(n).padStart(2,"0"); }
+    function fmtTime(sec){
+      sec = Math.max(0, Math.floor(sec));
+      const m = Math.floor(sec/60);
+      const s = sec%60;
+      return `${pad2(m)}:${pad2(s)}`;
+    }
 
-  // ---------- Board Rendering ----------
-  const boardEl = $("board");
-  function squareName(fileIndex, rankIndex){ // file 0..7 => a..h, rank 0..7 => 8..1
-    const file = "abcdefgh"[fileIndex];
-    const rank = (8 - rankIndex);
-    return file + rank;
-  }
+    /***********************
+     *  Music (WebAudio)
+     ***********************/
+    let audioCtx = null;
+    let musicOn = false;
+    let osc = null;
+    let gain = null;
 
-  function getDisplaySquares(){
-    // build 8x8 list of square names in current orientation
-    const squares = [];
-    for(let r=0;r<8;r++){
-      for(let f=0;f<8;f++){
-        const file = orientation === "w" ? f : 7 - f;
-        const rank = orientation === "w" ? r : 7 - r;
-        squares.push(squareName(file, rank));
+    function startMusic(){
+      try{
+        if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if(audioCtx.state === "suspended") audioCtx.resume();
+
+        if(osc) return; // already
+        osc = audioCtx.createOscillator();
+        gain = audioCtx.createGain();
+
+        // Basit, lo-fi bir drone: iki frekans arası yavaş salınım
+        osc.type = "sine";
+        osc.frequency.value = 110; // A2
+        gain.gain.value = 0.02; // düşük ses
+
+        const lfo = audioCtx.createOscillator();
+        const lfoGain = audioCtx.createGain();
+        lfo.type = "sine";
+        lfo.frequency.value = 0.08;
+        lfoGain.gain.value = 18; // 110 +- 18
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        lfo.start();
+        osc.start();
+      }catch(e){
+        console.warn(e);
+        toast("Müzik başlatılamadı (tarayıcı engeli olabilir).");
+        $("musicTog").checked = false;
       }
     }
-    return squares;
-  }
-
-  function isLightSquare(sq){
-    const f = "abcdefgh".indexOf(sq[0]);
-    const r = parseInt(sq[1],10)-1;
-    return ((f + r) % 2) === 0;
-  }
-
-  function render(){
-    const squares = getDisplaySquares();
-    boardEl.innerHTML = "";
-    const showCoords = $("chkCoords").checked;
-
-    for(const sq of squares){
-      const div = document.createElement("div");
-      div.className = "sq " + (isLightSquare(sq) ? "light":"dark");
-      div.dataset.sq = sq;
-
-      const piece = game.get(sq);
-      if(piece){
-        div.textContent = P[piece.color][piece.type];
-      } else {
-        div.textContent = "";
-      }
-
-      // coords on light squares only (optional)
-      if(showCoords && isLightSquare(sq)){
-        const c = document.createElement("div");
-        c.className = "coord";
-        c.textContent = sq;
-        div.appendChild(c);
-      }
-
-      // highlights
-      if(selectedSq === sq) div.classList.add("hlSel");
-      if(lastMove && lastMove.from === sq) div.classList.add("lastFrom");
-      if(lastMove && lastMove.to === sq) div.classList.add("lastTo");
-
-      if($("chkLegal").checked){
-        if(legalTargets.includes(sq)){
-          // capture?
-          const moves = game.moves({square: selectedSq, verbose:true});
-          const isCap = moves.some(m => m.to === sq && (m.captured || m.flags.includes("e")));
-          div.classList.add(isCap ? "hlCap" : "hlMove");
+    function stopMusic(){
+      try{
+        if(osc){
+          osc.stop();
+          osc.disconnect();
+          osc = null;
         }
-      }
-
-      // check glow for king
-      const inCheck = game.in_check();
-      if(inCheck && piece && piece.type==="k" && piece.color===game.turn()){
-        div.classList.add("checkGlow");
-      }
-
-      div.addEventListener("click", () => onSquareClick(sq));
-      boardEl.appendChild(div);
+        if(gain){ gain.disconnect(); gain = null; }
+      }catch{}
     }
 
-    renderStatus();
-    renderMoves();
-  }
+    /***********************
+     *  Chess core
+     ***********************/
+    const game = new Chess();
 
-  function renderStatus(){
-    const turn = game.turn()==="w" ? "Beyaz" : "Siyah";
-    $("pillTurn").textContent = "Sıra: " + turn;
+    // Board orientation
+    let perspective = "w"; // "w" => a1 bottom-left, "b" => black at bottom
+    let humanSide = "w";
+    let aiSide = "b";
 
-    let state = "Oyun devam ediyor";
-    let cls = "pill warn";
-    if(game.is_checkmate()){
-      state = "Şah Mat • Kazanan: " + (game.turn()==="w" ? "Siyah" : "Beyaz");
-      cls = "pill dng";
-    } else if(game.is_draw()){
-      state = "Berabere";
-      cls = "pill warn";
-    } else if(game.in_check()){
-      state = "Şah!";
-      cls = "pill warn";
-    }
-    $("pillState").className = cls;
-    $("pillState").textContent = "Durum: " + state;
+    // Selection
+    let selectedSq = null;
+    let legalTargets = [];
+    let captureTargets = [];
+    let showLegal = true;
 
-    const mode =
-      playerSide==="none" ? "2 Oyuncu" :
-      (playerSide==="w" ? "Sen: Beyaz • AI: Siyah" : "Sen: Siyah • AI: Beyaz");
-    $("pillMode").textContent = "Mod: " + mode;
-  }
+    // Clocks
+    let baseTime = 300; // 5 min default
+    let timeW = baseTime, timeB = baseTime;
+    let ticking = false;
+    let tickTimer = null;
 
-  function renderMoves(){
-    const hist = game.history({ verbose: true });
-    // group by full moves
-    let out = "";
-    for(let i=0;i<hist.length;i+=2){
-      const n = Math.floor(i/2)+1;
-      const w = hist[i] ? hist[i].san : "";
-      const b = hist[i+1] ? hist[i+1].san : "";
-      out += `${n}. ${w}${b? "   "+b:""}\n`;
-    }
-    $("moves").textContent = out.trim() || "Henüz hamle yok.";
-  }
+    // AI
+    let aiLevel = 2; // 1..4
+    let aiBusy = false;
 
-  // ---------- Move Selection ----------
-  function setSelection(sq){
-    selectedSq = sq;
-    legalTargets = [];
-    if(!sq) return;
+    // Dede
+    let kaganOn = true;
 
-    const piece = game.get(sq);
-    if(!piece) return;
-    if(piece.color !== game.turn()) return;
+    // Basic opening recognition (minimal set; genişletilebilir)
+    const OPENINGS = [
+      { name: "İtalyan Açılışı", moves: ["e4","e5","Nf3","Nc6","Bc4"] },
+      { name: "İspanyol (Ruy Lopez)", moves: ["e4","e5","Nf3","Nc6","Bb5"] },
+      { name: "Sicilya Savunması", moves: ["e4","c5"] },
+      { name: "Fransız Savunması", moves: ["e4","e6"] },
+      { name: "Caro-Kann", moves: ["e4","c6"] },
+      { name: "İskandinav", moves: ["e4","d5"] },
+      { name: "Kral Gambiti", moves: ["e4","e5","f4"] },
+      { name: "Vezir Gambiti", moves: ["d4","d5","c4"] },
+      { name: "Hint Savunmaları (genel)", moves: ["d4","Nf6"] },
+      { name: "İngiliz Açılışı", moves: ["c4"] },
+    ];
 
-    // if AI's turn, user can't select
-    if(isAITurn()) return;
-
-    // if playerSide fixed, only allow selecting player's pieces
-    if(playerSide !== "none" && piece.color !== playerSide) return;
-
-    const moves = game.moves({ square: sq, verbose: true });
-    legalTargets = moves.map(m => m.to);
-  }
-
-  function clearSelection(){
-    selectedSq = null;
-    legalTargets = [];
-  }
-
-  function onSquareClick(sq){
-    if(aiBusy) return;
-
-    // If nothing selected yet:
-    if(!selectedSq){
-      setSelection(sq);
-      render();
-      return;
-    }
-
-    // If clicked same square -> deselect
-    if(selectedSq === sq){
-      clearSelection();
-      render();
-      return;
-    }
-
-    // Try to make move if sq is legal target
-    if(legalTargets.includes(sq)){
-      const move = game.move({ from: selectedSq, to: sq, promotion: "q" }); // auto queen
-      if(move){
-        lastMove = { from: move.from, to: move.to };
-        beep(620, 55);
-        clearSelection();
-        render();
-        maybeAutoFlip();
-        maybeAIMove();
-        return;
-      }
-    }
-
-    // Otherwise select new piece
-    clearSelection();
-    setSelection(sq);
-    render();
-  }
-
-  function maybeAutoFlip(){
-    if(!$("chkAutoFlip").checked) return;
-    if(playerSide === "none") return;
-    // Flip so the side to move is at bottom? keep player at bottom usually:
-    // Here: keep player's side at bottom:
-    orientation = playerSide;
-    render();
-  }
-
-  // ---------- Stockfish Engine ----------
-  // We create a worker that importScripts Stockfish.
-  let engine = null;
-  let engineReady = false;
-  let pendingBestMoveResolve = null;
-  let pendingInfoHandler = null;
-
-  function createEngine(){
-    // Common CDN path for stockfish.js builds (works with importScripts in worker in most cases)
-    const STOCKFISH_CDN = "https://cdn.jsdelivr.net/npm/stockfish@16.0.0/stockfish.js";
-
-    const workerCode = `
-      let sf = null;
-      function post(msg){ self.postMessage(msg); }
-
-      async function boot(){
-        try{
-          importScripts("${STOCKFISH_CDN}");
-          // stockfish.js usually exposes STOCKFISH() factory OR Stockfish() function.
-          if (typeof STOCKFISH !== "undefined") sf = STOCKFISH();
-          else if (typeof Stockfish !== "undefined") sf = Stockfish();
-          else if (typeof createStockfish !== "undefined") sf = createStockfish();
-          else sf = null;
-
-          if(!sf){
-            post({type:"error", data:"Stockfish yüklenemedi."});
-            return;
-          }
-          // UCI ready
-          sf.onmessage = (e) => post({type:"line", data: (typeof e === "string") ? e : e.data});
-          post({type:"ready"});
-        }catch(err){
-          post({type:"error", data:String(err)});
+    function currentOpeningName(){
+      const hist = game.history(); // SAN
+      // SAN'den basit LAN benzeri açılış hamlesi çıkarma:
+      // piyon hamlesi "e4", at "Nf3" vs zaten SAN.
+      // karşılaştırmayı ilk N hamlede yapalım.
+      for(const op of OPENINGS){
+        if(hist.length < op.moves.length) continue;
+        let ok = true;
+        for(let i=0;i<op.moves.length;i++){
+          // SAN bazen "e4" veya "e4+" olabilir; +/# temizle
+          const a = hist[i].replace(/[+#]/g,"");
+          const b = op.moves[i];
+          if(a !== b){ ok = false; break; }
         }
+        if(ok) return op.name;
       }
-      boot();
+      return "—";
+    }
 
-      self.onmessage = (e) => {
-        if(!sf) return;
-        const {type, data} = e.data;
-        if(type==="cmd") sf.postMessage(data);
-      };
-    `;
+    /***********************
+     *  Rendering
+     ***********************/
+    const boardEl = $("board");
 
-    const blob = new Blob([workerCode], { type: "application/javascript" });
-    const url = URL.createObjectURL(blob);
-    engine = new Worker(url);
-
-    engine.onmessage = (e) => {
-      const msg = e.data;
-      if(msg.type === "ready"){
-        engineReady = true;
-        $("engineBadge").textContent = "AI: Stockfish hazır ✅";
-        // Init UCI options
-        sendCmd("uci");
-        sendCmd("isready");
-        // normalize
-        setEngineLevel(parseInt($("selLevel").value,10));
-        return;
-      }
-      if(msg.type === "error"){
-        $("engineBadge").textContent = "AI: başlatılamadı (basit AI) ⚠️";
-        engineReady = false;
-        return;
-      }
-      if(msg.type === "line"){
-        const line = msg.data || "";
-        // optional info
-        if(line.startsWith("info ") && pendingInfoHandler){
-          pendingInfoHandler(line);
-        }
-        // bestmove line
-        if(line.startsWith("bestmove")){
-          const parts = line.split(" ");
-          const bm = parts[1];
-          if(pendingBestMoveResolve){
-            const r = pendingBestMoveResolve;
-            pendingBestMoveResolve = null;
-            pendingInfoHandler = null;
-            r(bm);
-          }
-        }
-      }
+    // Unicode pieces
+    const U = {
+      wp:"♙", wn:"♘", wb:"♗", wr:"♖", wq:"♕", wk:"♔",
+      bp:"♟", bn:"♞", bb:"♝", br:"♜", bq:"♛", bk:"♚",
     };
-  }
 
-  function sendCmd(cmd){
-    if(!engine) return;
-    engine.postMessage({type:"cmd", data: cmd});
-  }
-
-  function setEngineLevel(skill){
-    // Skill 0..20, depth also increases.
-    // We'll map: depth = clamp(4..18)
-    const depth = Math.max(4, Math.min(18, Math.floor(skill/1.2)));
-    // A few strong defaults:
-    if(engineReady){
-      sendCmd("setoption name Skill Level value " + skill);
-      sendCmd("setoption name Threads value 2");
-      sendCmd("setoption name Hash value 64");
-      // Some builds support these:
-      sendCmd("setoption name UCI_LimitStrength value false");
-      sendCmd("setoption name Contempt value 0");
-      // store depth in UI dataset
-      $("selLevel").dataset.depth = String(depth);
-      $("engineBadge").textContent = `AI: Stockfish (Skill ${skill}, Depth ${depth})`;
-    }else{
-      $("engineBadge").textContent = `AI: Basit (Skill ${skill})`;
+    function sqColor(fileIdx, rankIdx){
+      // fileIdx 0=a..7=h, rankIdx 0=1..7=8
+      const isLight = (fileIdx + rankIdx) % 2 === 0;
+      return isLight ? "light" : "dark";
     }
-  }
 
-  async function getBestMove(fen, skill){
-    // If engine is ready, use it. Else fallback to tiny heuristic.
-    if(engineReady){
-      const depth = parseInt($("selLevel").dataset.depth || "10", 10);
-      return new Promise((resolve) => {
-        pendingBestMoveResolve = resolve;
-        pendingInfoHandler = (line) => {
-          // you can parse depth/score if you want later
-        };
-        sendCmd("position fen " + fen);
-        sendCmd("go depth " + depth);
+    function orientedSquares(){
+      // returns array of squares in render order
+      const files = ["a","b","c","d","e","f","g","h"];
+      const ranks = ["1","2","3","4","5","6","7","8"];
+      const out = [];
+      if(perspective === "w"){
+        for(let r=7;r>=0;r--){
+          for(let f=0;f<8;f++){
+            out.push(files[f]+ranks[r]);
+          }
+        }
+      }else{
+        for(let r=0;r<8;r++){
+          for(let f=7;f>=0;f--){
+            out.push(files[f]+ranks[r]);
+          }
+        }
+      }
+      return out;
+    }
+
+    function renderBoard(){
+      const squares = orientedSquares();
+      boardEl.innerHTML = "";
+
+      const files = ["a","b","c","d","e","f","g","h"];
+      for(let i=0;i<squares.length;i++){
+        const sq = squares[i];
+        const file = sq[0];
+        const rank = sq[1];
+        const fileIdx = files.indexOf(file);
+        const rankIdx = Number(rank)-1;
+
+        const div = document.createElement("div");
+        div.className = "sq " + sqColor(fileIdx, rankIdx);
+        div.dataset.sq = sq;
+
+        if(selectedSq === sq) div.classList.add("sel");
+
+        if(showLegal && legalTargets.includes(sq)) div.classList.add("hi");
+        if(showLegal && captureTargets.includes(sq)) div.classList.add("cap");
+
+        // piece
+        const p = game.get(sq); // {type:'p', color:'w'}
+        if(p){
+          const span = document.createElement("span");
+          span.className = "piece " + (p.color === "w" ? "white":"black");
+          span.textContent = U[p.color + p.type];
+          div.appendChild(span);
+        }
+
+        // coords (only on a1 corner squares style)
+        // show rank on file a, show file on rank 1 (depending orientation)
+        const showRank = (perspective === "w") ? (file === "a") : (file === "h");
+        const showFile = (perspective === "w") ? (rank === "1") : (rank === "8");
+        if(showRank || showFile){
+          const c = document.createElement("div");
+          c.className = "coord";
+          const isDark = div.classList.contains("dark");
+          if(isDark) c.classList.add("darkish");
+          c.textContent = showRank ? rank : file;
+          div.appendChild(c);
+        }
+
+        div.addEventListener("click", ()=>onSquareClick(sq));
+        boardEl.appendChild(div);
+      }
+
+      renderMoves();
+      renderStatus();
+      renderOpening();
+      if(kaganOn) updateKagan(false);
+    }
+
+    function renderMoves(){
+      const hist = game.history(); // SAN list
+      $("plyCount").textContent = `${hist.length} yarım hamle`;
+      const rows = [];
+      for(let i=0;i<hist.length;i+=2){
+        const no = (i/2)+1;
+        const w = hist[i] ?? "";
+        const b = hist[i+1] ?? "";
+        rows.push(`<tr><td>${no}.</td><td>${escapeHtml(w)}</td><td>${escapeHtml(b)}</td></tr>`);
+      }
+      $("movesBox").innerHTML =
+        `<table><tbody>${rows.join("") || `<tr><td class="mutedSmall">—</td><td class="mutedSmall">Henüz hamle yok</td><td></td></tr>`}</tbody></table>`;
+    }
+
+    function renderOpening(){
+      $("openingName").textContent = "Açılış: " + currentOpeningName();
+    }
+
+    function renderStatus(){
+      const turn = game.turn(); // 'w' or 'b'
+      $("turnSide").textContent = (turn === "w" ? "Beyaz" : "Siyah");
+      $("turnText").textContent = "Sıra:";
+      const over = game.isGameOver();
+
+      let state = "Hazır. Bir taş seç ve hamle yap.";
+      if(over){
+        if(game.isCheckmate()){
+          const winner = (turn === "w") ? "Siyah" : "Beyaz";
+          state = `Şah mat! Kazanan: ${winner}`;
+        } else if(game.isDraw()){
+          state = "Berabere (pat / 50 hamle / tekrar / yetersiz materyal).";
+        } else {
+          state = "Oyun bitti.";
+        }
+        stopClock();
+      } else {
+        if(game.isCheck()) state = "Şah!";
+        if(aiBusy) state = "AI düşünüyor…";
+      }
+      $("gameState").textContent = state;
+
+      // clock badges
+      $("clkW").textContent = `Beyaz: ${fmtTime(timeW)}`;
+      $("clkB").textContent = `Siyah: ${fmtTime(timeB)}`;
+      $("clkW").classList.toggle("active", ticking && game.turn() === "w");
+      $("clkB").classList.toggle("active", ticking && game.turn() === "b");
+    }
+
+    function escapeHtml(s){
+      return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+    }
+
+    /***********************
+     *  Interaction
+     ***********************/
+    function clearSelection(){
+      selectedSq = null;
+      legalTargets = [];
+      captureTargets = [];
+    }
+
+    function setSelection(sq){
+      selectedSq = sq;
+      legalTargets = [];
+      captureTargets = [];
+      const moves = game.moves({ square: sq, verbose: true });
+      for(const m of moves){
+        if(m.captured) captureTargets.push(m.to);
+        else legalTargets.push(m.to);
+      }
+    }
+
+    function isHumansTurn(){
+      return game.turn() === humanSide;
+    }
+
+    function onSquareClick(sq){
+      if(game.isGameOver()) return;
+      if(aiBusy) return;
+      if(!isHumansTurn()){
+        toast("Sıra AI’da.");
+        return;
+      }
+
+      const p = game.get(sq);
+      if(selectedSq){
+        // try move
+        const move = tryMove(selectedSq, sq);
+        if(move){
+          clearSelection();
+          renderBoard();
+          startClockIfNeeded();
+          maybeAiMove();
+          return;
+        }
+      }
+
+      // if clicked own piece => select
+      if(p && p.color === humanSide){
+        setSelection(sq);
+        renderBoard();
+      }else{
+        clearSelection();
+        renderBoard();
+      }
+    }
+
+    function tryMove(from, to){
+      const move = game.move({ from, to, promotion: "q" }); // default queen
+      if(move){
+        // If time is enabled and not ticking, start
+        return move;
+      }
+      return null;
+    }
+
+    /***********************
+     *  Clocks
+     ***********************/
+    function resetClock(){
+      baseTime = Number($("timeSel").value);
+      timeW = baseTime || 0;
+      timeB = baseTime || 0;
+      stopClock();
+      renderStatus();
+    }
+
+    function startClockIfNeeded(){
+      if(baseTime === 0) return;
+      if(ticking) return;
+      ticking = true;
+      tickTimer = setInterval(()=>{
+        if(game.isGameOver()){ stopClock(); return; }
+        const t = game.turn();
+        if(t === "w") timeW -= 1;
+        else timeB -= 1;
+
+        if(timeW <= 0 || timeB <= 0){
+          // time out
+          const winner = timeW <= 0 ? "Siyah" : "Beyaz";
+          toast(`Süre bitti! Kazanan: ${winner}`);
+          stopClock();
+        }
+        renderStatus();
+      }, 1000);
+      renderStatus();
+    }
+
+    function stopClock(){
+      ticking = false;
+      if(tickTimer){
+        clearInterval(tickTimer);
+        tickTimer = null;
+      }
+      renderStatus();
+    }
+
+    /***********************
+     *  AI
+     *  - MiniMax + alpha-beta
+     *  - Level -> depth & time cap
+     ***********************/
+    function aiConfig(level){
+      // Daha hızlı ama daha güçlü: depth + node/time cap
+      // Usta: depth 4 (bazı pozisyonlarda ağır olabilir; time cap koyuyoruz)
+      if(level === 1) return { depth: 1, timeMs: 150 };
+      if(level === 2) return { depth: 2, timeMs: 350 };
+      if(level === 3) return { depth: 3, timeMs: 700 };
+      return { depth: 4, timeMs: 1200 };
+    }
+
+    const PST = {
+      // basit piece-square tables (white perspective). Black mirror.
+      p: [
+        0,0,0,0,0,0,0,0,
+        5,6,6,7,7,6,6,5,
+        2,3,3,5,5,3,3,2,
+        1,2,2,4,4,2,2,1,
+        0,1,1,3,3,1,1,0,
+        0,0,0,2,2,0,0,0,
+        1,1,1,-2,-2,1,1,1,
+        0,0,0,0,0,0,0,0
+      ],
+      n: [
+        -5,-3,-2,-2,-2,-2,-3,-5,
+        -3,-1,0,0,0,0,-1,-3,
+        -2,0,1,1.5,1.5,1,0,-2,
+        -2,0.5,1.5,2,2,1.5,0.5,-2,
+        -2,0,1.5,2,2,1.5,0,-2,
+        -2,0.5,1,1.5,1.5,1,0.5,-2,
+        -3,-1,0.5,0.5,0.5,0.5,-1,-3,
+        -5,-3,-2,-2,-2,-2,-3,-5
+      ],
+      b: [
+        -2,-1,-1,-1,-1,-1,-1,-2,
+        -1,0,0,0,0,0,0,-1,
+        -1,0,0.5,1,1,0.5,0,-1,
+        -1,0.5,0.5,1,1,0.5,0.5,-1,
+        -1,0,1,1,1,1,0,-1,
+        -1,1,1,1,1,1,1,-1,
+        -1,0.5,0,0,0,0,0.5,-1,
+        -2,-1,-1,-1,-1,-1,-1,-2
+      ],
+      r: [
+        0,0,0,0,0,0,0,0,
+        0.5,1,1,1,1,1,1,0.5,
+        -0.5,0,0,0,0,0,0,-0.5,
+        -0.5,0,0,0,0,0,0,-0.5,
+        -0.5,0,0,0,0,0,0,-0.5,
+        -0.5,0,0,0,0,0,0,-0.5,
+        -0.5,0,0,0,0,0,0,-0.5,
+        0,0,0,0.5,0.5,0,0,0
+      ],
+      q: [
+        -2,-1,-1,-0.5,-0.5,-1,-1,-2,
+        -1,0,0,0,0,0,0,-1,
+        -1,0,0.5,0.5,0.5,0.5,0,-1,
+        -0.5,0,0.5,0.5,0.5,0.5,0,-0.5,
+        0,0,0.5,0.5,0.5,0.5,0,-0.5,
+        -1,0.5,0.5,0.5,0.5,0.5,0,-1,
+        -1,0,0.5,0,0,0,0,-1,
+        -2,-1,-1,-0.5,-0.5,-1,-1,-2
+      ],
+      k: [
+        -3,-4,-4,-5,-5,-4,-4,-3,
+        -3,-4,-4,-5,-5,-4,-4,-3,
+        -3,-4,-4,-5,-5,-4,-4,-3,
+        -3,-4,-4,-5,-5,-4,-4,-3,
+        -2,-3,-3,-4,-4,-3,-3,-2,
+        -1,-2,-2,-2,-2,-2,-2,-1,
+        2,2,0,0,0,0,2,2,
+        2,3,1,0,0,1,3,2
+      ]
+    };
+
+    const PIECE_VALUE = { p:100, n:320, b:330, r:500, q:900, k:0 };
+
+    function squareIndex(sq){
+      const file = sq.charCodeAt(0) - 97; // a=0
+      const rank = Number(sq[1]) - 1; // 0..7
+      // index from a1=0 to h8=63
+      return rank*8 + file;
+    }
+    function mirrorIndex(i){
+      // mirror vertically for black
+      const rank = Math.floor(i/8);
+      const file = i%8;
+      const mr = 7-rank;
+      return mr*8 + file;
+    }
+
+    function evaluate(){
+      // Positive => advantage for White
+      // material + PST
+      let score = 0;
+      const board = game.board(); // 8x8, rank8..rank1
+      for(let r=0;r<8;r++){
+        for(let f=0;f<8;f++){
+          const p = board[r][f];
+          if(!p) continue;
+          const type = p.type;
+          const color = p.color;
+          // convert to index a1..h8
+          // board() is rank8 at r=0 -> rank = 8-r
+          const rank = 8 - r;
+          const file = String.fromCharCode(97 + f);
+          const sq = file + String(rank);
+          const idx = squareIndex(sq);
+          const base = PIECE_VALUE[type] || 0;
+          const pst = PST[type] ? PST[type][color === "w" ? idx : mirrorIndex(idx)] : 0;
+          const val = base + pst*10;
+          score += (color === "w") ? val : -val;
+        }
+      }
+      // small mobility bonus
+      const mob = game.moves().length;
+      score += (game.turn() === "w" ? mob : -mob) * 0.5;
+      return score;
+    }
+
+    function orderMoves(moves){
+      // Captures first, then checks, then others
+      // moves are verbose
+      return moves.sort((a,b)=>{
+        const ac = a.captured ? 1 : 0;
+        const bc = b.captured ? 1 : 0;
+        if(ac !== bc) return bc-ac;
+        const ap = a.promotion ? 1 : 0;
+        const bp = b.promotion ? 1 : 0;
+        if(ap !== bp) return bp-ap;
+        const ach = a.san.includes("+") ? 1 : 0;
+        const bch = b.san.includes("+") ? 1 : 0;
+        return bch-ach;
       });
     }
-    // Fallback: random legal move (very easy)
-    const moves = game.moves({ verbose:true });
-    if(!moves.length) return null;
-    // prefer captures
-    const caps = moves.filter(m => m.captured || m.flags.includes("e"));
-    const pick = (caps.length ? caps : moves)[Math.floor(Math.random()*(caps.length?caps.length:moves.length))];
-    return pick.from + pick.to + (pick.promotion || "");
-  }
 
-  function uciToMoveObj(uci){
-    // uci like e2e4 or e7e8q
-    if(!uci || uci.length < 4) return null;
-    return {
-      from: uci.slice(0,2),
-      to: uci.slice(2,4),
-      promotion: uci.length >= 5 ? uci[4] : "q"
-    };
-  }
+    function minimax(depth, alpha, beta, maximizing, startTime, timeMs){
+      // time cutoff
+      if(performance.now() - startTime > timeMs) return { score: evaluate(), cut: true };
 
-  function isAITurn(){
-    if(playerSide === "none") return false;
-    return game.turn() !== playerSide;
-  }
-
-  async function maybeAIMove(){
-    if(playerSide === "none") return;
-    if(game.is_game_over()) return;
-    if(!isAITurn()) return;
-
-    aiBusy = true;
-    $("aiThink").textContent = "AI düşünüyor…";
-    const skill = parseInt($("selLevel").value,10);
-
-    try{
-      const fen = game.fen();
-      const best = await getBestMove(fen, skill);
-      if(!best){ aiBusy=false; $("aiThink").textContent="AI beklemede"; return; }
-      const mv = uciToMoveObj(best);
-      if(!mv){ aiBusy=false; $("aiThink").textContent="AI beklemede"; return; }
-
-      const made = game.move({ from: mv.from, to: mv.to, promotion: mv.promotion || "q" });
-      if(made){
-        lastMove = { from: made.from, to: made.to };
-        beep(440, 55);
+      if(depth === 0 || game.isGameOver()){
+        let s = evaluate();
+        // checkmate huge
+        if(game.isCheckmate()){
+          // side to move is mated
+          const turn = game.turn();
+          s = (turn === "w") ? -999999 : 999999;
+        }
+        return { score: s, cut: false };
       }
-    }catch(e){
-      // ignore
-    }finally{
-      aiBusy = false;
-      $("aiThink").textContent = "AI beklemede";
-      render();
-    }
-  }
 
-  // ---------- Hint (Suggestion) ----------
-  async function giveHint(){
-    if(hintBusy || aiBusy) return;
-    if(game.is_game_over()) return;
-    if(playerSide !== "none" && game.turn() !== playerSide){
-      toast("İpucu için sıra sende olmalı.");
-      return;
-    }
-    hintBusy = true;
-    $("aiThink").textContent = "İpucu hesaplanıyor…";
-    const skill = Math.min(20, parseInt($("selLevel").value,10) + 2);
-    try{
-      const fen = game.fen();
-      const best = await getBestMove(fen, skill);
-      const mv = uciToMoveObj(best);
-      if(mv){
-        // highlight hint move
-        lastMove = { from: mv.from, to: mv.to };
-        toast(`İpucu: ${mv.from} → ${mv.to}`);
-      }
-    }catch(e){}
-    hintBusy = false;
-    $("aiThink").textContent = "AI beklemede";
-    render();
-  }
+      const moves = orderMoves(game.moves({ verbose:true }));
+      let bestMove = null;
 
-  // ---------- Controls ----------
-  $("btnNew").addEventListener("click", () => {
-    // start new keeping side selection
-    game.reset();
-    lastMove = null;
-    clearSelection();
-    orientation = (playerSide==="none") ? "w" : playerSide;
-    render();
-    toast("Yeni oyun başladı.");
-    // if player chose black, AI plays first
-    maybeAIMove();
-  });
-
-  $("btnReset").addEventListener("click", () => {
-    // full reset to defaults
-    game.reset();
-    lastMove = null;
-    clearSelection();
-    $("selSide").value = "w";
-    playerSide = "w";
-    orientation = "w";
-    $("selLevel").value = "10";
-    setEngineLevel(10);
-    $("chkLegal").checked = true;
-    $("chkAutoFlip").checked = true;
-    $("chkCoords").checked = false;
-    render();
-    toast("Ayarlar sıfırlandı.");
-    maybeAIMove();
-  });
-
-  $("btnFlip").addEventListener("click", () => {
-    orientation = (orientation==="w") ? "b" : "w";
-    render();
-  });
-
-  $("btnUndo").addEventListener("click", () => {
-    if(aiBusy) return;
-    if(game.history().length === 0) return;
-
-    // Undo: if vs AI, undo 2 plies (player+AI) when possible
-    if(playerSide !== "none"){
-      if(game.history().length >= 2){
-        game.undo();
-        game.undo();
+      if(maximizing){
+        let best = -Infinity;
+        for(const m of moves){
+          game.move(m);
+          const res = minimax(depth-1, alpha, beta, false, startTime, timeMs);
+          game.undo();
+          if(res.score > best){
+            best = res.score;
+            bestMove = m;
+          }
+          alpha = Math.max(alpha, best);
+          if(beta <= alpha) break;
+          if(res.cut) break;
+        }
+        return { score: best, move: bestMove, cut: false };
       }else{
+        let best = Infinity;
+        for(const m of moves){
+          game.move(m);
+          const res = minimax(depth-1, alpha, beta, true, startTime, timeMs);
+          game.undo();
+          if(res.score < best){
+            best = res.score;
+            bestMove = m;
+          }
+          beta = Math.min(beta, best);
+          if(beta <= alpha) break;
+          if(res.cut) break;
+        }
+        return { score: best, move: bestMove, cut: false };
+      }
+    }
+
+    function chooseAiMove(){
+      const cfg = aiConfig(aiLevel);
+      const start = performance.now();
+
+      const maximizing = (aiSide === "w"); // AI is white => maximize eval, else minimize
+      const res = minimax(cfg.depth, -Infinity, Infinity, maximizing, start, cfg.timeMs);
+
+      // fallback if null
+      if(!res.move){
+        const ms = game.moves({ verbose:true });
+        return ms[Math.floor(Math.random()*ms.length)];
+      }
+      return res.move;
+    }
+
+    async function maybeAiMove(){
+      if(game.isGameOver()) return;
+      if(game.turn() !== aiSide) return;
+
+      aiBusy = true;
+      renderStatus();
+
+      // kısa bekleme: UI donmasın
+      await new Promise(r => setTimeout(r, 40));
+
+      const m = chooseAiMove();
+      if(m){
+        game.move(m);
+      }
+      aiBusy = false;
+      clearSelection();
+      renderBoard();
+      startClockIfNeeded();
+    }
+
+    /***********************
+     *  Kağan Dede
+     ***********************/
+    function updateKagan(forceToast){
+      const score = evaluate()/100; // pawn units
+      const asText = (score>=0 ? "+" : "") + score.toFixed(1);
+      $("evalText").textContent = `Değerlendirme: ${asText}`;
+
+      let advice = "";
+      const turn = game.turn();
+      const op = currentOpeningName();
+
+      // basic advice rules
+      if(game.isCheck()){
+        advice = "“Şahın tehlikede! Önce şahı kurtar, sonra töre konuşur.”";
+      } else if(game.history().length < 6){
+        advice = `“Açılışta taşlarını geliştir, merkeze hâkim ol. (${op !== "—" ? op : "Açılış"} çizgisinde sakin ilerle.)”`;
+      } else {
+        // evaluate material and suggest
+        const s = score;
+        if(s > 1.5) advice = "“Üstünlük sende. Acele etme: taşlarını aktif tut, gereksiz fedadan kaçın.”";
+        else if(s < -1.5) advice = "“Geri düştün. Taş değişimini azalt, şah güvenliğini sağlamlaştır, karşı oyun ara.”";
+        else advice = "“Denge var. Zayıf kareleri hedefle, atlarını ileri karakol yap. Piyonlarını gereksiz zayıflatma.”";
+      }
+
+      // add small tactical hint: best move suggestion from AI (as coach)
+      let coach = "";
+      try{
+        const cfg = aiConfig(Math.min(4, aiLevel+1));
+        const start = performance.now();
+        const maximizing = (turn === "w");
+        const res = minimax(Math.min(3,cfg.depth), -Infinity, Infinity, maximizing, start, 350);
+        if(res.move){
+          coach = `\n\nTavsiye hamle: ${res.move.san} (fikri: ${res.move.captured ? "taş kazanımı / takas" : "gelişim & baskı"})`;
+        }
+      }catch{}
+
+      $("kaganText").textContent = advice + coach;
+
+      if(forceToast){
+        toast("Kağan Dede konuştu: panelde tavsiyeyi gör.");
+      }
+    }
+
+    /***********************
+     *  New game / Undo / Flip
+     ***********************/
+    function newGame(){
+      game.reset();
+      clearSelection();
+      resetClock();
+
+      // set sides
+      humanSide = $("sideSel").value;
+      aiSide = (humanSide === "w") ? "b" : "w";
+
+      // default perspective: human at bottom
+      perspective = humanSide;
+      renderBoard();
+
+      // if human chose black, AI plays first
+      if(aiSide === "w"){
+        startClockIfNeeded();
+        maybeAiMove();
+      }
+      toast("Yeni oyun başladı.");
+    }
+
+    function undo(){
+      if(aiBusy) return;
+      // Undo last ply; if AI just moved, also undo one more ply (player move)
+      const h = game.history();
+      if(h.length === 0){ toast("Geri alınacak hamle yok."); return; }
+
+      // Typically we undo twice to return control to human (like common chess apps)
+      game.undo();
+      if(game.history().length > 0 && game.turn() !== humanSide){
+        // ensure it's human's turn
         game.undo();
       }
-    }else{
-      game.undo();
+      clearSelection();
+      renderBoard();
+      toast("Hamle geri alındı.");
     }
-    lastMove = null;
-    clearSelection();
-    render();
-    toast("Geri alındı.");
-  });
 
-  $("btnHint").addEventListener("click", giveHint);
-
-  $("selSide").addEventListener("change", () => {
-    playerSide = $("selSide").value;
-    if(playerSide === "none"){
-      $("pillMode").textContent = "Mod: 2 Oyuncu";
-      $("engineBadge").textContent = engineReady ? "AI: Stockfish hazır ✅" : "AI: kapalı";
-    }else{
-      orientation = playerSide;
-      setEngineLevel(parseInt($("selLevel").value,10));
+    function flipBoard(){
+      perspective = (perspective === "w") ? "b" : "w";
+      renderBoard();
     }
-    // restart game for clarity
-    game.reset();
-    lastMove = null;
-    clearSelection();
-    render();
-    toast("Mod değişti: " + (playerSide==="none" ? "2 oyuncu" : (playerSide==="w" ? "Sen beyaz" : "Sen siyah")));
-    maybeAIMove();
-  });
 
-  $("selLevel").addEventListener("change", () => {
-    setEngineLevel(parseInt($("selLevel").value,10));
-    toast("AI seviyesi güncellendi.");
-  });
+    /***********************
+     *  Hook UI
+     ***********************/
+    $("btnNew").addEventListener("click", newGame);
+    $("btnUndo").addEventListener("click", undo);
+    $("btnFlip").addEventListener("click", flipBoard);
 
-  $("chkLegal").addEventListener("change", render);
-  $("chkCoords").addEventListener("change", render);
-  $("chkAutoFlip").addEventListener("change", () => toast("Oto çevir: " + ($("chkAutoFlip").checked ? "açık" : "kapalı")));
+    $("btnHint").addEventListener("click", ()=>{
+      if(!kaganOn){ toast("Kağan Dede kapalı. Sağdan açabilirsin."); return; }
+      updateKagan(true);
+    });
 
-  $("btnCopyPGN").addEventListener("click", async () => {
-    const pgn = game.pgn({ newline_char: "\n" }) || "";
-    try{
-      await navigator.clipboard.writeText(pgn);
-      toast("PGN kopyalandı.");
-    }catch{
-      toast("Kopyalanamadı (tarayıcı izni).");
+    $("showLegal").addEventListener("change", (e)=>{
+      showLegal = e.target.checked;
+      renderBoard();
+    });
+
+    $("showInfo").addEventListener("change", (e)=>{
+      const on = e.target.checked;
+      $("infoSection").classList.toggle("hidden", !on);
+    });
+
+    $("kaganTog").addEventListener("change", (e)=>{
+      kaganOn = e.target.checked;
+      $("kaganSection").classList.toggle("hidden", !kaganOn);
+      if(kaganOn) updateKagan(false);
+    });
+
+    $("aiSel").addEventListener("change", (e)=>{
+      aiLevel = Number(e.target.value);
+      toast("AI seviyesi güncellendi.");
+    });
+
+    $("sideSel").addEventListener("change", ()=>{
+      toast("Taraf seçimi yeni oyunda uygulanır (Yeni Oyun).");
+    });
+
+    $("timeSel").addEventListener("change", ()=>{
+      toast("Zaman ayarı yeni oyunda uygulanır (Yeni Oyun).");
+    });
+
+    $("musicTog").addEventListener("change", (e)=>{
+      musicOn = e.target.checked;
+      if(musicOn){
+        startMusic();
+        toast("Müzik açıldı.");
+      }else{
+        stopMusic();
+        toast("Müzik kapandı.");
+      }
+    });
+
+    // init status pill (player-facing; teknik detay yok)
+    function setSitePill(ok){
+      const dot = $("siteDot");
+      const txt = $("siteStatus");
+      if(ok){
+        dot.style.background = "#21d4a2";
+        dot.style.boxShadow = "0 0 0 4px rgba(33,212,162,.16)";
+        txt.textContent = "Durum: oyun hazır";
+      }else{
+        dot.style.background = "#fbbf24";
+        dot.style.boxShadow = "0 0 0 4px rgba(251,191,36,.16)";
+        txt.textContent = "Durum: hazırlanıyor";
+      }
     }
-  });
+    setSitePill(true);
 
-  $("btnCopyFEN").addEventListener("click", async () => {
-    const fen = game.fen();
-    try{
-      await navigator.clipboard.writeText(fen);
-      toast("FEN kopyalandı.");
-    }catch{
-      toast("Kopyalanamadı (tarayıcı izni).");
-    }
-  });
+    /***********************
+     *  Start
+     ***********************/
+    // default settings
+    showLegal = $("showLegal").checked;
+    $("domainText").textContent = location.hostname || "turkuntoresi.com";
 
-  // ---------- Init ----------
-  function init(){
-    // default
-    playerSide = $("selSide").value;
-    orientation = playerSide==="none" ? "w" : playerSide;
+    resetClock();
+    renderBoard();
+    updateKagan(false);
 
-    $("engineBadge").textContent = "AI: başlatılıyor…";
-    createEngine();
-
-    // set level after engine ready too
-    setEngineLevel(parseInt($("selLevel").value,10));
-
-    render();
-    // If player is black, AI starts
-    maybeAIMove();
-  }
-
-  init();
-})();
-</script>
+    // If user clicks anywhere and music was requested but blocked, they can toggle again.
+  </script>
 </body>
 </html>
