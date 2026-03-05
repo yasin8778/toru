@@ -292,7 +292,7 @@
     <div class="note">
       ✅ Tam kurallar: Rok / En Passant / Terfi / Mat-Pat / 50 hamle kuralı. <br/>
       ✅ Tahta standardı: <b>a8 açık</b>, <b>h1 açık</b>. “Oyuncunun sağ altı” her zaman açık olacak şekilde taraf seçimine göre görünüm ayarlanır. <br/>
-      ⚠️ YouTube tarayıcı kuralı: Ses için ilk kez <b>ÇAL</b>’a dokunman gerekir.
+      ⚡ Hızlandırma: AI hesapları artık <b>Web Worker</b> içinde (UI donmaz).
     </div>
   </div>
 
@@ -416,7 +416,7 @@
         <div class="tag">Müzik (YouTube · Kilitli Liste)</div>
         <div class="small">
           ✅ Sadece <b>video ID</b> ile çalar (başka videoya kaymaz).<br/>
-          ✅ “Listeyi düzenle” kapalıyken kimse ekleyemez (senin cihazında bile kapalıyken eklemez).
+          ✅ “Listeyi düzenle” kapalıyken kimse ekleyemez.
         </div>
         <div class="spacer"></div>
         <div class="row">
@@ -504,7 +504,7 @@ const nowDayKey = ()=> new Date().toISOString().slice(0,10);
 const pick = (arr)=> arr[Math.floor(Math.random()*arr.length)];
 
 /* =========================
-   Intro (Göktürkçe + töre)
+   Intro
 ========================= */
 const RUNES = [
   "𐰴𐰍𐰣: 𐱅𐰇𐰺𐰇 𐰉𐰆𐰔𐰞𐰢𐰀",
@@ -534,7 +534,9 @@ $("intro").addEventListener("click", hideIntro, {passive:true});
 setTimeout(hideIntro, 2400);
 
 /* =========================
-   Chess Core (full rules)
+   Chess UI Core (main thread)
+   - Move legality used for UI & play
+   - AI search moved to Worker
 ========================= */
 const PIECE_UNI = {
   P:"♙", N:"♘", B:"♗", R:"♖", Q:"♕", K:"♔",
@@ -563,9 +565,6 @@ function algebra(sq){
 function cloneState(s){ return JSON.parse(JSON.stringify(s)); }
 
 function initialState(){
-  // Standard chess start:
-  // Rank 8: r n b q k b n r
-  // Rank 1: R N B Q K B N R
   const b = Array(64).fill(null);
   const backBlack = ["r","n","b","q","k","b","n","r"];
   const backWhite = ["R","N","B","Q","K","B","N","R"];
@@ -596,7 +595,6 @@ function attackedBy(state, sq, byColor){
   const b = state.board;
   const {r,c}=sqToRC(sq);
 
-  // pawns
   if(byColor==="w"){
     for(const dc of [-1,1]){
       const rr=r+1, cc=c+dc;
@@ -609,7 +607,6 @@ function attackedBy(state, sq, byColor){
     }
   }
 
-  // knights
   const kD = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
   for(const [dr,dc] of kD){
     const rr=r+dr, cc=c+dc;
@@ -620,7 +617,6 @@ function attackedBy(state, sq, byColor){
     if(byColor==="b" && p==="n") return true;
   }
 
-  // bishops/queens
   const diag = [[-1,-1],[-1,1],[1,-1],[1,1]];
   for(const [dr,dc] of diag){
     let rr=r+dr, cc=c+dc;
@@ -635,7 +631,6 @@ function attackedBy(state, sq, byColor){
     }
   }
 
-  // rooks/queens
   const line = [[-1,0],[1,0],[0,-1],[0,1]];
   for(const [dr,dc] of line){
     let rr=r+dr, cc=c+dc;
@@ -650,7 +645,6 @@ function attackedBy(state, sq, byColor){
     }
   }
 
-  // king
   for(let dr=-1;dr<=1;dr++){
     for(let dc=-1;dc<=1;dc++){
       if(dr===0 && dc===0) continue;
@@ -661,7 +655,6 @@ function attackedBy(state, sq, byColor){
       if(byColor==="b" && p==="k") return true;
     }
   }
-
   return false;
 }
 
@@ -711,7 +704,6 @@ function genPseudoMoves(state){
         const startR = (us==="w") ? 6 : 1;
         const promoR = (us==="w") ? 0 : 7;
 
-        // forward
         const rr=r+dir, cc=c;
         if(inBoard(rr,cc)){
           const to=rcToSq(rr,cc);
@@ -723,7 +715,6 @@ function genPseudoMoves(state){
               }
             }else{
               push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
-              // double
               if(r===startR){
                 const rr2=r+dir*2;
                 const to2=rcToSq(rr2,cc);
@@ -735,7 +726,6 @@ function genPseudoMoves(state){
           }
         }
 
-        // captures + ep
         for(const dc of [-1,1]){
           const rrC=r+dir, ccC=c+dc;
           if(!inBoard(rrC,ccC)) continue;
@@ -793,7 +783,6 @@ function genPseudoMoves(state){
           }
         }
 
-        // castling
         const kingHome = us==="w" ? rcToSq(7,4) : rcToSq(0,4);
         if(sq===kingHome && !inCheck(state, us)){
           if(us==="w" && state.castling.K){
@@ -900,10 +889,10 @@ function gameEnd(state){
   const inC = inCheck(state, us);
 
   if(moves.length===0){
-    if(inC) return us==="w" ? "0-1" : "1-0"; // checkmate
-    return "1/2-1/2"; // stalemate
+    if(inC) return us==="w" ? "0-1" : "1-0";
+    return "1/2-1/2";
   }
-  if(state.halfmove>=100) return "1/2-1/2"; // 50-move rule
+  if(state.halfmove>=100) return "1/2-1/2";
   return null;
 }
 
@@ -934,9 +923,6 @@ function sanForMove(state, m){
   return s;
 }
 
-/* =========================
-   Eval + Minimax (fast)
-========================= */
 function evalState(state){
   const b=state.board;
   let score=0;
@@ -945,48 +931,8 @@ function evalState(state){
     const v = pieceValue(p);
     score += isWhite(p) ? v : -v;
   }
-  // tiny tempo bonus
   score += (state.turn==="w") ? 5 : -5;
   return score;
-}
-
-function minimax(state, depth, alpha, beta){
-  const end = gameEnd(state);
-  if(end){
-    if(end==="1/2-1/2") return {score:0, move:null};
-    if(end==="1-0") return {score: 999999, move:null};
-    if(end==="0-1") return {score: -999999, move:null};
-  }
-  if(depth===0) return {score: evalState(state), move:null};
-
-  const moves = legalMoves(state);
-  // captures first
-  moves.sort((a,b)=> (b.cap?1:0)-(a.cap?1:0));
-
-  const maximizing = (state.turn==="w");
-  let bestMove=null;
-
-  if(maximizing){
-    let best=-Infinity;
-    for(const m of moves){
-      const s2=makeMove(state,m);
-      const res=minimax(s2, depth-1, alpha, beta);
-      if(res.score>best){ best=res.score; bestMove=m; }
-      alpha=Math.max(alpha,best);
-      if(beta<=alpha) break;
-    }
-    return {score:best, move:bestMove};
-  }else{
-    let best=Infinity;
-    for(const m of moves){
-      const s2=makeMove(state,m);
-      const res=minimax(s2, depth-1, alpha, beta);
-      if(res.score<best){ best=res.score; bestMove=m; }
-      beta=Math.min(beta,best);
-      if(beta<=alpha) break;
-    }
-    return {score:best, move:bestMove};
-  }
 }
 
 /* =========================
@@ -1002,7 +948,6 @@ const OPENINGS = [
   {seq:["f4"], name:"Kuş Açılışı (Bird)"},
   {seq:["g4"], name:"Grob Saldırısı"},
 ];
-
 function openingName(sanList){
   for(const o of OPENINGS){
     if(sanList.length < o.seq.length) continue;
@@ -1016,7 +961,7 @@ function openingName(sanList){
 }
 
 /* =========================
-   Kağan & Dede text
+   Kağan & Dede
 ========================= */
 const KAGAN_EMIR = [
   "Merkez tutulmadan sefer uzar.",
@@ -1030,7 +975,6 @@ const KAGAN_EMIR = [
   "Açık hat bul; kaleyi oraya sür.",
   "Sabır kılıçtan keskindir."
 ];
-
 const DEDE_USLUP = [
   "Yiğit, taşın gönlünü kırma; doğru yere kondur.",
   "At gider, iz kalır; hamle gider, hüküm kalır.",
@@ -1041,7 +985,6 @@ const DEDE_USLUP = [
   "Sabır kılıçtan keskindir; beklemesini bil.",
   "Gönül ister saldırı; akıl ister tedbir.",
 ];
-
 function dedeComment(san, evalBefore, evalAfter){
   const swing = evalAfter - evalBefore;
   let mood = "";
@@ -1055,26 +998,26 @@ function dedeComment(san, evalBefore, evalAfter){
 const DEDE_LESSONS = {
   history: [
     "Satranç, büyük ihtimalle Hindistan’da (Çaturanga) doğup İran üzerinden dünyaya yayıldı. Modern kurallar özellikle vezirin güçlenmesiyle hız kazandı.",
-    "Satranç üç evredir: Açılış (hazırlık), oyun ortası (mücadele), oyun sonu (sonuç). Savaş gibidir; töre ister.",
-    "Ekoller vardır: Pozisyonel sabır ve dinamik saldırı. İkisi de töre içinde yer bulur."
+    "Satranç üç evredir: Açılış (hazırlık), oyun ortası (mücadele), oyun sonu (sonuç).",
+    "Ekoller vardır: Pozisyonel sabır ve dinamik saldırı."
   ],
   pieces: [
     "Piyon yürür, terfi eder. At çatal ustasıdır. Fil çaprazın gücüdür. Kale açık hat sever. Vezir güçlü ama erken gezdirilmez. Şah kaybedilmez.",
-    "Yaklaşık değerler: P=1, N=3, B=3, R=5, Q=9. Ama konum bazen değeri değiştirir.",
+    "Yaklaşık değerler: P=1, N=3, B=3, R=5, Q=9.",
     "Açılış töresi: Merkez + gelişim + şah güvenliği (rok)."
   ],
   basic: [
-    "Önce merkez piyonları (e/d), sonra atlar, filler, rok. Aynı taşı gereksiz yere iki kez oynama.",
-    "Şah güvenli değilken saldırı hızla döner. Rok çoğu zaman iyidir.",
+    "Önce merkez piyonları (e/d), sonra atlar, filler, rok.",
+    "Şah güvenli değilken saldırı hızla döner.",
     "Plan: Zayıf kareleri hedefle, taşlarını uyumla."
   ],
   openings: [
-    "Bilinen: İspanyol, Sicilya, Vezir Gambiti, Kral Hint. Hepsi farklı töre: kimisi sabır, kimisi fırtına.",
-    "Az bilinen: Orangutan (1.b4), Bird (1.f4), Grob (1.g4). Sürprizdir ama risk taşır.",
-    "Dede öğüdü: Açılış ezberi değil; fikir öğren: gelişim ve şah güvenliği."
+    "Bilinen: İspanyol, Sicilya, Vezir Gambiti, Kral Hint.",
+    "Sürpriz: Orangutan (1.b4), Bird (1.f4), Grob (1.g4).",
+    "Ezber değil; fikir öğren: gelişim ve şah güvenliği."
   ],
   endgames: [
-    "Oyun sonu kuralı: Şah savaşçıdır, merkeze yürür. Geçer piyon yarat, kaleyi arkadan destekle.",
+    "Oyun sonu: Şah merkeze yürür. Geçer piyon yarat.",
     "Kale oyun sonu: Kale piyonun arkasında çoğu zaman doğrudur.",
     "Basit matlar: K+Q vs K, K+R vs K."
   ],
@@ -1091,30 +1034,537 @@ const DEDE_LESSONS = {
 };
 
 /* =========================
+   WORKER: AI search (minimax) off main thread
+   - Tek HTML: Blob Worker
+========================= */
+function createAIWorker(){
+  const workerCode = `
+    const isWhite = (p)=> p && p===p.toUpperCase();
+    const isBlack = (p)=> p && p===p.toLowerCase();
+    const pieceValue = (p)=>{
+      switch(p.toLowerCase()){
+        case "p": return 100;
+        case "n": return 320;
+        case "b": return 330;
+        case "r": return 500;
+        case "q": return 900;
+        case "k": return 0;
+      }
+      return 0;
+    };
+    const sqToRC=(sq)=>({r:Math.floor(sq/8), c:sq%8});
+    const rcToSq=(r,c)=>r*8+c;
+    const inBoard=(r,c)=>r>=0&&r<8&&c>=0&&c<8;
+    const clone=(s)=>JSON.parse(JSON.stringify(s));
+
+    function findKing(state, color){
+      const target = color==="w" ? "K" : "k";
+      return state.board.findIndex(x=>x===target);
+    }
+
+    function attackedBy(state, sq, byColor){
+      const b = state.board;
+      const {r,c}=sqToRC(sq);
+
+      if(byColor==="w"){
+        for(const dc of [-1,1]){
+          const rr=r+1, cc=c+dc;
+          if(inBoard(rr,cc) && b[rcToSq(rr,cc)]==="P") return true;
+        }
+      }else{
+        for(const dc of [-1,1]){
+          const rr=r-1, cc=c+dc;
+          if(inBoard(rr,cc) && b[rcToSq(rr,cc)]==="p") return true;
+        }
+      }
+
+      const kD = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+      for(const [dr,dc] of kD){
+        const rr=r+dr, cc=c+dc;
+        if(!inBoard(rr,cc)) continue;
+        const p=b[rcToSq(rr,cc)];
+        if(!p) continue;
+        if(byColor==="w" && p==="N") return true;
+        if(byColor==="b" && p==="n") return true;
+      }
+
+      const diag = [[-1,-1],[-1,1],[1,-1],[1,1]];
+      for(const [dr,dc] of diag){
+        let rr=r+dr, cc=c+dc;
+        while(inBoard(rr,cc)){
+          const p=b[rcToSq(rr,cc)];
+          if(p){
+            if(byColor==="w" && (p==="B"||p==="Q")) return true;
+            if(byColor==="b" && (p==="b"||p==="q")) return true;
+            break;
+          }
+          rr+=dr; cc+=dc;
+        }
+      }
+
+      const line = [[-1,0],[1,0],[0,-1],[0,1]];
+      for(const [dr,dc] of line){
+        let rr=r+dr, cc=c+dc;
+        while(inBoard(rr,cc)){
+          const p=b[rcToSq(rr,cc)];
+          if(p){
+            if(byColor==="w" && (p==="R"||p==="Q")) return true;
+            if(byColor==="b" && (p==="r"||p==="q")) return true;
+            break;
+          }
+          rr+=dr; cc+=dc;
+        }
+      }
+
+      for(let dr=-1;dr<=1;dr++){
+        for(let dc=-1;dc<=1;dc++){
+          if(dr===0 && dc===0) continue;
+          const rr=r+dr, cc=c+dc;
+          if(!inBoard(rr,cc)) continue;
+          const p=b[rcToSq(rr,cc)];
+          if(byColor==="w" && p==="K") return true;
+          if(byColor==="b" && p==="k") return true;
+        }
+      }
+      return false;
+    }
+
+    function inCheck(state, color){
+      const ksq=findKing(state, color);
+      const attacker = (color==="w") ? "b" : "w";
+      return attackedBy(state, ksq, attacker);
+    }
+
+    function genPseudoMoves(state){
+      const b=state.board;
+      const moves=[];
+      const us = state.turn;
+      const them = us==="w" ? "b" : "w";
+      const push = (m)=>moves.push(m);
+
+      for(let sq=0;sq<64;sq++){
+        const p=b[sq];
+        if(!p) continue;
+        if(us==="w" && !isWhite(p)) continue;
+        if(us==="b" && !isBlack(p)) continue;
+
+        const {r,c}=sqToRC(sq);
+
+        const addSlide = (dirs)=>{
+          for(const [dr,dc] of dirs){
+            let rr=r+dr, cc=c+dc;
+            while(inBoard(rr,cc)){
+              const to=rcToSq(rr,cc);
+              const tp=b[to];
+              if(!tp){
+                push({from:sq,to, piece:p, cap:null, promo:null, ep:false, castle:false});
+              }else{
+                if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp))){
+                  push({from:sq,to, piece:p, cap:tp, promo:null, ep:false, castle:false});
+                }
+                break;
+              }
+              rr+=dr; cc+=dc;
+            }
+          }
+        };
+
+        switch(p.toLowerCase()){
+          case "p":{
+            const dir = (us==="w") ? -1 : 1;
+            const startR = (us==="w") ? 6 : 1;
+            const promoR = (us==="w") ? 0 : 7;
+
+            const rr=r+dir, cc=c;
+            if(inBoard(rr,cc)){
+              const to=rcToSq(rr,cc);
+              if(!b[to]){
+                if(rr===promoR){
+                  for(const pr of ["q","r","b","n"]){
+                    const promo = us==="w" ? pr.toUpperCase() : pr;
+                    push({from:sq,to,piece:p,cap:null,promo,ep:false,castle:false});
+                  }
+                }else{
+                  push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+                  if(r===startR){
+                    const rr2=r+dir*2;
+                    const to2=rcToSq(rr2,cc);
+                    if(!b[to2]){
+                      push({from:sq,to:to2,piece:p,cap:null,promo:null,ep:false,castle:false, dbl:true});
+                    }
+                  }
+                }
+              }
+            }
+
+            for(const dc of [-1,1]){
+              const rrC=r+dir, ccC=c+dc;
+              if(!inBoard(rrC,ccC)) continue;
+              const to=rcToSq(rrC,ccC);
+              const tp=b[to];
+
+              if(tp && ((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))){
+                if(rrC===promoR){
+                  for(const pr of ["q","r","b","n"]){
+                    const promo = us==="w" ? pr.toUpperCase() : pr;
+                    push({from:sq,to,piece:p,cap:tp,promo,ep:false,castle:false});
+                  }
+                }else{
+                  push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+                }
+              }
+
+              if(state.ep!==null && to===state.ep){
+                const capSq = rcToSq(r, ccC);
+                const capP = b[capSq];
+                if(capP && capP.toLowerCase()==="p" && ((us==="w" && isBlack(capP)) || (us==="b" && isWhite(capP)))){
+                  push({from:sq,to,piece:p,cap:capP,promo:null,ep:true,castle:false, capSq});
+                }
+              }
+            }
+            break;
+          }
+          case "n":{
+            const d=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+            for(const [dr,dc] of d){
+              const rr=r+dr, cc=c+dc;
+              if(!inBoard(rr,cc)) continue;
+              const to=rcToSq(rr,cc);
+              const tp=b[to];
+              if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+              else if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))
+                push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+            }
+            break;
+          }
+          case "b": addSlide([[-1,-1],[-1,1],[1,-1],[1,1]]); break;
+          case "r": addSlide([[-1,0],[1,0],[0,-1],[0,1]]); break;
+          case "q": addSlide([[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]]); break;
+          case "k":{
+            for(let dr=-1;dr<=1;dr++){
+              for(let dc=-1;dc<=1;dc++){
+                if(dr===0 && dc===0) continue;
+                const rr=r+dr, cc=c+dc;
+                if(!inBoard(rr,cc)) continue;
+                const to=rcToSq(rr,cc);
+                const tp=b[to];
+                if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+                else if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))
+                  push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+              }
+            }
+
+            const kingHome = us==="w" ? rcToSq(7,4) : rcToSq(0,4);
+            if(sq===kingHome && !inCheck(state, us)){
+              if(us==="w" && state.castling.K){
+                const f1=rcToSq(7,5), g1=rcToSq(7,6), h1=rcToSq(7,7);
+                if(!b[f1] && !b[g1] && b[h1]==="R" && !attackedBy(state,f1,them) && !attackedBy(state,g1,them)){
+                  push({from:sq,to:g1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h1, rookTo:f1});
+                }
+              }
+              if(us==="w" && state.castling.Q){
+                const d1=rcToSq(7,3), c1=rcToSq(7,2), b1=rcToSq(7,1), a1=rcToSq(7,0);
+                if(!b[d1] && !b[c1] && !b[b1] && b[a1]==="R" && !attackedBy(state,d1,them) && !attackedBy(state,c1,them)){
+                  push({from:sq,to:c1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a1, rookTo:d1});
+                }
+              }
+              if(us==="b" && state.castling.k){
+                const f8=rcToSq(0,5), g8=rcToSq(0,6), h8=rcToSq(0,7);
+                if(!b[f8] && !b[g8] && b[h8]==="r" && !attackedBy(state,f8,them) && !attackedBy(state,g8,them)){
+                  push({from:sq,to:g8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h8, rookTo:f8});
+                }
+              }
+              if(us==="b" && state.castling.q){
+                const d8=rcToSq(0,3), c8=rcToSq(0,2), b8=rcToSq(0,1), a8=rcToSq(0,0);
+                if(!b[d8] && !b[c8] && !b[b8] && b[a8]==="r" && !attackedBy(state,d8,them) && !attackedBy(state,c8,them)){
+                  push({from:sq,to:c8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a8, rookTo:d8});
+                }
+              }
+            }
+            break;
+          }
+        }
+      }
+      return moves;
+    }
+
+    function makeMove(state, m){
+      const s = clone(state);
+      const b = s.board;
+      s.ep = null;
+
+      if(m.piece.toLowerCase()==="p" || m.cap) s.halfmove=0;
+      else s.halfmove++;
+
+      b[m.to] = m.promo ? m.promo : m.piece;
+      b[m.from] = null;
+
+      if(m.ep && m.capSq!=null) b[m.capSq]=null;
+      if(m.castle){
+        b[m.rookTo] = b[m.rookFrom];
+        b[m.rookFrom] = null;
+      }
+      if(m.dbl){
+        const {r:toR,c:toC}=sqToRC(m.to);
+        const epR = (s.turn==="w") ? toR+1 : toR-1;
+        s.ep = rcToSq(epR, toC);
+      }
+
+      const from = m.from, to = m.to;
+      const moved = m.piece;
+      const cap = m.cap;
+      const revoke = (k)=>{ s.castling[k]=false; };
+
+      if(moved==="K"){ revoke("K"); revoke("Q"); }
+      if(moved==="k"){ revoke("k"); revoke("q"); }
+      if(moved==="R"){
+        if(from===rcToSq(7,0)) revoke("Q");
+        if(from===rcToSq(7,7)) revoke("K");
+      }
+      if(moved==="r"){
+        if(from===rcToSq(0,0)) revoke("q");
+        if(from===rcToSq(0,7)) revoke("k");
+      }
+      if(cap==="R"){
+        if(to===rcToSq(7,0)) revoke("Q");
+        if(to===rcToSq(7,7)) revoke("K");
+      }
+      if(cap==="r"){
+        if(to===rcToSq(0,0)) revoke("q");
+        if(to===rcToSq(0,7)) revoke("k");
+      }
+
+      s.turn = (s.turn==="w") ? "b" : "w";
+      if(s.turn==="w") s.fullmove++;
+      return s;
+    }
+
+    function legalMoves(state){
+      const pseudo = genPseudoMoves(state);
+      const leg=[];
+      for(const m of pseudo){
+        const s2 = makeMove(state, m);
+        const us = state.turn;
+        if(!inCheck(s2, us)) leg.push(m);
+      }
+      return leg;
+    }
+
+    function gameEnd(state){
+      const moves = legalMoves(state);
+      const us = state.turn;
+      const inC = inCheck(state, us);
+      if(moves.length===0){
+        if(inC) return us==="w" ? "0-1" : "1-0";
+        return "1/2-1/2";
+      }
+      if(state.halfmove>=100) return "1/2-1/2";
+      return null;
+    }
+
+    function evalState(state){
+      const b=state.board;
+      let score=0;
+      for(const p of b){
+        if(!p) continue;
+        const v = pieceValue(p);
+        score += isWhite(p) ? v : -v;
+      }
+      score += (state.turn==="w") ? 5 : -5;
+      return score;
+    }
+
+    function minimax(state, depth, alpha, beta){
+      const end = gameEnd(state);
+      if(end){
+        if(end==="1/2-1/2") return {score:0, move:null};
+        if(end==="1-0") return {score: 999999, move:null};
+        if(end==="0-1") return {score: -999999, move:null};
+      }
+      if(depth===0) return {score: evalState(state), move:null};
+
+      const moves = legalMoves(state);
+      moves.sort((a,b)=> (b.cap?1:0)-(a.cap?1:0));
+
+      const maximizing = (state.turn==="w");
+      let bestMove=null;
+
+      if(maximizing){
+        let best=-Infinity;
+        for(const m of moves){
+          const s2=makeMove(state,m);
+          const res=minimax(s2, depth-1, alpha, beta);
+          if(res.score>best){ best=res.score; bestMove=m; }
+          alpha=Math.max(alpha,best);
+          if(beta<=alpha) break;
+        }
+        return {score:best, move:bestMove};
+      }else{
+        let best=Infinity;
+        for(const m of moves){
+          const s2=makeMove(state,m);
+          const res=minimax(s2, depth-1, alpha, beta);
+          if(res.score<best){ best=res.score; bestMove=m; }
+          beta=Math.min(beta,best);
+          if(beta<=alpha) break;
+        }
+        return {score:best, move:bestMove};
+      }
+    }
+
+    self.onmessage = (ev)=>{
+      const {id, type, state, depth} = ev.data || {};
+      try{
+        const res = minimax(state, depth, -Infinity, Infinity);
+        self.postMessage({id, ok:true, move: res.move, score: res.score});
+      }catch(e){
+        self.postMessage({id, ok:false, error: (e && e.message) ? e.message : String(e)});
+      }
+    };
+  `;
+  const blob = new Blob([workerCode], {type:"application/javascript"});
+  const url = URL.createObjectURL(blob);
+  return new Worker(url);
+}
+
+let AIW = null;
+let aiReqId = 1;
+const aiPending = new Map();
+
+function ensureWorker(){
+  if(AIW) return true;
+  try{
+    AIW = createAIWorker();
+    AIW.onmessage = (ev)=>{
+      const msg = ev.data || {};
+      const cb = aiPending.get(msg.id);
+      if(cb){
+        aiPending.delete(msg.id);
+        cb(msg);
+      }
+    };
+    return true;
+  }catch(e){
+    AIW = null;
+    return false;
+  }
+}
+
+function aiDepthFromLevel(level){
+  const map = {
+    l1:{d:1, bl:0.35},
+    l2:{d:2, bl:0.20},
+    l3:{d:2, bl:0.12},
+    l4:{d:3, bl:0.10},
+    l5:{d:3, bl:0.06},
+    l6:{d:4, bl:0.05},
+    l7:{d:4, bl:0.03},
+    l8:{d:5, bl:0.02},
+    l9:{d:5, bl:0.01},
+    l10:{d:6, bl:0.00},
+  };
+  return map[level] || {d:3, bl:0.08};
+}
+
+function exportForAI(state){
+  // Worker only needs current position + rights; history not needed.
+  return {
+    board: state.board,
+    turn: state.turn,
+    castling: state.castling,
+    ep: state.ep,
+    halfmove: state.halfmove,
+    fullmove: state.fullmove
+  };
+}
+
+function aiSearch(state, depth){
+  return new Promise((resolve)=>{
+    if(!ensureWorker()){
+      resolve({ok:false, error:"Worker yok"});
+      return;
+    }
+    const id = aiReqId++;
+    aiPending.set(id, resolve);
+    AIW.postMessage({id, type:"search", state: exportForAI(state), depth});
+  });
+}
+
+/* =========================
    UI / State
 ========================= */
 let S = initialState();
 let selected = null;
 let legalCache = [];
 let sanHistory = [];
-let flipped = false;          // manual flip
-let mySide = "w";             // chosen side
+let flipped = false;
+let mySide = "w";
 let p2p = { pc:null, dc:null, role:null };
 
 const boardEl = $("board");
-
-/* Player view: we want player's pieces at bottom by default.
-   If mySide is "w": bottom is white -> not flipped.
-   If mySide is "b": bottom is black -> flipped = true.
-   But user can still press "Tahtayı Çevir" -> toggles manual flip on top of that.
-*/
-function effectiveFlip(){
-  const base = (mySide==="b");
-  return (base ^ flipped); // XOR
-}
-
 function setStatus(t){ $("status").textContent = t; }
 
+function effectiveFlip(){
+  const base = (mySide==="b");
+  return (base ^ flipped);
+}
+
+/* Arrow canvas */
+const arrowCv = $("arrowCanvas");
+let currentHint = null;
+
+function resizeArrowCanvas(){
+  const layer = arrowCv.parentElement;
+  const rect = layer.getBoundingClientRect();
+  arrowCv.width = Math.max(1, Math.round(rect.width * devicePixelRatio));
+  arrowCv.height = Math.max(1, Math.round(rect.height * devicePixelRatio));
+  arrowCv.style.width = rect.width + "px";
+  arrowCv.style.height = rect.height + "px";
+}
+window.addEventListener("resize", ()=>{ resizeArrowCanvas(); drawArrow(currentHint); });
+
+function sqCenterOnScreen(sq){
+  const el = boardEl.querySelector(`[data-sq="${sq}"]`);
+  if(!el) return null;
+  const r = el.getBoundingClientRect();
+  const layer = arrowCv.getBoundingClientRect();
+  return {
+    x: (r.left + r.right)/2 - layer.left,
+    y: (r.top + r.bottom)/2 - layer.top
+  };
+}
+function drawArrow(hint){
+  const ctx = arrowCv.getContext("2d");
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  ctx.clearRect(0,0,arrowCv.width/devicePixelRatio, arrowCv.height/devicePixelRatio);
+  if(!hint) return;
+  if(!$("showArrow").checked) return;
+
+  const a = sqCenterOnScreen(hint.from);
+  const b = sqCenterOnScreen(hint.to);
+  if(!a || !b) return;
+
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "rgba(74,163,255,.92)";
+  ctx.fillStyle = "rgba(74,163,255,.92)";
+
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.stroke();
+
+  const ang = Math.atan2(b.y-a.y, b.x-a.x);
+  const headLen = 18;
+  ctx.beginPath();
+  ctx.moveTo(b.x, b.y);
+  ctx.lineTo(b.x - headLen*Math.cos(ang - Math.PI/7), b.y - headLen*Math.sin(ang - Math.PI/7));
+  ctx.lineTo(b.x - headLen*Math.cos(ang + Math.PI/7), b.y - headLen*Math.sin(ang + Math.PI/7));
+  ctx.closePath();
+  ctx.fill();
+}
+
+/* Render */
 function render(){
   const end = gameEnd(S);
   if(end && !S.result){ S.result = end; onGameFinished(end); }
@@ -1124,15 +1574,12 @@ function render(){
   $("eval").textContent = (ev>=0?"+":"") + ev.toFixed(1);
   $("opening").textContent = openingName(sanHistory);
 
-  // update last move
   $("lastMove").textContent = S.last ? S.last.san : "-";
   $("kaganMini").textContent = S.result ? "Hüküm" : "Hazır";
   $("dedeMini").textContent = S.result ? "Yazdı" : "Bekler";
 
-  // legal moves cache
   legalCache = legalMoves(S);
 
-  // board rebuild
   boardEl.innerHTML = "";
   const viewFlipped = effectiveFlip();
 
@@ -1142,13 +1589,11 @@ function render(){
 
   for(let view=0; view<64; view++){
     const vr = Math.floor(view/8), vc = view%8;
-
     const r = viewFlipped ? (7 - vr) : vr;
     const c = viewFlipped ? (7 - vc) : vc;
     const sq = rcToSq(r,c);
 
-    // IMPORTANT: square color is based on absolute (r+c)%2 so:
-    // a8 (0,0) -> light, h1 (7,7) -> light
+    // a8 (0,0) light, h1 (7,7) light
     const isLight = ((r + c) % 2 === 0);
 
     const d = document.createElement("div");
@@ -1159,7 +1604,6 @@ function render(){
     if(last && (sq===last.from || sq===last.to)) d.classList.add("last");
     if(kingSq===sq) d.classList.add("check");
 
-    // show legal targets
     if($("showLegal").checked && selected!=null){
       for(const m of legalCache){
         if(m.from===selected && m.to===sq){ d.classList.add("hint"); break; }
@@ -1174,14 +1618,9 @@ function render(){
       d.appendChild(span);
     }
 
-    // coordinates (file/rank) on edges only
     if($("showCoords").checked){
-      // files on bottom row from player's view
-      // ranks on left column from player's view
       const isBottomRow = (vr===7);
       const isLeftCol = (vc===0);
-
-      // compute file/rank label from absolute square
       const file = "abcdefgh"[c];
       const rank = String(8 - r);
 
@@ -1203,33 +1642,27 @@ function render(){
     boardEl.appendChild(d);
   }
 
-  // arrow canvas
   resizeArrowCanvas();
-  if(!S.result && $("hintOn").checked && $("autoHint").checked){
-    if(S.turn===mySide) showHint(true);
-  } else {
+  updateClockLine();
+
+  // AI turn / hint (async)
+  if(!S.result && $("hintOn").checked && $("autoHint").checked && S.turn===mySide){
+    showHint(true);
+  }else{
     drawArrow(null);
   }
 
-  // AI reply
   maybeAiReply();
-
-  // clock label
-  updateClockLine();
 }
 
-/* =========================
-   Move handling + undo
-========================= */
+/* Move / click */
 let uiBusy = false;
 
 function onSquareClick(e){
   if(uiBusy) return;
   if(S.result) return;
 
-  // if P2P connected, allow only if local turn and matches side
   if(p2p.dc && p2p.dc.readyState==="open"){
-    // in P2P mode we assume both are humans and mySide defines my color
     if(S.turn !== mySide){
       setStatus("P2P: Rakibin sırası.");
       return;
@@ -1262,12 +1695,10 @@ function onSquareClick(e){
     return;
   }
 
-  // choose queen promotion by default
   let mv = candidates[0];
   if(candidates.some(x=>x.promo)){
     mv = candidates.find(x=>x.promo && x.promo.toLowerCase()==="q") || candidates[0];
   }
-
   playMove(mv, {sendP2P:true});
 }
 
@@ -1275,7 +1706,6 @@ function playMove(mv, opts={sendP2P:false}){
   const evalBefore = evalState(S);
   const san = sanForMove(S, mv);
 
-  // clock update
   onClockMoveStart();
 
   const after = makeMove(S, mv);
@@ -1291,36 +1721,26 @@ function playMove(mv, opts={sendP2P:false}){
     $("dedeText").innerHTML = dedeComment(san, evalBefore, evalAfter);
   }
 
-  // Kağan message
   if($("hintOn").checked){
-    const hint = getHintForSide(S.turn===mySide ? mySide : (mySide==="w"?"b":"w"), 2);
-    if(hint && S.turn===mySide){
-      $("kaganText").innerHTML = `${pick(KAGAN_EMIR)}<br><br>Buyruk: <b>${hint.san}</b> — ${algebra(hint.from)} → ${algebra(hint.to)}`;
-    } else {
-      $("kaganText").innerHTML = pick(KAGAN_EMIR);
-    }
+    $("kaganText").innerHTML = `${pick(KAGAN_EMIR)}<br><br>Hamle: <b>${san}</b>`;
   }
 
   selected = null;
   drawArrow(null);
 
-  // send to P2P
   if(opts.sendP2P && p2p.dc && p2p.dc.readyState==="open"){
     p2p.dc.send(JSON.stringify({t:"move", mv}));
   }
 
-  // clock update end
   onClockMoveEnd();
-
   render();
 }
 
+/* Undo */
 function undoOnePly(){
-  // undo last move (one ply)
   if(!S.history.length) return;
   if(S.result) S.result = null;
   S.history.pop();
-  // reconstruct from start
   const hist = [...S.history];
   S = initialState();
   sanHistory = [];
@@ -1328,16 +1748,13 @@ function undoOnePly(){
   for(const m of hist){
     const san = sanForMove(S, m);
     S = makeMove(S, m);
-    S.last.san = san;
+    S.last = {from:m.from,to:m.to,san};
     sanHistory.push(san.replace(/[+#]$/,""));
+    S.history.push(m);
   }
-  // restore last
   if(hist.length){
-    const lastMove = hist[hist.length-1];
-    const san = sanForMove(S, lastMove);
-    S.last = {from:lastMove.from,to:lastMove.to,san};
-    $("lastMove").textContent = san;
-  } else {
+    $("lastMove").textContent = S.last.san;
+  }else{
     S.last = null;
     $("lastMove").textContent = "-";
   }
@@ -1345,32 +1762,21 @@ function undoOnePly(){
   drawArrow(null);
   render();
 }
-
 $("undoMoveBtn").addEventListener("click", ()=>{
-  // if AI enabled, undo 2 plies for convenience
   const aiOn = $("aiLevel").value !== "off";
-  if(aiOn && S.history.length>=2){
-    undoOnePly();
-    undoOnePly();
-  }else{
-    undoOnePly();
-  }
+  if(aiOn && S.history.length>=2){ undoOnePly(); undoOnePly(); }
+  else undoOnePly();
 });
 
-/* =========================
-   Side pick / flip / reset
-========================= */
+/* Side / flip / reset */
 $("sidePick").addEventListener("change", ()=>{
   mySide = $("sidePick").value;
-  // base view changes, but keep manual flip toggle as-is
   render();
 });
-
 $("flipBtn").addEventListener("click", ()=>{
   flipped = !flipped;
   render();
 });
-
 $("resetBtn").addEventListener("click", ()=>{
   S = initialState();
   selected=null;
@@ -1382,111 +1788,28 @@ $("resetBtn").addEventListener("click", ()=>{
   render();
 });
 
-/* =========================
-   Kağan hint arrow
-========================= */
-const arrowCv = $("arrowCanvas");
-let currentHint = null;
+/* Hint (Worker) */
+let hintToken = 0;
 
-function resizeArrowCanvas(){
-  const layer = arrowCv.parentElement;
-  const rect = layer.getBoundingClientRect();
-  arrowCv.width = Math.max(1, Math.round(rect.width * devicePixelRatio));
-  arrowCv.height = Math.max(1, Math.round(rect.height * devicePixelRatio));
-  arrowCv.style.width = rect.width + "px";
-  arrowCv.style.height = rect.height + "px";
-}
-
-window.addEventListener("resize", ()=>{ resizeArrowCanvas(); drawArrow(currentHint); });
-
-function sqCenterOnScreen(sq){
-  const el = boardEl.querySelector(`[data-sq="${sq}"]`);
-  if(!el) return null;
-  const r = el.getBoundingClientRect();
-  const layer = arrowCv.getBoundingClientRect();
-  const cx = (r.left + r.right)/2 - layer.left;
-  const cy = (r.top + r.bottom)/2 - layer.top;
-  return {x:cx, y:cy};
-}
-
-function drawArrow(hint){
-  const ctx = arrowCv.getContext("2d");
-  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
-  ctx.clearRect(0,0,arrowCv.width/devicePixelRatio, arrowCv.height/devicePixelRatio);
-
-  if(!hint) return;
-  if(!$("showArrow").checked) return;
-
-  const a = sqCenterOnScreen(hint.from);
-  const b = sqCenterOnScreen(hint.to);
-  if(!a || !b) return;
-
-  ctx.lineWidth = 6;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = "rgba(74,163,255,.92)";
-  ctx.fillStyle = "rgba(74,163,255,.92)";
-
-  ctx.beginPath();
-  ctx.moveTo(a.x, a.y);
-  ctx.lineTo(b.x, b.y);
-  ctx.stroke();
-
-  const ang = Math.atan2(b.y-a.y, b.x-a.x);
-  const headLen = 18;
-  ctx.beginPath();
-  ctx.moveTo(b.x, b.y);
-  ctx.lineTo(b.x - headLen*Math.cos(ang - Math.PI/7), b.y - headLen*Math.sin(ang - Math.PI/7));
-  ctx.lineTo(b.x - headLen*Math.cos(ang + Math.PI/7), b.y - headLen*Math.sin(ang + Math.PI/7));
-  ctx.closePath();
-  ctx.fill();
-}
-
-function aiDepthFromLevel(level){
-  // keep mobile fast; l10 still reasonable
-  const map = {
-    l1:{d:1, bl:0.35},
-    l2:{d:2, bl:0.20},
-    l3:{d:2, bl:0.12},
-    l4:{d:3, bl:0.10},
-    l5:{d:3, bl:0.06},
-    l6:{d:4, bl:0.05},
-    l7:{d:4, bl:0.03},
-    l8:{d:5, bl:0.02},
-    l9:{d:5, bl:0.01},
-    l10:{d:6, bl:0.00},
-  };
-  return map[level] || {d:3, bl:0.08};
-}
-
-function getHintForSide(color, depth){
-  const savedTurn = S.turn;
-  const temp = cloneState(S);
-  temp.turn = color;
-  const mm = minimax(temp, depth, -Infinity, Infinity);
-  if(!mm.move) return null;
-  // rebuild san from original state perspective: temporarily set S.turn to color
-  const origTurn = S.turn;
-  S.turn = color;
-  const san = sanForMove(S, mm.move);
-  S.turn = origTurn;
-  return {from:mm.move.from, to:mm.move.to, san};
-}
-
-function showHint(force=false){
-  if(!$("hintOn").checked && !force) return;
+async function showHint(force=false){
   if(S.result) return;
+  if(!$("hintOn").checked && !force) return;
   if(S.turn !== mySide) return;
 
-  const cfg = aiDepthFromLevel($("aiLevel").value);
-  const depth = Math.max(2, Math.min(4, cfg.d)); // hint depth stable
-  const best = minimax(S, depth, -Infinity, Infinity).move;
-  if(!best) return;
+  const token = ++hintToken;
+  const lvl = $("aiLevel").value;
+  const cfg = aiDepthFromLevel(lvl);
+  const depth = Math.max(2, Math.min(4, cfg.d)); // hint stable
 
-  const san = sanForMove(S, best);
-  currentHint = {from:best.from, to:best.to, san};
+  const res = await aiSearch(S, depth);
+  if(token !== hintToken) return; // outdated
+  if(!res.ok || !res.move) return;
+
+  const san = sanForMove(S, res.move);
+  currentHint = {from:res.move.from, to:res.move.to, san};
   drawArrow(currentHint);
 
-  $("kaganText").innerHTML = `${pick(KAGAN_EMIR)}<br><br>Buyruk: <b>${san}</b> — ${algebra(best.from)} → ${algebra(best.to)}`;
+  $("kaganText").innerHTML = `${pick(KAGAN_EMIR)}<br><br>Buyruk: <b>${san}</b> — ${algebra(res.move.from)} → ${algebra(res.move.to)}`;
 }
 
 $("hintBtn").addEventListener("click", ()=>{ showHint(true); });
@@ -1496,9 +1819,7 @@ $("hintOn").addEventListener("change", ()=>{ if(!$("hintOn").checked){ drawArrow
 $("showCoords").addEventListener("change", render);
 $("showLegal").addEventListener("change", render);
 
-/* =========================
-   Dede lessons
-========================= */
+/* Dede lessons */
 $("dedeLessonBtn").addEventListener("click", ()=>{
   const mode = $("dedeMode").value;
   if(mode==="off"){ $("dedeLessonText").textContent = "Ders kapalı."; return; }
@@ -1506,9 +1827,7 @@ $("dedeLessonBtn").addEventListener("click", ()=>{
   $("dedeLessonText").textContent = arr.length ? arr[Math.floor(Math.random()*arr.length)] : "Ders bulunamadı.";
 });
 
-/* =========================
-   AI reply (plays the opposite side)
-========================= */
+/* AI reply (Worker) */
 function pickWeakerMove(state, chance){
   if(Math.random() > chance) return null;
   const moves = legalMoves(state);
@@ -1517,45 +1836,47 @@ function pickWeakerMove(state, chance){
     const s2 = makeMove(state, m);
     return {m, score: evalState(s2)};
   });
-  // if black to move, prefer higher score as weaker (bad for black)
   const maximizing = (state.turn==="w");
   scored.sort((a,b)=> maximizing ? (a.score-b.score) : (b.score-a.score));
   const idx = Math.min(scored.length-1, 1 + Math.floor(Math.random()*Math.min(5, scored.length-1)));
   return scored[idx].m;
 }
 
-function maybeAiReply(){
+let aiToken = 0;
+
+async function maybeAiReply(){
   const lvl = $("aiLevel").value;
   if(lvl==="off") return;
   if(S.result) return;
 
-  // AI plays the opposite color of mySide
   const aiSide = (mySide==="w") ? "b" : "w";
   if(S.turn !== aiSide) return;
-
-  // if P2P active, AI off effectively
   if(p2p.dc && p2p.dc.readyState==="open") return;
 
   const cfg = aiDepthFromLevel(lvl);
+  const weaker = pickWeakerMove(S, cfg.bl);
+  if(weaker){
+    setStatus("AI (kolay) oynuyor…");
+    uiBusy = true;
+    setTimeout(()=>{ uiBusy=false; setStatus("Hazır"); playMove(weaker); }, 50);
+    return;
+  }
+
+  const token = ++aiToken;
   setStatus("AI düşünüyor…");
   uiBusy = true;
 
-  // small delay so UI doesn't freeze
-  setTimeout(()=>{
-    // sometimes blunder for easier levels
-    const weaker = pickWeakerMove(S, cfg.bl);
-    if(weaker){ uiBusy=false; setStatus("Hazır"); playMove(weaker); return; }
+  const res = await aiSearch(S, cfg.d);
+  if(token !== aiToken){ uiBusy=false; return; } // outdated
 
-    const mm = minimax(S, cfg.d, -Infinity, Infinity);
-    uiBusy=false;
-    setStatus("Hazır");
-    if(mm.move) playMove(mm.move);
-  }, 60);
+  uiBusy=false;
+  setStatus("Hazır");
+  if(res.ok && res.move){
+    playMove(res.move);
+  }
 }
 
-/* =========================
-   Endgame -> auto stats record
-========================= */
+/* Endgame -> auto stats record */
 function onGameFinished(result){
   let msg="";
   if(result==="1-0") msg="Beyaz MAT etti. Zafer beyazın.";
@@ -1568,8 +1889,6 @@ function onGameFinished(result){
     $("dedeText").innerHTML = `${pick(DEDE_USLUP)}<br><br><b>${msg}</b>`;
   }
 
-  // auto log based on mySide perspective:
-  // W = mySide won, L = mySide lost, D = draw
   if(result==="1/2-1/2"){
     addResult("D");
   }else{
@@ -1591,7 +1910,6 @@ function fmtMs(ms){
   const r = s%60;
   return `${m}:${String(r).padStart(2,"0")}`;
 }
-
 function initClockFromUI(){
   clock.on = $("clockOn").checked;
   const min = parseInt($("clockMin").value,10);
@@ -1604,12 +1922,10 @@ function initClockFromUI(){
   updateClockLine();
   $("clockHelp").textContent = clock.on ? "Saat açık. Hamle yaptıkça süre akar." : "Saat kapalı.";
 }
-
 function updateClockLine(){
   if(!clock.on){ $("clockLine").textContent = "Kapalı"; return; }
   $("clockLine").textContent = `Beyaz ${fmtMs(clock.w)} · Siyah ${fmtMs(clock.b)}`;
 }
-
 function tickClock(){
   if(!clock.running || !clock.on) return;
   const now = performance.now();
@@ -1621,7 +1937,6 @@ function tickClock(){
 
   updateClockLine();
 
-  // flag fall
   if(clock.w<=0 || clock.b<=0){
     clock.running=false;
     clearInterval(clock.timer);
@@ -1631,7 +1946,6 @@ function tickClock(){
     render();
   }
 }
-
 function startClock(){
   if(!clock.on) return;
   if(clock.running) return;
@@ -1639,29 +1953,24 @@ function startClock(){
   clock.lastTick = performance.now();
   clock.timer = setInterval(tickClock, 200);
 }
-
 function stopClock(){
   clock.running=false;
   if(clock.timer) clearInterval(clock.timer);
   clock.timer=null;
   updateClockLine();
 }
-
 function onClockMoveStart(){
   if(!$("clockOn").checked) return;
   if(!clock.on) initClockFromUI();
   startClock();
 }
-
 function onClockMoveEnd(){
   if(!clock.on) return;
-  // add increment to side who just moved (which is opposite of current turn now)
   const movedSide = (S.turn==="w") ? "b" : "w";
   if(movedSide==="w") clock.w += clock.incMs;
   else clock.b += clock.incMs;
   updateClockLine();
 }
-
 $("clockOn").addEventListener("change", ()=>{
   initClockFromUI();
   if(!clock.on) stopClock();
@@ -1674,7 +1983,7 @@ $("clockReset").addEventListener("click", ()=>{
 });
 
 /* =========================
-   Daily goal + stats (1..10000)
+   Daily goal + stats
 ========================= */
 const LS_GOAL = "toru_goal_v1";
 const LS_DAILY = "toru_daily_v1";
@@ -1696,7 +2005,6 @@ function getTodayObj(daily){
   daily[key] = daily[key] || { w:0, l:0, d:0, games:[] };
   return daily[key];
 }
-
 function lastNDaysKeys(n=14){
   const out=[];
   const d=new Date();
@@ -1779,31 +2087,25 @@ function updateStatsUI(){
   const done = total >= goal;
   $("goalHint").textContent = done
     ? "Bugünün hedefi tamam. Töre tamamlandı."
-    : `Hedefe ${goal-total} oyun kaldı. Töre sabır ister.`;
+    : \`Hedefe \${goal-total} oyun kaldı. Töre sabır ister.\`;
 
-  // analysis line (goal completion & success within completed)
   const completed = Math.min(total, goal);
-  const completedWins = Math.min(t.w||0, completed); // simplistic: if total>goal, extra games not considered
+  const completedWins = Math.min(t.w||0, completed);
   const completedWR = completed>0 ? (completedWins / completed) : 0;
   $("analysisLine").textContent =
-    `Hedef: ${goal} · Tamamlanan: ${completed} (${clamp(pct,0,999)}%) · Hedef içi başarı: ${(completedWR*100).toFixed(0)}% · Bugün başarı: ${(wr*100).toFixed(0)}%`;
+    \`Hedef: \${goal} · Tamamlanan: \${completed} (\${clamp(pct,0,999)}%) · Hedef içi başarı: \${(completedWR*100).toFixed(0)}% · Bugün başarı: \${(wr*100).toFixed(0)}%\`;
 
-  // history list
   const keys = lastNDaysKeys(14);
   let lines = [];
   for(const k of keys){
     const x = daily[k];
-    if(!x){
-      lines.push(`${k}: 0 oyun`);
-      continue;
-    }
+    if(!x){ lines.push(\`\${k}: 0 oyun\`); continue; }
     const tt=(x.w||0)+(x.l||0)+(x.d||0);
     const r = winRate(x.w||0,x.l||0,x.d||0);
-    lines.push(`${k}: ${tt} oyun · ✅${x.w||0} ❌${x.l||0} ➖${x.d||0} · ${(r*100).toFixed(0)}%`);
+    lines.push(\`\${k}: \${tt} oyun · ✅\${x.w||0} ❌\${x.l||0} ➖\${x.d||0} · \${(r*100).toFixed(0)}%\`);
   }
   $("historyList").textContent = lines.join("\\n");
 
-  // progress analysis: first 7 vs last 7
   const first7 = keys.slice(0,7);
   const last7  = keys.slice(7);
 
@@ -1823,36 +2125,29 @@ function updateStatsUI(){
 
   let verdict;
   if(b.t < 3){
-    verdict = "Yeterli veri yok: Son 7 günde oyun az. (En az 3–5 oyun iyi olur.)";
+    verdict = "Yeterli veri yok: Son 7 günde oyun az.";
   }else if(delta > 0.08){
     verdict = "GELİŞİM VAR: Başarı oranı anlamlı yükselmiş.";
   }else if(delta < -0.08){
-    verdict = "DÜŞÜŞ VAR: Başarı oranı düşmüş. Açılış + taktik tekrar önerilir.";
+    verdict = "DÜŞÜŞ VAR: Başarı oranı düşmüş.";
   }else{
-    verdict = "DENGE: Benzer performans. Oyun sayısı artınca trend netleşir.";
+    verdict = "DENGE: Benzer performans.";
   }
 
   $("progressAnalysis").textContent =
-    `Önceki 7 gün: ${a.t} oyun · ${(a.r*100).toFixed(0)}%\\n` +
-    `Son 7 gün:   ${b.t} oyun · ${(b.r*100).toFixed(0)}%\\n` +
-    `Değişim: ${(delta*100).toFixed(0)} puan\\n` +
-    `${verdict}`;
+    \`Önceki 7 gün: \${a.t} oyun · \${(a.r*100).toFixed(0)}%\\n\` +
+    \`Son 7 gün:   \${b.t} oyun · \${(b.r*100).toFixed(0)}%\\n\` +
+    \`Değişim: \${(delta*100).toFixed(0)} puan\\n\` +
+    \`\${verdict}\`;
 }
 
-$("goalMinus").addEventListener("click", ()=>{
-  saveGoal(loadGoal()-1);
-  updateStatsUI();
-});
-$("goalPlus").addEventListener("click", ()=>{
-  saveGoal(loadGoal()+1);
-  updateStatsUI();
-});
+$("goalMinus").addEventListener("click", ()=>{ saveGoal(loadGoal()-1); updateStatsUI(); });
+$("goalPlus").addEventListener("click", ()=>{ saveGoal(loadGoal()+1); updateStatsUI(); });
 $("goalApply").addEventListener("click", ()=>{
   const v = parseInt($("goalSet").value,10);
   if(!isNaN(v)) saveGoal(v);
   updateStatsUI();
 });
-
 $("markWin").addEventListener("click", ()=> addResult("W"));
 $("markLoss").addEventListener("click", ()=> addResult("L"));
 $("markDraw").addEventListener("click", ()=> addResult("D"));
@@ -1863,9 +2158,7 @@ $("clearToday").addEventListener("click", clearToday);
    YouTube locked list
 ========================= */
 const LS_SONGS = "toru_songs_v1";
-let SONGS = [
-  { title: "Senin parça (m0fXYGf0bfw)", id: "m0fXYGf0bfw" }
-];
+let SONGS = [{ title: "Senin parça (m0fXYGf0bfw)", id: "m0fXYGf0bfw" }];
 
 function normalizeYouTubeId(urlOrId){
   if(!urlOrId) return null;
@@ -1879,22 +2172,17 @@ function normalizeYouTubeId(urlOrId){
     }
     const v = u.searchParams.get("v");
     if(v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
-    const m = u.pathname.match(/\/(embed|shorts)\/([a-zA-Z0-9_-]{11})/);
+    const m = u.pathname.match(/\\/(embed|shorts)\\/([a-zA-Z0-9_-]{11})/);
     if(m) return m[2];
     return null;
-  }catch{
-    return null;
-  }
+  }catch{ return null; }
 }
-
 function loadSongs(){
   try{
     const raw = localStorage.getItem(LS_SONGS);
     if(!raw) return;
     const arr = JSON.parse(raw);
-    if(Array.isArray(arr) && arr.length){
-      SONGS = arr.filter(x=>x && x.id && x.title);
-    }
+    if(Array.isArray(arr) && arr.length) SONGS = arr.filter(x=>x && x.id && x.title);
   }catch{}
 }
 function saveSongs(){ localStorage.setItem(LS_SONGS, JSON.stringify(SONGS)); }
@@ -1911,9 +2199,7 @@ function renderSongs(){
 }
 
 let ytPlayer=null, ytReady=false, currentIndex=0;
-
 function setYtStatus(t){ $("ytStatus").textContent = "Durum: " + t; }
-
 function playByIndex(i){
   if(!SONGS.length) return setYtStatus("Liste boş");
   currentIndex = (i + SONGS.length) % SONGS.length;
@@ -1923,7 +2209,6 @@ function playByIndex(i){
   ytPlayer.loadVideoById(s.id);
   setYtStatus("Çalıyor: " + s.title);
 }
-
 function playSelected(){
   const id = songSelect.value;
   const idx = SONGS.findIndex(x=>x.id===id);
@@ -1944,16 +2229,10 @@ $("addBtn").addEventListener("click", ()=>{
   }
   const url = $("songUrl").value;
   const id = normalizeYouTubeId(url);
-  if(!id){
-    setYtStatus("Link/ID okunamadı. 'watch?v=...' olmalı.");
-    return;
-  }
+  if(!id){ setYtStatus("Link/ID okunamadı."); return; }
   const title = prompt("Şarkı adı ne olsun?", "Yeni Parça");
   if(!title) return;
-  if(SONGS.some(x=>x.id===id)){
-    setYtStatus("Bu parça zaten listede.");
-    return;
-  }
+  if(SONGS.some(x=>x.id===id)){ setYtStatus("Bu parça zaten listede."); return; }
   SONGS.push({title, id});
   saveSongs();
   renderSongs();
@@ -1970,15 +2249,9 @@ window.onYouTubeIframeAPIReady = function(){
   ytPlayer = new YT.Player("yt", {
     height:"0", width:"0",
     videoId: SONGS[0]?.id || "",
-    playerVars:{
-      autoplay:0, controls:0, rel:0, modestbranding:1, playsinline:1,
-      origin: location.origin
-    },
+    playerVars:{ autoplay:0, controls:0, rel:0, modestbranding:1, playsinline:1, origin: location.origin },
     events:{
-      onReady: ()=>{
-        ytReady=true;
-        setYtStatus("Hazır. İlk kez ÇAL’a dokun.");
-      },
+      onReady: ()=>{ ytReady=true; setYtStatus("Hazır. İlk kez ÇAL’a dokun."); },
       onStateChange: (ev)=>{
         if(ev.data===YT.PlayerState.ENDED) playNext();
         if(ev.data===YT.PlayerState.PLAYING) setYtStatus("Çalıyor");
@@ -1994,59 +2267,39 @@ window.onYouTubeIframeAPIReady = function(){
 loadYouTubeAPI();
 
 /* =========================
-   P2P (WebRTC copy/paste)
+   P2P (same as before)
 ========================= */
 function setP2PHint(t){ $("p2pHint").textContent = t; }
 function setP2PState(t){ $("p2pState").textContent = t; }
 
 async function makePeer(role){
-  // Public STUN is OK; no server you own needed
-  const pc = new RTCPeerConnection({
-    iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-  });
+  const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
 
-  pc.onicecandidate = ()=> {
-    // we wait for ICE gathering complete then export local description
-  };
-
-  pc.onconnectionstatechange = ()=>{
-    setP2PState(pc.connectionState);
-  };
+  pc.onconnectionstatechange = ()=> setP2PState(pc.connectionState);
 
   pc.ondatachannel = (e)=>{
     p2p.dc = e.channel;
     wireDC();
   };
 
-  let dc = null;
   if(role==="host"){
-    dc = pc.createDataChannel("toru");
-    p2p.dc = dc;
+    p2p.dc = pc.createDataChannel("toru");
     wireDC();
   }
 
   p2p.pc = pc;
   p2p.role = role;
-
   return pc;
 }
 
 function wireDC(){
   if(!p2p.dc) return;
-  p2p.dc.onopen = ()=>{
-    setP2PState("Açık");
-    setP2PHint("Bağlandı. Hamleler iki tarafa gider.");
-  };
-  p2p.dc.onclose = ()=>{
-    setP2PState("Kapalı");
-    setP2PHint("Kanal kapandı.");
-  };
+  p2p.dc.onopen = ()=>{ setP2PState("Açık"); setP2PHint("Bağlandı. Hamleler iki tarafa gider."); };
+  p2p.dc.onclose = ()=>{ setP2PState("Kapalı"); setP2PHint("Kanal kapandı."); };
   p2p.dc.onmessage = (ev)=>{
     try{
       const msg = JSON.parse(ev.data);
-      if(msg.t==="move" && msg.mv){
-        playMove(msg.mv, {sendP2P:false});
-      }
+      if(msg.t==="move" && msg.mv) playMove(msg.mv, {sendP2P:false});
     }catch{}
   };
 }
@@ -2099,11 +2352,6 @@ $("p2pJoin").addEventListener("click", async ()=>{
   }
 });
 
-// Host: paste Answer and setRemoteDescription
-$("p2pBox").addEventListener("input", ()=>{
-  // no-op; user pastes
-});
-
 $("p2pCopy").addEventListener("click", async ()=>{
   try{
     await navigator.clipboard.writeText($("p2pBox").value);
@@ -2113,37 +2361,6 @@ $("p2pCopy").addEventListener("click", async ()=>{
   }
 });
 
-// If host pastes answer, they must click Join? We add quick auto-detect:
-$("p2pBox").addEventListener("change", async ()=>{
-  // no-op
-});
-
-document.addEventListener("keydown", async (e)=>{
-  if(e.ctrlKey && e.key==="Enter"){
-    // convenience: host can apply answer quickly
-    if(p2p.role==="host" && p2p.pc){
-      try{
-        const raw = $("p2pBox").value.trim();
-        if(!raw) return;
-        const ans = JSON.parse(raw);
-        await p2p.pc.setRemoteDescription(ans);
-        setP2PHint("Host: Answer uygulandı. Bağlantı kuruluyor…");
-      }catch{}
-    }
-  }
-});
-
-$("p2pClose").addEventListener("click", ()=>{
-  try{
-    if(p2p.dc) p2p.dc.close();
-    if(p2p.pc) p2p.pc.close();
-  }catch{}
-  p2p = { pc:null, dc:null, role:null };
-  setP2PState("Kapalı");
-  setP2PHint("Kapandı.");
-});
-
-/* Add an explicit buttonless apply for host answer (simple) */
 $("p2pBox").addEventListener("blur", async ()=>{
   if(p2p.role==="host" && p2p.pc){
     const raw = $("p2pBox").value.trim();
@@ -2158,6 +2375,13 @@ $("p2pBox").addEventListener("blur", async ()=>{
   }
 });
 
+$("p2pClose").addEventListener("click", ()=>{
+  try{ if(p2p.dc) p2p.dc.close(); if(p2p.pc) p2p.pc.close(); }catch{}
+  p2p = { pc:null, dc:null, role:null };
+  setP2PState("Kapalı");
+  setP2PHint("Kapandı.");
+});
+
 /* =========================
    Start
 ========================= */
@@ -2167,6 +2391,7 @@ function applyDefaults(){
   initClockFromUI();
   updateStatsUI();
   mySide = $("sidePick").value;
+  setStatus("Hazır");
 }
 applyDefaults();
 render();
