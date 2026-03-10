@@ -3,400 +3,2398 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Törü — Oda Kur / Bağlan (Sunucusuz)</title>
+  <title>Törü — Türk’ün Töresi · Satranç</title>
   <style>
     :root{
-      --bg:#070b16; --stroke:rgba(255,255,255,.12);
-      --txt:rgba(255,255,255,.92); --muted:rgba(255,255,255,.68);
-      --good:#2ee59d; --bad:#ff5b7a; --acc:#4aa3ff;
-      --light:#f3d8b8; --dark:#b98563;
-      --sq: clamp(38px, 10vw, 62px);
+      --bg:#070b16;
+      --stroke:rgba(255,255,255,.10);
+      --txt:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.68);
+      --acc:#4aa3ff;
+      --good:#2ee59d;
+      --bad:#ff5b7a;
+      --warn:#ffd56a;
+
+      --light:#f3d8b8;
+      --dark:#b98563;
+
+      --sq: clamp(38px, 9.2vw, 64px);
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
     }
+
     *{box-sizing:border-box}
     body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background: radial-gradient(1100px 600px at 50% 0%, #132351 0%, var(--bg) 55%, #050711 100%);
-      color:var(--txt); padding:14px 10px 40px; display:flex; justify-content:center;
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 50% 0%, #132351 0%, var(--bg) 52%, #050711 100%);
+      color:var(--txt);
+      padding:16px 12px 48px;
+      display:flex;
+      justify-content:center;
     }
-    .wrap{width:min(1100px,100%)}
-    .top{
-      border:1px solid var(--stroke); border-radius:16px; padding:14px;
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+    .wrap{width:min(1180px, 100%);}
+
+    .hero{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      padding:16px;
+      box-shadow: var(--shadow);
     }
-    h1{margin:0; font-size:22px}
-    .sub{margin-top:6px; color:var(--muted); line-height:1.35}
-    .grid{display:grid; gap:12px; margin-top:12px}
-    @media(min-width:980px){ .grid{grid-template-columns: 560px 1fr;} }
-    .card{
-      border:1px solid var(--stroke); border-radius:16px; padding:12px;
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-    }
-    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    button, textarea{
-      border:1px solid var(--stroke); border-radius:12px;
-      background:rgba(255,255,255,.06); color:var(--txt);
-      padding:10px 12px; font-weight:800;
-    }
-    button{cursor:pointer}
-    button.good{background: rgba(46,229,157,.14); border-color: rgba(46,229,157,.40)}
-    button.bad{background: rgba(255,91,122,.14); border-color: rgba(255,91,122,.40)}
-    button.acc{background: rgba(74,163,255,.14); border-color: rgba(74,163,255,.40)}
-    textarea{width:100%; min-height:120px; resize:vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight:600; cursor:text}
+    .hrow{display:flex; gap:12px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;}
+    h1{margin:0; font-size:26px; letter-spacing:.3px;}
+    .sub{color:var(--muted); margin-top:4px; line-height:1.35}
+
+    .pillrow{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
     .pill{
-      border:1px solid var(--stroke); background:rgba(0,0,0,.18);
-      color:var(--muted); padding:7px 10px; border-radius:999px; font-size:13px; white-space:nowrap;
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.18);
+      color:var(--muted);
+      padding:8px 10px;
+      border-radius:999px;
+      font-size:13px;
+      display:flex;
+      gap:8px;
+      align-items:center;
+      user-select:none;
+      white-space:nowrap;
     }
+
+    .btnrow{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
+    button, select, input, textarea{
+      appearance:none;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      color:var(--txt);
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:800;
+      cursor:pointer;
+    }
+    input, textarea{cursor:text; font-weight:650;}
+    textarea{width:100%; min-height:86px; resize:vertical;}
+    button.primary{background: rgba(74,163,255,.18); border-color: rgba(74,163,255,.45)}
+    button.danger{background: rgba(255,91,122,.16); border-color: rgba(255,91,122,.45)}
+    button.good{background: rgba(46,229,157,.14); border-color: rgba(46,229,157,.40)}
+    button.warn{background: rgba(255,213,106,.14); border-color: rgba(255,213,106,.42)}
+    button:active{transform: translateY(1px)}
+    select{font-weight:900}
+
+    .grid{margin-top:12px; display:grid; gap:12px; grid-template-columns: 1fr;}
+    @media (min-width: 980px){ .grid{grid-template-columns: 560px 1fr;} }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      padding:14px;
+      box-shadow: var(--shadow);
+    }
+
+    .sectionTitle{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 10px;}
+    .sectionTitle h2{margin:0; font-size:18px; letter-spacing:.2px;}
+
+    /* BOARD */
+    .boardWrap{display:flex; justify-content:center;}
+    .boardLayer{ position:relative; display:inline-block; }
+    #arrowCanvas{ position:absolute; inset:0; pointer-events:none; }
+
     .board{
-      width: calc(var(--sq) * 8); height: calc(var(--sq) * 8);
-      display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr);
-      border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,.16);
-      box-shadow: 0 18px 40px rgba(0,0,0,.45); margin:auto;
-      user-select:none; touch-action:manipulation;
+      width: calc(var(--sq) * 8);
+      height: calc(var(--sq) * 8);
+      display:grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(8, 1fr);
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 18px 40px rgba(0,0,0,.45);
+      background:#000;
+      touch-action: manipulation;
+      user-select:none;
     }
     .sq{
-      display:flex; align-items:center; justify-content:center;
-      font-size: calc(var(--sq) * .70);
-      position:relative; cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: calc(var(--sq) * .74);
+      line-height:1;
+      position:relative;
     }
-    .light{background:var(--light)} .dark{background:var(--dark)}
-    .sq.sel{outline: 4px solid rgba(74,163,255,.9); outline-offset:-4px}
-    .note{color:var(--muted); font-size:13px; line-height:1.45}
-    .log{color:var(--muted); font-size:13px; line-height:1.45; white-space:pre-wrap}
+    .light{background:var(--light)}
+    .dark{background:var(--dark)}
+    .sq::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border:1px solid rgba(0,0,0,.05);
+      pointer-events:none;
+    }
+    .sq.sel{outline: 4px solid rgba(74,163,255,.9); outline-offset:-4px; z-index:2;}
+    .sq.hint{outline: 4px solid rgba(46,229,157,.85); outline-offset:-4px; z-index:1;}
+    .sq.last{box-shadow: inset 0 0 0 5px rgba(255, 215, 0, .35);}
+    .sq.check{box-shadow: inset 0 0 0 6px rgba(255, 91, 122, .45);}
+
+    .piece{font-weight:1000; filter: drop-shadow(0 2px 1px rgba(0,0,0,.35));}
+    .w{color:#f7f7f7; text-shadow: 0 1px 0 rgba(0,0,0,.35), 0 0 10px rgba(255,255,255,.18);}
+    .b{color:#141414; text-shadow: 0 1px 0 rgba(255,255,255,.10), 0 0 10px rgba(0,0,0,.12);}
+
+    /* coordinates inside squares */
+    .coord{
+      position:absolute;
+      font-size:12px;
+      font-weight:1000;
+      opacity:.85;
+      pointer-events:none;
+      user-select:none;
+      letter-spacing:.02em;
+    }
+    .coord.light{ color:rgba(0,0,0,0.78); }
+    .coord.dark{ color:rgba(255,255,255,0.88); }
+    .coord.file{ bottom:2px; right:4px; }
+    .coord.rank{ top:2px; left:4px; }
+
+    .statusline{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .statusline b{color:var(--txt)}
+    .note{margin-top:10px; color:var(--muted); line-height:1.45}
+    .small{font-size:12.5px; color:var(--muted); line-height:1.45}
+
+    .bubble{
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.22);
+      border-radius:16px;
+      padding:12px;
+      margin-top:10px;
+    }
+    .tag{
+      display:inline-flex; gap:8px; align-items:center;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:1000;
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:8px;
+      user-select:none;
+    }
+
+    .chat{display:grid; gap:10px;}
+    .msg{
+      border:1px solid var(--stroke);
+      background: rgba(0,0,0,.22);
+      border-radius:16px;
+      padding:12px;
+    }
+    .msg .who{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:1000;
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+    .msg .txt{line-height:1.55; color:var(--txt)}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    .spacer{height:10px}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;}
+
+    /* Intro */
+    .intro{
+      position:fixed;
+      inset:0;
+      background: radial-gradient(900px 500px at 50% 20%, rgba(74,163,255,.18), rgba(0,0,0,.92));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      z-index:9999;
+      padding:18px;
+    }
+    .introBox{
+      width:min(820px, 100%);
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.45);
+      border-radius:22px;
+      padding:20px 18px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+    }
+    .introTitle{font-size:20px; font-weight:1000; margin:0 0 10px}
+    .runes{
+      font-size: clamp(16px, 3.1vw, 26px);
+      letter-spacing: .08em;
+      line-height:1.7;
+      white-space:pre-wrap;
+      font-weight:1000;
+    }
+    .fadeOut{animation: fadeOut .7s ease forwards;}
+    @keyframes fadeOut{to{opacity:0; transform: translateY(-6px)}}
   </style>
 </head>
+
 <body>
 <div class="wrap">
-  <div class="top">
-    <h1>Törü — Oda Kur / Bağlan (Sunucusuz)</h1>
-    <div class="sub">
-      Bu sayfa WebRTC ile <b>kopyala-yapıştır</b> üzerinden bağlanır. Sunucu yoktur.<br>
-      <span class="pill">Güvenlik</span> Karşı taraf <b>telefonuna/PC’ne erişemez</b>. Sadece bu sayfanın gönderdiği <b>hamle verileri</b> gider.
+
+  <div class="hero">
+    <div class="hrow">
+      <div>
+        <h1>Törü — Türk’ün Töresi</h1>
+        <div class="sub">Kurallı Satranç · <b>Kağan 𐰴𐰍𐰣</b> (yol) · <b>Dede 𐱅𐰑𐰀</b> (yorum) · Koordinatlı Tahta · Geri Alma · YouTube Müzik</div>
+      </div>
+
+      <div class="btnrow">
+        <select id="sidePick" title="Taraf">
+          <option value="w" selected>Ben: Beyaz</option>
+          <option value="b">Ben: Siyah</option>
+        </select>
+
+        <select id="aiLevel" title="AI">
+          <option value="off">AI: Kapalı (2 Kişi)</option>
+          <option value="l1">AI: 1 (Çok Kolay)</option>
+          <option value="l2" selected>AI: 2 (Kolay ama ciddi)</option>
+          <option value="l3">AI: 3 (Orta-)</option>
+          <option value="l4">AI: 4 (Orta)</option>
+          <option value="l5">AI: 5 (Orta+)</option>
+          <option value="l6">AI: 6 (Zor)</option>
+          <option value="l7">AI: 7 (Usta)</option>
+          <option value="l8">AI: 8 (Çok Zor)</option>
+          <option value="l9">AI: 9 (Zorlu)</option>
+          <option value="l10">AI: 10 (En Güçlü)</option>
+        </select>
+
+        <button id="undoMoveBtn" class="warn">Hamle Geri Al</button>
+        <button id="flipBtn">Tahtayı Çevir</button>
+        <button id="resetBtn" class="danger">Yeniden Başlat</button>
+      </div>
+    </div>
+
+    <div class="statusline">
+      <div class="pill">Durum: <b id="status">Hazır</b></div>
+      <div class="pill">Sıra: <b id="turn">Beyaz</b></div>
+      <div class="pill">Değerlendirme: <b id="eval">+0.0</b></div>
+      <div class="pill">Son Hamle: <b id="lastMove">-</b></div>
+      <div class="pill">Açılış: <b id="opening">-</b></div>
+      <div class="pill">Saat: <b id="clockLine">Kapalı</b></div>
+    </div>
+
+    <div class="note">
+      ✅ Tam kurallar: Rok / En Passant / Terfi / Mat-Pat / 50 hamle kuralı. <br/>
+      ✅ Tahta standardı: <b>a8 açık</b>, <b>h1 açık</b>. “Oyuncunun sağ altı” her zaman açık olacak şekilde taraf seçimine göre görünüm ayarlanır. <br/>
+      ⚡ Hızlandırma: AI hesapları artık <b>Web Worker</b> içinde (UI donmaz).
     </div>
   </div>
 
   <div class="grid">
+    <!-- LEFT -->
     <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <b>Tahta (Demo)</b>
-        <div class="row">
-          <button class="acc" id="newBtn">Yeni Oyun</button>
-          <button id="flipBtn">Tahtayı Çevir</button>
+      <div class="sectionTitle">
+        <h2>Tahta</h2>
+        <div class="pillrow">
+          <label class="pill"><input type="checkbox" id="showCoords" checked style="transform:scale(1.1); margin-right:8px;"> Koordinat</label>
+          <label class="pill"><input type="checkbox" id="showLegal" checked style="transform:scale(1.1); margin-right:8px;"> Gidiş Noktaları</label>
+          <label class="pill"><input type="checkbox" id="showArrow" checked style="transform:scale(1.1); margin-right:8px;"> Kağan Oku</label>
         </div>
       </div>
-      <div style="height:10px"></div>
-      <div class="board" id="board"></div>
-      <div style="height:10px"></div>
-      <div class="row">
-        <span class="pill">Sıra: <b id="turn">Beyaz</b></span>
-        <span class="pill">Bağlantı: <b id="conn">Kapalı</b></span>
+
+      <div class="boardWrap">
+        <div class="boardLayer">
+          <div id="board" class="board" aria-label="Satranç tahtası"></div>
+          <canvas id="arrowCanvas"></canvas>
+        </div>
       </div>
-      <div class="note" style="margin-top:10px">
-        Not: Bu sürüm “oda kurma” için. (Hamle senkronu var.) Tam satranç kuralları/AI’yi istersen bir sonraki adımda bunu baz alıp ekleriz.
+
+      <div class="bubble">
+        <div class="tag">Saat (İsteğe Bağlı)</div>
+        <div class="row">
+          <label class="pill"><input type="checkbox" id="clockOn" style="transform:scale(1.1); margin-right:8px;"> Saat Aç</label>
+          <select id="clockMin">
+            <option value="1">1 dk</option>
+            <option value="3">3 dk</option>
+            <option value="5" selected>5 dk</option>
+            <option value="10">10 dk</option>
+            <option value="15">15 dk</option>
+          </select>
+          <select id="clockInc">
+            <option value="0" selected>+0 sn</option>
+            <option value="1">+1 sn</option>
+            <option value="2">+2 sn</option>
+            <option value="3">+3 sn</option>
+            <option value="5">+5 sn</option>
+          </select>
+          <button id="clockReset" class="primary">Saati Sıfırla</button>
+        </div>
+        <div class="small" id="clockHelp">Saat kapalı.</div>
+      </div>
+
+      <div class="bubble">
+        <div class="tag">P2P Online (Sunucusuz)</div>
+        <div class="small">
+          “Kur” → Offer kopyala → karşıya gönder. Karşı “Bağlan” → Offer yapıştır → Answer kopyala → geri gönder. Sonra Host Answer’ı yapıştırıp bağlar.
+          <br/>Bu bağlantı sadece <b>oyun hamlesi</b> taşır; telefon dosyalarına/kişisel bilgilere erişmez.
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <button id="p2pHost" class="good">Kur (Host)</button>
+          <button id="p2pJoin" class="primary">Bağlan (Join)</button>
+          <button id="p2pClose" class="danger">Kapat</button>
+        </div>
+        <div class="spacer"></div>
+        <div class="small"><b>Offer / Answer:</b></div>
+        <textarea id="p2pBox" class="mono" placeholder="Offer veya Answer buraya..."></textarea>
+        <div class="row" style="margin-top:10px">
+          <button id="p2pCopy" class="warn">Kutuyu Kopyala</button>
+          <span class="pill">Bağlantı: <b id="p2pState">Kapalı</b></span>
+        </div>
+        <div class="small" id="p2pHint" style="margin-top:8px"></div>
       </div>
     </div>
 
+    <!-- RIGHT -->
     <div class="card">
-      <b>P2P Online (Sunucusuz)</b>
-      <div class="note" style="margin-top:6px">
-        <b>Host:</b> Kur → Offer’ı gönder → Answer gelince yapıştır → Answer’ı Uygula.<br>
-        <b>Join:</b> Offer’ı yapıştır → Bağlan → Answer’ı gönder.
+      <div class="sectionTitle">
+        <h2>Kağan & Dede</h2>
+        <div class="pillrow">
+          <div class="pill">Kağan 𐰴𐰍𐰣: <b id="kaganMini">-</b></div>
+          <div class="pill">Dede 𐱅𐰑𐰀: <b id="dedeMini">-</b></div>
+        </div>
       </div>
 
-      <div style="height:10px"></div>
-      <div class="row">
-        <button class="good" id="hostBtn">Kur (Host)</button>
-        <button class="acc" id="joinBtn">Bağlan (Join)</button>
-        <button class="acc" id="applyAnswerBtn">Answer’ı Uygula (Host)</button>
-        <button class="bad" id="closeBtn">Kapat</button>
+      <div class="bubble" style="margin-top:0">
+        <div class="tag">Yol Gösterme (Kağan)</div>
+        <div class="small">İstersen Kağan “en iyi hamleyi” söyler ve ok çizer. İstersen kapatırsın.</div>
+        <div class="row" style="margin-top:10px">
+          <label class="pill"><input type="checkbox" id="hintOn" checked style="transform:scale(1.1); margin-right:8px;"> Öneri Aç</label>
+          <label class="pill"><input type="checkbox" id="autoHint" checked style="transform:scale(1.1); margin-right:8px;"> Sıra bende iken otomatik</label>
+          <button id="hintBtn" class="primary">Kağan’dan Öneri Al</button>
+        </div>
       </div>
 
-      <div style="height:10px"></div>
-      <textarea id="box" placeholder="Offer veya Answer buraya..."></textarea>
-
-      <div class="row" style="margin-top:10px">
-        <button id="copyBtn">Kutuyu Kopyala</button>
-        <span class="pill">Durum: <b id="state">-</b></span>
+      <div class="bubble">
+        <div class="tag">Dede Öğreti Modu</div>
+        <div class="small">İstersen Dede oyun öncesi “ders” anlatır. İstersen kapatırsın.</div>
+        <div class="row" style="margin-top:10px">
+          <label class="pill"><input type="checkbox" id="dedeOn" checked style="transform:scale(1.1); margin-right:8px;"> Dede Aç</label>
+          <select id="dedeMode">
+            <option value="off">Ders: Kapalı</option>
+            <option value="history">Tarihçe</option>
+            <option value="pieces">Taşlar</option>
+            <option value="basic">Temel Töre</option>
+            <option value="openings">Açılışlar</option>
+            <option value="endgames">Oyun Sonu</option>
+            <option value="tactics">Taktik</option>
+            <option value="mate">Mat Temaları</option>
+          </select>
+          <button id="dedeLessonBtn">Dede’den Ders</button>
+        </div>
+        <div class="small" style="margin-top:8px" id="dedeLessonText"></div>
       </div>
 
-      <div style="height:10px"></div>
-      <div class="note"><b>Log:</b></div>
-      <div class="log" id="log"></div>
+      <div class="chat" id="chat">
+        <div class="msg">
+          <div class="who">Kağan 𐰴𐰍𐰣</div>
+          <div class="txt" id="kaganText">Törüyle başla: Merkez, gelişim, güvenlik. İlk hamleni yap.</div>
+        </div>
+        <div class="msg">
+          <div class="who">Dede 𐱅𐰑𐰀</div>
+          <div class="txt" id="dedeText">Yiğit, hamle gelince sözüm de gelir.</div>
+        </div>
+      </div>
+
+      <div class="bubble">
+        <div class="tag">Müzik (YouTube · Kilitli Liste)</div>
+        <div class="small">
+          ✅ Sadece <b>video ID</b> ile çalar (başka videoya kaymaz).<br/>
+          ✅ “Listeyi düzenle” kapalıyken kimse ekleyemez.
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <select id="songSelect" style="min-width:min(520px,100%);"></select>
+          <button id="playBtn" class="primary">ÇAL</button>
+          <button id="pauseBtn">DURAKLAT</button>
+          <button id="nextBtn">SONRAKİ</button>
+        </div>
+
+        <div class="spacer"></div>
+        <div class="row">
+          <label class="pill"><input type="checkbox" id="songEditOn" style="transform:scale(1.1); margin-right:8px;"> Listeyi düzenle (sadece sen)</label>
+          <input id="songUrl" placeholder="YouTube linki/ID (watch?v=...)" style="flex:1; min-width:min(520px,100%);" />
+          <button id="addBtn" class="warn">Ekle</button>
+        </div>
+
+        <div class="small" style="margin-top:8px" id="ytStatus">Durum: Player yükleniyor…</div>
+        <div id="yt" style="width:0;height:0;overflow:hidden;"></div>
+      </div>
+
+      <div class="bubble">
+        <div class="tag">Günlük Hedef · İstatistik</div>
+        <div class="small">
+          Hedefi <b>1–10000</b> seçebilirsin. Sonuçları yerel depoya kaydeder (telefon/PC tarayıcı hafızası).
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <label class="pill">Hedef: <b><span id="goalNum">5</span></b> oyun</label>
+          <button id="goalMinus">-</button>
+          <button id="goalPlus">+</button>
+          <input id="goalSet" type="number" min="1" max="10000" value="5" style="width:140px" />
+          <button id="goalApply" class="primary">Hedefe Uygula</button>
+        </div>
+
+        <div class="spacer"></div>
+        <div class="row">
+          <label class="pill">Bugün: <b><span id="todayTotal">0</span></b></label>
+          <label class="pill">Tamamlanma: <b><span id="goalPct">0%</span></b></label>
+          <label class="pill">✅ <b><span id="todayW">0</span></b></label>
+          <label class="pill">❌ <b><span id="todayL">0</span></b></label>
+          <label class="pill">➖ <b><span id="todayD">0</span></b></label>
+          <label class="pill">Başarı: <b><span id="todayWR">0%</span></b></label>
+        </div>
+
+        <div class="small" style="margin-top:8px" id="goalHint"></div>
+
+        <hr style="border:none;border-top:1px solid rgba(255,255,255,.10); margin:12px 0" />
+
+        <div class="tag">Kayıt & Analiz</div>
+        <div class="small" id="analysisLine"></div>
+        <div class="row" style="margin-top:10px">
+          <button id="markWin" class="good">+1 Galibiyet</button>
+          <button id="markLoss" class="danger">+1 Mağlubiyet</button>
+          <button id="markDraw">+1 Berabere</button>
+          <button id="undoLastStat" class="warn">Son Kaydı Geri Al</button>
+          <button id="clearToday" class="danger">Bugünü Sıfırla</button>
+        </div>
+
+        <div class="small" style="margin-top:10px"><b>Gün Gün Geçmiş (son 14 gün):</b></div>
+        <div id="historyList" class="small" style="margin-top:6px; white-space:pre-wrap"></div>
+
+        <div class="small" style="margin-top:10px"><b>Gelişim Analizi:</b></div>
+        <div id="progressAnalysis" class="small" style="margin-top:6px; white-space:pre-wrap"></div>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- Intro -->
+<div id="intro" class="intro" title="Dokununca geçer">
+  <div class="introBox">
+    <div class="introTitle">𐱅𐰇𐰺𐰇 · Törü — Türk’ün Töresi</div>
+    <div class="runes" id="runeText"></div>
+    <div class="small" style="margin-top:10px">Başlamak için dokun…</div>
   </div>
 </div>
 
 <script>
 /* =========================
-   0) Mini yardımcılar
+   Helpers
 ========================= */
 const $ = (id)=>document.getElementById(id);
-const log = (t)=>{ $("log").textContent = (t + "\\n" + $("log").textContent).slice(0, 5000); };
-const setState = (t)=> $("state").textContent = t;
-const setConn = (t)=> $("conn").textContent = t;
+const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+const nowDayKey = ()=> new Date().toISOString().slice(0,10);
+const pick = (arr)=> arr[Math.floor(Math.random()*arr.length)];
 
 /* =========================
-   1) Satranç (Demo) - hamle senkronu
+   Intro
 ========================= */
-const pieces = {
-  p:"♟", r:"♜", n:"♞", b:"♝", q:"♛", k:"♚",
-  P:"♙", R:"♖", N:"♘", B:"♗", Q:"♕", K:"♔"
-};
-let board = [];
-let turn = "w";          // w=beyaz, b=siyah
-let selected = null;
-let flipped = false;
+const RUNES = [
+  "𐰴𐰍𐰣: 𐱅𐰇𐰺𐰇 𐰉𐰆𐰔𐰞𐰢𐰀",
+  "𐱅𐰑𐰀: 𐰴𐰆𐱅 𐰋𐰃𐰠𐰏𐰀 𐰋𐰃𐰠𐰀 𐰋𐰇𐰼𐰢𐰾",
+  "",
+  "Törü bozulmaz; düzen bozulursa ordu çözülür.",
+  "Akıl kılavuzdur; sabır kılıçtan keskindir.",
+  "Er olana yol, töreyle açılır."
+].join("\\n");
 
-function newGameLocal(){
-  board = [
-    "r","n","b","q","k","b","n","r",
-    "p","p","p","p","p","p","p","p",
-    "","","","","","","","",
-    "","","","","","","","",
-    "","","","","","","","",
-    "","","","","","","","",
-    "P","P","P","P","P","P","P","P",
-    "R","N","B","Q","K","B","N","R"
-  ];
-  turn = "w";
-  selected = null;
-  render();
+(function introType(){
+  const el = $("runeText");
+  let i=0;
+  const t = setInterval(()=>{
+    el.textContent = RUNES.slice(0, i++);
+    if(i>RUNES.length){ clearInterval(t); }
+  }, 16);
+})();
+
+function hideIntro(){
+  const intro = $("intro");
+  if(!intro || intro.style.display==="none") return;
+  intro.classList.add("fadeOut");
+  setTimeout(()=> intro.style.display="none", 720);
 }
-function render(){
-  $("turn").textContent = (turn==="w") ? "Beyaz" : "Siyah";
-  const b = $("board");
-  b.innerHTML = "";
-  for(let vr=0; vr<8; vr++){
-    for(let vc=0; vc<8; vc++){
-      const r = flipped ? (7-vr) : vr;
-      const c = flipped ? (7-vc) : vc;
-      const idx = r*8+c;
+$("intro").addEventListener("click", hideIntro, {passive:true});
+setTimeout(hideIntro, 2400);
 
-      const sq = document.createElement("div");
-      sq.className = "sq " + (((vr+vc)%2===0) ? "light" : "dark");
-      if(selected===idx) sq.classList.add("sel");
+/* =========================
+   Chess UI Core (main thread)
+   - Move legality used for UI & play
+   - AI search moved to Worker
+========================= */
+const PIECE_UNI = {
+  P:"♙", N:"♘", B:"♗", R:"♖", Q:"♕", K:"♔",
+  p:"♟", n:"♞", b:"♝", r:"♜", q:"♛", k:"♚",
+};
+const isWhite = (p)=> p && p===p.toUpperCase();
+const isBlack = (p)=> p && p===p.toLowerCase();
+const pieceValue = (p)=>{
+  switch(p.toLowerCase()){
+    case "p": return 100;
+    case "n": return 320;
+    case "b": return 330;
+    case "r": return 500;
+    case "q": return 900;
+    case "k": return 0;
+  }
+  return 0;
+};
+function sqToRC(sq){ return {r: Math.floor(sq/8), c: sq%8}; }
+function rcToSq(r,c){ return r*8+c; }
+function inBoard(r,c){ return r>=0 && r<8 && c>=0 && c<8; }
+function algebra(sq){
+  const {r,c}=sqToRC(sq);
+  return "abcdefgh"[c] + (8-r);
+}
+function cloneState(s){ return JSON.parse(JSON.stringify(s)); }
 
-      sq.dataset.idx = idx;
-      sq.textContent = pieces[board[idx]] || "";
-      sq.onclick = onSquareClick;
-      b.appendChild(sq);
+function initialState(){
+  const b = Array(64).fill(null);
+  const backBlack = ["r","n","b","q","k","b","n","r"];
+  const backWhite = ["R","N","B","Q","K","B","N","R"];
+  for(let c=0;c<8;c++) b[rcToSq(0,c)] = backBlack[c];
+  for(let c=0;c<8;c++) b[rcToSq(1,c)] = "p";
+  for(let c=0;c<8;c++) b[rcToSq(6,c)] = "P";
+  for(let c=0;c<8;c++) b[rcToSq(7,c)] = backWhite[c];
+
+  return {
+    board: b,
+    turn: "w",
+    castling: {K:true,Q:true,k:true,q:true},
+    ep: null,
+    halfmove: 0,
+    fullmove: 1,
+    last: null,
+    history: [],
+    result: null,
+  };
+}
+
+function findKing(state, color){
+  const target = color==="w" ? "K" : "k";
+  return state.board.findIndex(x=>x===target);
+}
+
+function attackedBy(state, sq, byColor){
+  const b = state.board;
+  const {r,c}=sqToRC(sq);
+
+  if(byColor==="w"){
+    for(const dc of [-1,1]){
+      const rr=r+1, cc=c+dc;
+      if(inBoard(rr,cc) && b[rcToSq(rr,cc)]==="P") return true;
+    }
+  }else{
+    for(const dc of [-1,1]){
+      const rr=r-1, cc=c+dc;
+      if(inBoard(rr,cc) && b[rcToSq(rr,cc)]==="p") return true;
     }
   }
+
+  const kD = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+  for(const [dr,dc] of kD){
+    const rr=r+dr, cc=c+dc;
+    if(!inBoard(rr,cc)) continue;
+    const p=b[rcToSq(rr,cc)];
+    if(!p) continue;
+    if(byColor==="w" && p==="N") return true;
+    if(byColor==="b" && p==="n") return true;
+  }
+
+  const diag = [[-1,-1],[-1,1],[1,-1],[1,1]];
+  for(const [dr,dc] of diag){
+    let rr=r+dr, cc=c+dc;
+    while(inBoard(rr,cc)){
+      const p=b[rcToSq(rr,cc)];
+      if(p){
+        if(byColor==="w" && (p==="B"||p==="Q")) return true;
+        if(byColor==="b" && (p==="b"||p==="q")) return true;
+        break;
+      }
+      rr+=dr; cc+=dc;
+    }
+  }
+
+  const line = [[-1,0],[1,0],[0,-1],[0,1]];
+  for(const [dr,dc] of line){
+    let rr=r+dr, cc=c+dc;
+    while(inBoard(rr,cc)){
+      const p=b[rcToSq(rr,cc)];
+      if(p){
+        if(byColor==="w" && (p==="R"||p==="Q")) return true;
+        if(byColor==="b" && (p==="r"||p==="q")) return true;
+        break;
+      }
+      rr+=dr; cc+=dc;
+    }
+  }
+
+  for(let dr=-1;dr<=1;dr++){
+    for(let dc=-1;dc<=1;dc++){
+      if(dr===0 && dc===0) continue;
+      const rr=r+dr, cc=c+dc;
+      if(!inBoard(rr,cc)) continue;
+      const p=b[rcToSq(rr,cc)];
+      if(byColor==="w" && p==="K") return true;
+      if(byColor==="b" && p==="k") return true;
+    }
+  }
+  return false;
 }
-function isWhitePiece(p){ return p && p===p.toUpperCase(); }
-function isBlackPiece(p){ return p && p===p.toLowerCase(); }
+
+function inCheck(state, color){
+  const ksq=findKing(state, color);
+  const attacker = (color==="w") ? "b" : "w";
+  return attackedBy(state, ksq, attacker);
+}
+
+function genPseudoMoves(state){
+  const b=state.board;
+  const moves=[];
+  const us = state.turn;
+  const them = us==="w" ? "b" : "w";
+  const push = (m)=>moves.push(m);
+
+  for(let sq=0;sq<64;sq++){
+    const p=b[sq];
+    if(!p) continue;
+    if(us==="w" && !isWhite(p)) continue;
+    if(us==="b" && !isBlack(p)) continue;
+
+    const {r,c}=sqToRC(sq);
+
+    const addSlide = (dirs)=>{
+      for(const [dr,dc] of dirs){
+        let rr=r+dr, cc=c+dc;
+        while(inBoard(rr,cc)){
+          const to=rcToSq(rr,cc);
+          const tp=b[to];
+          if(!tp){
+            push({from:sq,to, piece:p, cap:null, promo:null, ep:false, castle:false});
+          }else{
+            if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp))){
+              push({from:sq,to, piece:p, cap:tp, promo:null, ep:false, castle:false});
+            }
+            break;
+          }
+          rr+=dr; cc+=dc;
+        }
+      }
+    };
+
+    switch(p.toLowerCase()){
+      case "p":{
+        const dir = (us==="w") ? -1 : 1;
+        const startR = (us==="w") ? 6 : 1;
+        const promoR = (us==="w") ? 0 : 7;
+
+        const rr=r+dir, cc=c;
+        if(inBoard(rr,cc)){
+          const to=rcToSq(rr,cc);
+          if(!b[to]){
+            if(rr===promoR){
+              for(const pr of ["q","r","b","n"]){
+                const promo = us==="w" ? pr.toUpperCase() : pr;
+                push({from:sq,to,piece:p,cap:null,promo,ep:false,castle:false});
+              }
+            }else{
+              push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+              if(r===startR){
+                const rr2=r+dir*2;
+                const to2=rcToSq(rr2,cc);
+                if(!b[to2]){
+                  push({from:sq,to:to2,piece:p,cap:null,promo:null,ep:false,castle:false, dbl:true});
+                }
+              }
+            }
+          }
+        }
+
+        for(const dc of [-1,1]){
+          const rrC=r+dir, ccC=c+dc;
+          if(!inBoard(rrC,ccC)) continue;
+          const to=rcToSq(rrC,ccC);
+          const tp=b[to];
+
+          if(tp && ((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))){
+            if(rrC===promoR){
+              for(const pr of ["q","r","b","n"]){
+                const promo = us==="w" ? pr.toUpperCase() : pr;
+                push({from:sq,to,piece:p,cap:tp,promo,ep:false,castle:false});
+              }
+            }else{
+              push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+            }
+          }
+
+          if(state.ep!==null && to===state.ep){
+            const capSq = rcToSq(r, ccC);
+            const capP = b[capSq];
+            if(capP && capP.toLowerCase()==="p" && ((us==="w" && isBlack(capP)) || (us==="b" && isWhite(capP)))){
+              push({from:sq,to,piece:p,cap:capP,promo:null,ep:true,castle:false, capSq});
+            }
+          }
+        }
+        break;
+      }
+      case "n":{
+        const d=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+        for(const [dr,dc] of d){
+          const rr=r+dr, cc=c+dc;
+          if(!inBoard(rr,cc)) continue;
+          const to=rcToSq(rr,cc);
+          const tp=b[to];
+          if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+          else if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))
+            push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+        }
+        break;
+      }
+      case "b": addSlide([[-1,-1],[-1,1],[1,-1],[1,1]]); break;
+      case "r": addSlide([[-1,0],[1,0],[0,-1],[0,1]]); break;
+      case "q": addSlide([[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]]); break;
+      case "k":{
+        for(let dr=-1;dr<=1;dr++){
+          for(let dc=-1;dc<=1;dc++){
+            if(dr===0 && dc===0) continue;
+            const rr=r+dr, cc=c+dc;
+            if(!inBoard(rr,cc)) continue;
+            const to=rcToSq(rr,cc);
+            const tp=b[to];
+            if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+            else if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))
+              push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+          }
+        }
+
+        const kingHome = us==="w" ? rcToSq(7,4) : rcToSq(0,4);
+        if(sq===kingHome && !inCheck(state, us)){
+          if(us==="w" && state.castling.K){
+            const f1=rcToSq(7,5), g1=rcToSq(7,6), h1=rcToSq(7,7);
+            if(!b[f1] && !b[g1] && b[h1]==="R" && !attackedBy(state,f1,them) && !attackedBy(state,g1,them)){
+              push({from:sq,to:g1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h1, rookTo:f1});
+            }
+          }
+          if(us==="w" && state.castling.Q){
+            const d1=rcToSq(7,3), c1=rcToSq(7,2), b1=rcToSq(7,1), a1=rcToSq(7,0);
+            if(!b[d1] && !b[c1] && !b[b1] && b[a1]==="R" && !attackedBy(state,d1,them) && !attackedBy(state,c1,them)){
+              push({from:sq,to:c1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a1, rookTo:d1});
+            }
+          }
+          if(us==="b" && state.castling.k){
+            const f8=rcToSq(0,5), g8=rcToSq(0,6), h8=rcToSq(0,7);
+            if(!b[f8] && !b[g8] && b[h8]==="r" && !attackedBy(state,f8,them) && !attackedBy(state,g8,them)){
+              push({from:sq,to:g8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h8, rookTo:f8});
+            }
+          }
+          if(us==="b" && state.castling.q){
+            const d8=rcToSq(0,3), c8=rcToSq(0,2), b8=rcToSq(0,1), a8=rcToSq(0,0);
+            if(!b[d8] && !b[c8] && !b[b8] && b[a8]==="r" && !attackedBy(state,d8,them) && !attackedBy(state,c8,them)){
+              push({from:sq,to:c8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a8, rookTo:d8});
+            }
+          }
+        }
+        break;
+      }
+    }
+  }
+  return moves;
+}
+
+function makeMove(state, m){
+  const s = cloneState(state);
+  const b = s.board;
+  s.ep = null;
+
+  if(m.piece.toLowerCase()==="p" || m.cap) s.halfmove=0;
+  else s.halfmove++;
+
+  b[m.to] = m.promo ? m.promo : m.piece;
+  b[m.from] = null;
+
+  if(m.ep && m.capSq!=null) b[m.capSq]=null;
+  if(m.castle){
+    b[m.rookTo] = b[m.rookFrom];
+    b[m.rookFrom] = null;
+  }
+  if(m.dbl){
+    const {r:toR,c:toC}=sqToRC(m.to);
+    const epR = (s.turn==="w") ? toR+1 : toR-1;
+    s.ep = rcToSq(epR, toC);
+  }
+
+  const from = m.from, to = m.to;
+  const moved = m.piece;
+  const cap = m.cap;
+  const revoke = (k)=>{ s.castling[k]=false; };
+
+  if(moved==="K"){ revoke("K"); revoke("Q"); }
+  if(moved==="k"){ revoke("k"); revoke("q"); }
+  if(moved==="R"){
+    if(from===rcToSq(7,0)) revoke("Q");
+    if(from===rcToSq(7,7)) revoke("K");
+  }
+  if(moved==="r"){
+    if(from===rcToSq(0,0)) revoke("q");
+    if(from===rcToSq(0,7)) revoke("k");
+  }
+  if(cap==="R"){
+    if(to===rcToSq(7,0)) revoke("Q");
+    if(to===rcToSq(7,7)) revoke("K");
+  }
+  if(cap==="r"){
+    if(to===rcToSq(0,0)) revoke("q");
+    if(to===rcToSq(0,7)) revoke("k");
+  }
+
+  s.turn = (s.turn==="w") ? "b" : "w";
+  if(s.turn==="w") s.fullmove++;
+
+  s.last = {from:m.from,to:m.to, san:""};
+  s.history.push(m);
+  return s;
+}
+
+function legalMoves(state){
+  const pseudo = genPseudoMoves(state);
+  const leg=[];
+  for(const m of pseudo){
+    const s2 = makeMove(state, m);
+    const us = state.turn;
+    if(!inCheck(s2, us)) leg.push(m);
+  }
+  return leg;
+}
+
+function gameEnd(state){
+  if(state.result) return state.result;
+  const moves = legalMoves(state);
+  const us = state.turn;
+  const inC = inCheck(state, us);
+
+  if(moves.length===0){
+    if(inC) return us==="w" ? "0-1" : "1-0";
+    return "1/2-1/2";
+  }
+  if(state.halfmove>=100) return "1/2-1/2";
+  return null;
+}
+
+function sanForMove(state, m){
+  if(m.castle){
+    const {c}=sqToRC(m.to);
+    return (c===6) ? "O-O" : "O-O-O";
+  }
+  const piece = m.piece;
+  const isPawn = piece.toLowerCase()==="p";
+  const cap = !!m.cap || m.ep;
+
+  let s = "";
+  if(!isPawn) s += piece.toUpperCase();
+  else if(cap) s += "abcdefgh"[sqToRC(m.from).c];
+
+  if(cap) s += "x";
+  s += algebra(m.to);
+  if(m.promo) s += "=" + m.promo.toUpperCase();
+
+  const after = makeMove(state, m);
+  const end = gameEnd(after);
+  const them = after.turn;
+  const check = inCheck(after, them);
+
+  if(end && (end==="1-0"||end==="0-1")) s += "#";
+  else if(check) s += "+";
+  return s;
+}
+
+function evalState(state){
+  const b=state.board;
+  let score=0;
+  for(const p of b){
+    if(!p) continue;
+    const v = pieceValue(p);
+    score += isWhite(p) ? v : -v;
+  }
+  score += (state.turn==="w") ? 5 : -5;
+  return score;
+}
+
+/* =========================
+   Opening mini-book
+========================= */
+const OPENINGS = [
+  {seq:["e4","e5","Nf3","Nc6","Bb5"], name:"İspanyol Açılışı (Ruy Lopez)"},
+  {seq:["e4","c5"], name:"Sicilya Savunması"},
+  {seq:["d4","d5","c4"], name:"Vezir Gambiti"},
+  {seq:["e4","e5","Nf3","Nf6"], name:"Petrov Savunması"},
+  {seq:["d4","Nf6","c4","g6"], name:"Kral Hint Savunması"},
+  {seq:["b4"], name:"Orangutan (Sokolsky)"},
+  {seq:["f4"], name:"Kuş Açılışı (Bird)"},
+  {seq:["g4"], name:"Grob Saldırısı"},
+];
+function openingName(sanList){
+  for(const o of OPENINGS){
+    if(sanList.length < o.seq.length) continue;
+    let ok=true;
+    for(let i=0;i<o.seq.length;i++){
+      if(sanList[i]!==o.seq[i]){ ok=false; break; }
+    }
+    if(ok) return o.name;
+  }
+  return "-";
+}
+
+/* =========================
+   Kağan & Dede
+========================= */
+const KAGAN_EMIR = [
+  "Merkez tutulmadan sefer uzar.",
+  "Taşlar birlik ister; yalnız kalan düşer.",
+  "Şah güvenliği töredir; sonra hücum gelir.",
+  "Gereksiz hamle töreyi yorar.",
+  "Basit olan güçlüdür; karmaşa zayıflatır.",
+  "Zayıf kareyi tut; sonra baskıyı artır.",
+  "Her hamlede niyet olsun: tehdit, savunma, gelişim.",
+  "Rokla; ordunu tek cepheye topla.",
+  "Açık hat bul; kaleyi oraya sür.",
+  "Sabır kılıçtan keskindir."
+];
+const DEDE_USLUP = [
+  "Yiğit, taşın gönlünü kırma; doğru yere kondur.",
+  "At gider, iz kalır; hamle gider, hüküm kalır.",
+  "Söz bir, ok bir; hamlen de bir olsun.",
+  "Kurt sürüsü dağılmaz; taşların dağılmasın.",
+  "Yol uzunsa akıl kısadır; sade oyna, sağlam oyna.",
+  "Bir taşın kıymeti, durduğu yerle ölçülür.",
+  "Sabır kılıçtan keskindir; beklemesini bil.",
+  "Gönül ister saldırı; akıl ister tedbir.",
+];
+function dedeComment(san, evalBefore, evalAfter){
+  const swing = evalAfter - evalBefore;
+  let mood = "";
+  if(Math.abs(swing) < 40) mood = "Denge bozulmadı; ama yol uzun.";
+  else if(swing > 120) mood = "Güzel hamle! Rüzgâr senden yana döndü.";
+  else if(swing < -120) mood = "Aman yiğit… Bu hamle bir gedik açtı; dikkat et.";
+  else mood = "İşin özü: tedbirle yürü.";
+  return `${pick(DEDE_USLUP)}<br><br>Hamle: <b>${san}</b>. ${mood}`;
+}
+
+const DEDE_LESSONS = {
+  history: [
+    "Satranç, büyük ihtimalle Hindistan’da (Çaturanga) doğup İran üzerinden dünyaya yayıldı. Modern kurallar özellikle vezirin güçlenmesiyle hız kazandı.",
+    "Satranç üç evredir: Açılış (hazırlık), oyun ortası (mücadele), oyun sonu (sonuç).",
+    "Ekoller vardır: Pozisyonel sabır ve dinamik saldırı."
+  ],
+  pieces: [
+    "Piyon yürür, terfi eder. At çatal ustasıdır. Fil çaprazın gücüdür. Kale açık hat sever. Vezir güçlü ama erken gezdirilmez. Şah kaybedilmez.",
+    "Yaklaşık değerler: P=1, N=3, B=3, R=5, Q=9.",
+    "Açılış töresi: Merkez + gelişim + şah güvenliği (rok)."
+  ],
+  basic: [
+    "Önce merkez piyonları (e/d), sonra atlar, filler, rok.",
+    "Şah güvenli değilken saldırı hızla döner.",
+    "Plan: Zayıf kareleri hedefle, taşlarını uyumla."
+  ],
+  openings: [
+    "Bilinen: İspanyol, Sicilya, Vezir Gambiti, Kral Hint.",
+    "Sürpriz: Orangutan (1.b4), Bird (1.f4), Grob (1.g4).",
+    "Ezber değil; fikir öğren: gelişim ve şah güvenliği."
+  ],
+  endgames: [
+    "Oyun sonu: Şah merkeze yürür. Geçer piyon yarat.",
+    "Kale oyun sonu: Kale piyonun arkasında çoğu zaman doğrudur.",
+    "Basit matlar: K+Q vs K, K+R vs K."
+  ],
+  tactics: [
+    "Çatal: özellikle at ile iki hedefe birden saldır.",
+    "Açmaz/Şiş: arkadaki daha değerli taş yüzünden kıpırdayamama.",
+    "Saptırma: savunmacıyı görevinden kopar."
+  ],
+  mate: [
+    "Arka sıra matı: piyonlar kaçışı kapatır, kale/vezir son sıraya iner.",
+    "Boğma mat: at ile, rakibin kendi taşları şahı boğar.",
+    "Kutu matı: kaçış karelerini tek tek kapat."
+  ]
+};
+
+/* =========================
+   WORKER: AI search (minimax) off main thread
+   - Tek HTML: Blob Worker
+========================= */
+function createAIWorker(){
+  const workerCode = `
+    const isWhite = (p)=> p && p===p.toUpperCase();
+    const isBlack = (p)=> p && p===p.toLowerCase();
+    const pieceValue = (p)=>{
+      switch(p.toLowerCase()){
+        case "p": return 100;
+        case "n": return 320;
+        case "b": return 330;
+        case "r": return 500;
+        case "q": return 900;
+        case "k": return 0;
+      }
+      return 0;
+    };
+    const sqToRC=(sq)=>({r:Math.floor(sq/8), c:sq%8});
+    const rcToSq=(r,c)=>r*8+c;
+    const inBoard=(r,c)=>r>=0&&r<8&&c>=0&&c<8;
+    const clone=(s)=>JSON.parse(JSON.stringify(s));
+
+    function findKing(state, color){
+      const target = color==="w" ? "K" : "k";
+      return state.board.findIndex(x=>x===target);
+    }
+
+    function attackedBy(state, sq, byColor){
+      const b = state.board;
+      const {r,c}=sqToRC(sq);
+
+      if(byColor==="w"){
+        for(const dc of [-1,1]){
+          const rr=r+1, cc=c+dc;
+          if(inBoard(rr,cc) && b[rcToSq(rr,cc)]==="P") return true;
+        }
+      }else{
+        for(const dc of [-1,1]){
+          const rr=r-1, cc=c+dc;
+          if(inBoard(rr,cc) && b[rcToSq(rr,cc)]==="p") return true;
+        }
+      }
+
+      const kD = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+      for(const [dr,dc] of kD){
+        const rr=r+dr, cc=c+dc;
+        if(!inBoard(rr,cc)) continue;
+        const p=b[rcToSq(rr,cc)];
+        if(!p) continue;
+        if(byColor==="w" && p==="N") return true;
+        if(byColor==="b" && p==="n") return true;
+      }
+
+      const diag = [[-1,-1],[-1,1],[1,-1],[1,1]];
+      for(const [dr,dc] of diag){
+        let rr=r+dr, cc=c+dc;
+        while(inBoard(rr,cc)){
+          const p=b[rcToSq(rr,cc)];
+          if(p){
+            if(byColor==="w" && (p==="B"||p==="Q")) return true;
+            if(byColor==="b" && (p==="b"||p==="q")) return true;
+            break;
+          }
+          rr+=dr; cc+=dc;
+        }
+      }
+
+      const line = [[-1,0],[1,0],[0,-1],[0,1]];
+      for(const [dr,dc] of line){
+        let rr=r+dr, cc=c+dc;
+        while(inBoard(rr,cc)){
+          const p=b[rcToSq(rr,cc)];
+          if(p){
+            if(byColor==="w" && (p==="R"||p==="Q")) return true;
+            if(byColor==="b" && (p==="r"||p==="q")) return true;
+            break;
+          }
+          rr+=dr; cc+=dc;
+        }
+      }
+
+      for(let dr=-1;dr<=1;dr++){
+        for(let dc=-1;dc<=1;dc++){
+          if(dr===0 && dc===0) continue;
+          const rr=r+dr, cc=c+dc;
+          if(!inBoard(rr,cc)) continue;
+          const p=b[rcToSq(rr,cc)];
+          if(byColor==="w" && p==="K") return true;
+          if(byColor==="b" && p==="k") return true;
+        }
+      }
+      return false;
+    }
+
+    function inCheck(state, color){
+      const ksq=findKing(state, color);
+      const attacker = (color==="w") ? "b" : "w";
+      return attackedBy(state, ksq, attacker);
+    }
+
+    function genPseudoMoves(state){
+      const b=state.board;
+      const moves=[];
+      const us = state.turn;
+      const them = us==="w" ? "b" : "w";
+      const push = (m)=>moves.push(m);
+
+      for(let sq=0;sq<64;sq++){
+        const p=b[sq];
+        if(!p) continue;
+        if(us==="w" && !isWhite(p)) continue;
+        if(us==="b" && !isBlack(p)) continue;
+
+        const {r,c}=sqToRC(sq);
+
+        const addSlide = (dirs)=>{
+          for(const [dr,dc] of dirs){
+            let rr=r+dr, cc=c+dc;
+            while(inBoard(rr,cc)){
+              const to=rcToSq(rr,cc);
+              const tp=b[to];
+              if(!tp){
+                push({from:sq,to, piece:p, cap:null, promo:null, ep:false, castle:false});
+              }else{
+                if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp))){
+                  push({from:sq,to, piece:p, cap:tp, promo:null, ep:false, castle:false});
+                }
+                break;
+              }
+              rr+=dr; cc+=dc;
+            }
+          }
+        };
+
+        switch(p.toLowerCase()){
+          case "p":{
+            const dir = (us==="w") ? -1 : 1;
+            const startR = (us==="w") ? 6 : 1;
+            const promoR = (us==="w") ? 0 : 7;
+
+            const rr=r+dir, cc=c;
+            if(inBoard(rr,cc)){
+              const to=rcToSq(rr,cc);
+              if(!b[to]){
+                if(rr===promoR){
+                  for(const pr of ["q","r","b","n"]){
+                    const promo = us==="w" ? pr.toUpperCase() : pr;
+                    push({from:sq,to,piece:p,cap:null,promo,ep:false,castle:false});
+                  }
+                }else{
+                  push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+                  if(r===startR){
+                    const rr2=r+dir*2;
+                    const to2=rcToSq(rr2,cc);
+                    if(!b[to2]){
+                      push({from:sq,to:to2,piece:p,cap:null,promo:null,ep:false,castle:false, dbl:true});
+                    }
+                  }
+                }
+              }
+            }
+
+            for(const dc of [-1,1]){
+              const rrC=r+dir, ccC=c+dc;
+              if(!inBoard(rrC,ccC)) continue;
+              const to=rcToSq(rrC,ccC);
+              const tp=b[to];
+
+              if(tp && ((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))){
+                if(rrC===promoR){
+                  for(const pr of ["q","r","b","n"]){
+                    const promo = us==="w" ? pr.toUpperCase() : pr;
+                    push({from:sq,to,piece:p,cap:tp,promo,ep:false,castle:false});
+                  }
+                }else{
+                  push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+                }
+              }
+
+              if(state.ep!==null && to===state.ep){
+                const capSq = rcToSq(r, ccC);
+                const capP = b[capSq];
+                if(capP && capP.toLowerCase()==="p" && ((us==="w" && isBlack(capP)) || (us==="b" && isWhite(capP)))){
+                  push({from:sq,to,piece:p,cap:capP,promo:null,ep:true,castle:false, capSq});
+                }
+              }
+            }
+            break;
+          }
+          case "n":{
+            const d=[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+            for(const [dr,dc] of d){
+              const rr=r+dr, cc=c+dc;
+              if(!inBoard(rr,cc)) continue;
+              const to=rcToSq(rr,cc);
+              const tp=b[to];
+              if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+              else if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))
+                push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+            }
+            break;
+          }
+          case "b": addSlide([[-1,-1],[-1,1],[1,-1],[1,1]]); break;
+          case "r": addSlide([[-1,0],[1,0],[0,-1],[0,1]]); break;
+          case "q": addSlide([[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]]); break;
+          case "k":{
+            for(let dr=-1;dr<=1;dr++){
+              for(let dc=-1;dc<=1;dc++){
+                if(dr===0 && dc===0) continue;
+                const rr=r+dr, cc=c+dc;
+                if(!inBoard(rr,cc)) continue;
+                const to=rcToSq(rr,cc);
+                const tp=b[to];
+                if(!tp) push({from:sq,to,piece:p,cap:null,promo:null,ep:false,castle:false});
+                else if((us==="w" && isBlack(tp)) || (us==="b" && isWhite(tp)))
+                  push({from:sq,to,piece:p,cap:tp,promo:null,ep:false,castle:false});
+              }
+            }
+
+            const kingHome = us==="w" ? rcToSq(7,4) : rcToSq(0,4);
+            if(sq===kingHome && !inCheck(state, us)){
+              if(us==="w" && state.castling.K){
+                const f1=rcToSq(7,5), g1=rcToSq(7,6), h1=rcToSq(7,7);
+                if(!b[f1] && !b[g1] && b[h1]==="R" && !attackedBy(state,f1,them) && !attackedBy(state,g1,them)){
+                  push({from:sq,to:g1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h1, rookTo:f1});
+                }
+              }
+              if(us==="w" && state.castling.Q){
+                const d1=rcToSq(7,3), c1=rcToSq(7,2), b1=rcToSq(7,1), a1=rcToSq(7,0);
+                if(!b[d1] && !b[c1] && !b[b1] && b[a1]==="R" && !attackedBy(state,d1,them) && !attackedBy(state,c1,them)){
+                  push({from:sq,to:c1,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a1, rookTo:d1});
+                }
+              }
+              if(us==="b" && state.castling.k){
+                const f8=rcToSq(0,5), g8=rcToSq(0,6), h8=rcToSq(0,7);
+                if(!b[f8] && !b[g8] && b[h8]==="r" && !attackedBy(state,f8,them) && !attackedBy(state,g8,them)){
+                  push({from:sq,to:g8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:h8, rookTo:f8});
+                }
+              }
+              if(us==="b" && state.castling.q){
+                const d8=rcToSq(0,3), c8=rcToSq(0,2), b8=rcToSq(0,1), a8=rcToSq(0,0);
+                if(!b[d8] && !b[c8] && !b[b8] && b[a8]==="r" && !attackedBy(state,d8,them) && !attackedBy(state,c8,them)){
+                  push({from:sq,to:c8,piece:p,cap:null,promo:null,ep:false,castle:true, rookFrom:a8, rookTo:d8});
+                }
+              }
+            }
+            break;
+          }
+        }
+      }
+      return moves;
+    }
+
+    function makeMove(state, m){
+      const s = clone(state);
+      const b = s.board;
+      s.ep = null;
+
+      if(m.piece.toLowerCase()==="p" || m.cap) s.halfmove=0;
+      else s.halfmove++;
+
+      b[m.to] = m.promo ? m.promo : m.piece;
+      b[m.from] = null;
+
+      if(m.ep && m.capSq!=null) b[m.capSq]=null;
+      if(m.castle){
+        b[m.rookTo] = b[m.rookFrom];
+        b[m.rookFrom] = null;
+      }
+      if(m.dbl){
+        const {r:toR,c:toC}=sqToRC(m.to);
+        const epR = (s.turn==="w") ? toR+1 : toR-1;
+        s.ep = rcToSq(epR, toC);
+      }
+
+      const from = m.from, to = m.to;
+      const moved = m.piece;
+      const cap = m.cap;
+      const revoke = (k)=>{ s.castling[k]=false; };
+
+      if(moved==="K"){ revoke("K"); revoke("Q"); }
+      if(moved==="k"){ revoke("k"); revoke("q"); }
+      if(moved==="R"){
+        if(from===rcToSq(7,0)) revoke("Q");
+        if(from===rcToSq(7,7)) revoke("K");
+      }
+      if(moved==="r"){
+        if(from===rcToSq(0,0)) revoke("q");
+        if(from===rcToSq(0,7)) revoke("k");
+      }
+      if(cap==="R"){
+        if(to===rcToSq(7,0)) revoke("Q");
+        if(to===rcToSq(7,7)) revoke("K");
+      }
+      if(cap==="r"){
+        if(to===rcToSq(0,0)) revoke("q");
+        if(to===rcToSq(0,7)) revoke("k");
+      }
+
+      s.turn = (s.turn==="w") ? "b" : "w";
+      if(s.turn==="w") s.fullmove++;
+      return s;
+    }
+
+    function legalMoves(state){
+      const pseudo = genPseudoMoves(state);
+      const leg=[];
+      for(const m of pseudo){
+        const s2 = makeMove(state, m);
+        const us = state.turn;
+        if(!inCheck(s2, us)) leg.push(m);
+      }
+      return leg;
+    }
+
+    function gameEnd(state){
+      const moves = legalMoves(state);
+      const us = state.turn;
+      const inC = inCheck(state, us);
+      if(moves.length===0){
+        if(inC) return us==="w" ? "0-1" : "1-0";
+        return "1/2-1/2";
+      }
+      if(state.halfmove>=100) return "1/2-1/2";
+      return null;
+    }
+
+    function evalState(state){
+      const b=state.board;
+      let score=0;
+      for(const p of b){
+        if(!p) continue;
+        const v = pieceValue(p);
+        score += isWhite(p) ? v : -v;
+      }
+      score += (state.turn==="w") ? 5 : -5;
+      return score;
+    }
+
+    function minimax(state, depth, alpha, beta){
+      const end = gameEnd(state);
+      if(end){
+        if(end==="1/2-1/2") return {score:0, move:null};
+        if(end==="1-0") return {score: 999999, move:null};
+        if(end==="0-1") return {score: -999999, move:null};
+      }
+      if(depth===0) return {score: evalState(state), move:null};
+
+      const moves = legalMoves(state);
+      moves.sort((a,b)=> (b.cap?1:0)-(a.cap?1:0));
+
+      const maximizing = (state.turn==="w");
+      let bestMove=null;
+
+      if(maximizing){
+        let best=-Infinity;
+        for(const m of moves){
+          const s2=makeMove(state,m);
+          const res=minimax(s2, depth-1, alpha, beta);
+          if(res.score>best){ best=res.score; bestMove=m; }
+          alpha=Math.max(alpha,best);
+          if(beta<=alpha) break;
+        }
+        return {score:best, move:bestMove};
+      }else{
+        let best=Infinity;
+        for(const m of moves){
+          const s2=makeMove(state,m);
+          const res=minimax(s2, depth-1, alpha, beta);
+          if(res.score<best){ best=res.score; bestMove=m; }
+          beta=Math.min(beta,best);
+          if(beta<=alpha) break;
+        }
+        return {score:best, move:bestMove};
+      }
+    }
+
+    self.onmessage = (ev)=>{
+      const {id, type, state, depth} = ev.data || {};
+      try{
+        const res = minimax(state, depth, -Infinity, Infinity);
+        self.postMessage({id, ok:true, move: res.move, score: res.score});
+      }catch(e){
+        self.postMessage({id, ok:false, error: (e && e.message) ? e.message : String(e)});
+      }
+    };
+  `;
+  const blob = new Blob([workerCode], {type:"application/javascript"});
+  const url = URL.createObjectURL(blob);
+  return new Worker(url);
+}
+
+let AIW = null;
+let aiReqId = 1;
+const aiPending = new Map();
+
+function ensureWorker(){
+  if(AIW) return true;
+  try{
+    AIW = createAIWorker();
+    AIW.onmessage = (ev)=>{
+      const msg = ev.data || {};
+      const cb = aiPending.get(msg.id);
+      if(cb){
+        aiPending.delete(msg.id);
+        cb(msg);
+      }
+    };
+    return true;
+  }catch(e){
+    AIW = null;
+    return false;
+  }
+}
+
+function aiDepthFromLevel(level){
+  const map = {
+    l1:{d:1, bl:0.35},
+    l2:{d:2, bl:0.20},
+    l3:{d:2, bl:0.12},
+    l4:{d:3, bl:0.10},
+    l5:{d:3, bl:0.06},
+    l6:{d:4, bl:0.05},
+    l7:{d:4, bl:0.03},
+    l8:{d:5, bl:0.02},
+    l9:{d:5, bl:0.01},
+    l10:{d:6, bl:0.00},
+  };
+  return map[level] || {d:3, bl:0.08};
+}
+
+function exportForAI(state){
+  // Worker only needs current position + rights; history not needed.
+  return {
+    board: state.board,
+    turn: state.turn,
+    castling: state.castling,
+    ep: state.ep,
+    halfmove: state.halfmove,
+    fullmove: state.fullmove
+  };
+}
+
+function aiSearch(state, depth){
+  return new Promise((resolve)=>{
+    if(!ensureWorker()){
+      resolve({ok:false, error:"Worker yok"});
+      return;
+    }
+    const id = aiReqId++;
+    aiPending.set(id, resolve);
+    AIW.postMessage({id, type:"search", state: exportForAI(state), depth});
+  });
+}
+
+/* =========================
+   UI / State
+========================= */
+let S = initialState();
+let selected = null;
+let legalCache = [];
+let sanHistory = [];
+let flipped = false;
+let mySide = "w";
+let p2p = { pc:null, dc:null, role:null };
+
+const boardEl = $("board");
+function setStatus(t){ $("status").textContent = t; }
+
+function effectiveFlip(){
+  const base = (mySide==="b");
+  return (base ^ flipped);
+}
+
+/* Arrow canvas */
+const arrowCv = $("arrowCanvas");
+let currentHint = null;
+
+function resizeArrowCanvas(){
+  const layer = arrowCv.parentElement;
+  const rect = layer.getBoundingClientRect();
+  arrowCv.width = Math.max(1, Math.round(rect.width * devicePixelRatio));
+  arrowCv.height = Math.max(1, Math.round(rect.height * devicePixelRatio));
+  arrowCv.style.width = rect.width + "px";
+  arrowCv.style.height = rect.height + "px";
+}
+window.addEventListener("resize", ()=>{ resizeArrowCanvas(); drawArrow(currentHint); });
+
+function sqCenterOnScreen(sq){
+  const el = boardEl.querySelector(`[data-sq="${sq}"]`);
+  if(!el) return null;
+  const r = el.getBoundingClientRect();
+  const layer = arrowCv.getBoundingClientRect();
+  return {
+    x: (r.left + r.right)/2 - layer.left,
+    y: (r.top + r.bottom)/2 - layer.top
+  };
+}
+function drawArrow(hint){
+  const ctx = arrowCv.getContext("2d");
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  ctx.clearRect(0,0,arrowCv.width/devicePixelRatio, arrowCv.height/devicePixelRatio);
+  if(!hint) return;
+  if(!$("showArrow").checked) return;
+
+  const a = sqCenterOnScreen(hint.from);
+  const b = sqCenterOnScreen(hint.to);
+  if(!a || !b) return;
+
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "rgba(74,163,255,.92)";
+  ctx.fillStyle = "rgba(74,163,255,.92)";
+
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.stroke();
+
+  const ang = Math.atan2(b.y-a.y, b.x-a.x);
+  const headLen = 18;
+  ctx.beginPath();
+  ctx.moveTo(b.x, b.y);
+  ctx.lineTo(b.x - headLen*Math.cos(ang - Math.PI/7), b.y - headLen*Math.sin(ang - Math.PI/7));
+  ctx.lineTo(b.x - headLen*Math.cos(ang + Math.PI/7), b.y - headLen*Math.sin(ang + Math.PI/7));
+  ctx.closePath();
+  ctx.fill();
+}
+
+/* Render */
+function render(){
+  const end = gameEnd(S);
+  if(end && !S.result){ S.result = end; onGameFinished(end); }
+
+  $("turn").textContent = (S.turn==="w") ? "Beyaz" : "Siyah";
+  const ev = evalState(S)/100;
+  $("eval").textContent = (ev>=0?"+":"") + ev.toFixed(1);
+  $("opening").textContent = openingName(sanHistory);
+
+  $("lastMove").textContent = S.last ? S.last.san : "-";
+  $("kaganMini").textContent = S.result ? "Hüküm" : "Hazır";
+  $("dedeMini").textContent = S.result ? "Yazdı" : "Bekler";
+
+  legalCache = legalMoves(S);
+
+  boardEl.innerHTML = "";
+  const viewFlipped = effectiveFlip();
+
+  const last = S.last ? {from:S.last.from,to:S.last.to} : null;
+  const inC = inCheck(S, S.turn);
+  const kingSq = inC ? findKing(S, S.turn) : null;
+
+  for(let view=0; view<64; view++){
+    const vr = Math.floor(view/8), vc = view%8;
+    const r = viewFlipped ? (7 - vr) : vr;
+    const c = viewFlipped ? (7 - vc) : vc;
+    const sq = rcToSq(r,c);
+
+    // a8 (0,0) light, h1 (7,7) light
+    const isLight = ((r + c) % 2 === 0);
+
+    const d = document.createElement("div");
+    d.className = "sq " + (isLight ? "light":"dark");
+    d.dataset.sq = String(sq);
+
+    if(selected===sq) d.classList.add("sel");
+    if(last && (sq===last.from || sq===last.to)) d.classList.add("last");
+    if(kingSq===sq) d.classList.add("check");
+
+    if($("showLegal").checked && selected!=null){
+      for(const m of legalCache){
+        if(m.from===selected && m.to===sq){ d.classList.add("hint"); break; }
+      }
+    }
+
+    const p = S.board[sq];
+    if(p){
+      const span = document.createElement("span");
+      span.className = "piece " + (isWhite(p) ? "w":"b");
+      span.textContent = PIECE_UNI[p];
+      d.appendChild(span);
+    }
+
+    if($("showCoords").checked){
+      const isBottomRow = (vr===7);
+      const isLeftCol = (vc===0);
+      const file = "abcdefgh"[c];
+      const rank = String(8 - r);
+
+      if(isBottomRow){
+        const f = document.createElement("div");
+        f.className = "coord file " + (isLight ? "light":"dark");
+        f.textContent = file;
+        d.appendChild(f);
+      }
+      if(isLeftCol){
+        const rk = document.createElement("div");
+        rk.className = "coord rank " + (isLight ? "light":"dark");
+        rk.textContent = rank;
+        d.appendChild(rk);
+      }
+    }
+
+    d.addEventListener("click", onSquareClick, {passive:true});
+    boardEl.appendChild(d);
+  }
+
+  resizeArrowCanvas();
+  updateClockLine();
+
+  // AI turn / hint (async)
+  if(!S.result && $("hintOn").checked && $("autoHint").checked && S.turn===mySide){
+    showHint(true);
+  }else{
+    drawArrow(null);
+  }
+
+  maybeAiReply();
+}
+
+/* Move / click */
+let uiBusy = false;
 
 function onSquareClick(e){
-  const idx = parseInt(e.currentTarget.dataset.idx, 10);
-  const p = board[idx] || "";
+  if(uiBusy) return;
+  if(S.result) return;
 
-  // seçme
+  if(p2p.dc && p2p.dc.readyState==="open"){
+    if(S.turn !== mySide){
+      setStatus("P2P: Rakibin sırası.");
+      return;
+    }
+  }
+
+  const sq = parseInt(e.currentTarget.dataset.sq, 10);
+  const p = S.board[sq];
+
   if(selected===null){
-    if(!p) return;
-    if(turn==="w" && !isWhitePiece(p)) return;
-    if(turn==="b" && !isBlackPiece(p)) return;
-    selected = idx;
+    if(p && ((S.turn==="w" && isWhite(p)) || (S.turn==="b" && isBlack(p)))){
+      selected = sq;
+      render();
+    }
+    return;
+  }
+
+  if(selected===sq){
+    selected = null;
     render();
     return;
   }
 
-  // aynı kare
-  if(selected===idx){ selected=null; render(); return; }
-
-  // hedefte kendi taşı varsa yeniden seç
-  if(p){
-    if(turn==="w" && isWhitePiece(p)){ selected=idx; render(); return; }
-    if(turn==="b" && isBlackPiece(p)){ selected=idx; render(); return; }
+  const candidates = legalCache.filter(m=>m.from===selected && m.to===sq);
+  if(candidates.length===0){
+    if(p && ((S.turn==="w" && isWhite(p)) || (S.turn==="b" && isBlack(p)))){
+      selected = sq;
+      render();
+    }
+    return;
   }
 
-  // hamle yap (bu demo sürüm: tam kural kontrolü yok)
-  const from = selected, to = idx;
-  doMoveLocal(from, to, true);
+  let mv = candidates[0];
+  if(candidates.some(x=>x.promo)){
+    mv = candidates.find(x=>x.promo && x.promo.toLowerCase()==="q") || candidates[0];
+  }
+  playMove(mv, {sendP2P:true});
+}
+
+function playMove(mv, opts={sendP2P:false}){
+  const evalBefore = evalState(S);
+  const san = sanForMove(S, mv);
+
+  onClockMoveStart();
+
+  const after = makeMove(S, mv);
+  after.last.san = san;
+  S = after;
+
+  sanHistory.push(san.replace(/[+#]$/,""));
+  $("lastMove").textContent = san;
+
+  const evalAfter = evalState(S);
+
+  if($("dedeOn").checked){
+    $("dedeText").innerHTML = dedeComment(san, evalBefore, evalAfter);
+  }
+
+  if($("hintOn").checked){
+    $("kaganText").innerHTML = `${pick(KAGAN_EMIR)}<br><br>Hamle: <b>${san}</b>`;
+  }
+
   selected = null;
+  drawArrow(null);
+
+  if(opts.sendP2P && p2p.dc && p2p.dc.readyState==="open"){
+    p2p.dc.send(JSON.stringify({t:"move", mv}));
+  }
+
+  onClockMoveEnd();
   render();
 }
 
-function doMoveLocal(from, to, broadcast){
-  board[to] = board[from];
-  board[from] = "";
-
-  // sıra değiş
-  turn = (turn==="w") ? "b" : "w";
+/* Undo */
+function undoOnePly(){
+  if(!S.history.length) return;
+  if(S.result) S.result = null;
+  S.history.pop();
+  const hist = [...S.history];
+  S = initialState();
+  sanHistory = [];
+  S.history = [];
+  for(const m of hist){
+    const san = sanForMove(S, m);
+    S = makeMove(S, m);
+    S.last = {from:m.from,to:m.to,san};
+    sanHistory.push(san.replace(/[+#]$/,""));
+    S.history.push(m);
+  }
+  if(hist.length){
+    $("lastMove").textContent = S.last.san;
+  }else{
+    S.last = null;
+    $("lastMove").textContent = "-";
+  }
+  selected = null;
+  drawArrow(null);
   render();
+}
+$("undoMoveBtn").addEventListener("click", ()=>{
+  const aiOn = $("aiLevel").value !== "off";
+  if(aiOn && S.history.length>=2){ undoOnePly(); undoOnePly(); }
+  else undoOnePly();
+});
 
-  // P2P'ye gönder
-  if(broadcast && dc && dc.readyState==="open"){
-    dc.send(JSON.stringify({type:"move", from, to}));
+/* Side / flip / reset */
+$("sidePick").addEventListener("change", ()=>{
+  mySide = $("sidePick").value;
+  render();
+});
+$("flipBtn").addEventListener("click", ()=>{
+  flipped = !flipped;
+  render();
+});
+$("resetBtn").addEventListener("click", ()=>{
+  S = initialState();
+  selected=null;
+  sanHistory=[];
+  $("kaganText").innerHTML = "Törüyle başla: Merkez, gelişim, güvenlik. İlk hamleni yap.";
+  $("dedeText").innerHTML = "Yiğit, hamle gelince sözüm de gelir.";
+  stopClock();
+  initClockFromUI();
+  render();
+});
+
+/* Hint (Worker) */
+let hintToken = 0;
+
+async function showHint(force=false){
+  if(S.result) return;
+  if(!$("hintOn").checked && !force) return;
+  if(S.turn !== mySide) return;
+
+  const token = ++hintToken;
+  const lvl = $("aiLevel").value;
+  const cfg = aiDepthFromLevel(lvl);
+  const depth = Math.max(2, Math.min(4, cfg.d)); // hint stable
+
+  const res = await aiSearch(S, depth);
+  if(token !== hintToken) return; // outdated
+  if(!res.ok || !res.move) return;
+
+  const san = sanForMove(S, res.move);
+  currentHint = {from:res.move.from, to:res.move.to, san};
+  drawArrow(currentHint);
+
+  $("kaganText").innerHTML = `${pick(KAGAN_EMIR)}<br><br>Buyruk: <b>${san}</b> — ${algebra(res.move.from)} → ${algebra(res.move.to)}`;
+}
+
+$("hintBtn").addEventListener("click", ()=>{ showHint(true); });
+$("showArrow").addEventListener("change", ()=>{ drawArrow(currentHint); });
+$("hintOn").addEventListener("change", ()=>{ if(!$("hintOn").checked){ drawArrow(null); } render(); });
+
+$("showCoords").addEventListener("change", render);
+$("showLegal").addEventListener("change", render);
+
+/* Dede lessons */
+$("dedeLessonBtn").addEventListener("click", ()=>{
+  const mode = $("dedeMode").value;
+  if(mode==="off"){ $("dedeLessonText").textContent = "Ders kapalı."; return; }
+  const arr = DEDE_LESSONS[mode] || [];
+  $("dedeLessonText").textContent = arr.length ? arr[Math.floor(Math.random()*arr.length)] : "Ders bulunamadı.";
+});
+
+/* AI reply (Worker) */
+function pickWeakerMove(state, chance){
+  if(Math.random() > chance) return null;
+  const moves = legalMoves(state);
+  if(moves.length <= 1) return null;
+  const scored = moves.map(m=>{
+    const s2 = makeMove(state, m);
+    return {m, score: evalState(s2)};
+  });
+  const maximizing = (state.turn==="w");
+  scored.sort((a,b)=> maximizing ? (a.score-b.score) : (b.score-a.score));
+  const idx = Math.min(scored.length-1, 1 + Math.floor(Math.random()*Math.min(5, scored.length-1)));
+  return scored[idx].m;
+}
+
+let aiToken = 0;
+
+async function maybeAiReply(){
+  const lvl = $("aiLevel").value;
+  if(lvl==="off") return;
+  if(S.result) return;
+
+  const aiSide = (mySide==="w") ? "b" : "w";
+  if(S.turn !== aiSide) return;
+  if(p2p.dc && p2p.dc.readyState==="open") return;
+
+  const cfg = aiDepthFromLevel(lvl);
+  const weaker = pickWeakerMove(S, cfg.bl);
+  if(weaker){
+    setStatus("AI (kolay) oynuyor…");
+    uiBusy = true;
+    setTimeout(()=>{ uiBusy=false; setStatus("Hazır"); playMove(weaker); }, 50);
+    return;
+  }
+
+  const token = ++aiToken;
+  setStatus("AI düşünüyor…");
+  uiBusy = true;
+
+  const res = await aiSearch(S, cfg.d);
+  if(token !== aiToken){ uiBusy=false; return; } // outdated
+
+  uiBusy=false;
+  setStatus("Hazır");
+  if(res.ok && res.move){
+    playMove(res.move);
   }
 }
 
-$("newBtn").onclick = ()=>{
-  newGameLocal();
-  if(dc && dc.readyState==="open") dc.send(JSON.stringify({type:"new"}));
-};
-$("flipBtn").onclick = ()=>{ flipped = !flipped; render(); };
+/* Endgame -> auto stats record */
+function onGameFinished(result){
+  let msg="";
+  if(result==="1-0") msg="Beyaz MAT etti. Zafer beyazın.";
+  else if(result==="0-1") msg="Siyah MAT etti. Zafer siyahın.";
+  else msg="PAT / Berabere. Töre dengeyi yazdı.";
+
+  setStatus(msg);
+  $("kaganText").innerHTML = `<b>Hüküm:</b> ${msg}`;
+  if($("dedeOn").checked){
+    $("dedeText").innerHTML = `${pick(DEDE_USLUP)}<br><br><b>${msg}</b>`;
+  }
+
+  if(result==="1/2-1/2"){
+    addResult("D");
+  }else{
+    const whiteWon = (result==="1-0");
+    const myWon = (mySide==="w") ? whiteWon : !whiteWon;
+    addResult(myWon ? "W" : "L");
+  }
+}
 
 /* =========================
-   2) P2P WebRTC (Sunucusuz)
-   - trickle ICE kapalı gibi davranmak için
-     ICE tamamlanınca SDP'yi yazdırıyoruz
+   Clock (optional)
 ========================= */
-let pc = null;
-let dc = null;
-let isHost = false;
+let clock = { on:false, baseMs:0, incMs:0, w:0, b:0, lastTick:0, running:false, timer:null };
 
-function makePC(){
-  const cfg = {
-    iceServers: [
-      { urls: "stun:stun.l.google.com:19302" },
-      { urls: "stun:stun1.l.google.com:19302" }
-    ]
-  };
-  pc = new RTCPeerConnection(cfg);
+function fmtMs(ms){
+  ms = Math.max(0, ms|0);
+  const s = Math.floor(ms/1000);
+  const m = Math.floor(s/60);
+  const r = s%60;
+  return `${m}:${String(r).padStart(2,"0")}`;
+}
+function initClockFromUI(){
+  clock.on = $("clockOn").checked;
+  const min = parseInt($("clockMin").value,10);
+  const inc = parseInt($("clockInc").value,10);
+  clock.baseMs = min*60*1000;
+  clock.incMs = inc*1000;
+  clock.w = clock.baseMs;
+  clock.b = clock.baseMs;
+  clock.lastTick = performance.now();
+  updateClockLine();
+  $("clockHelp").textContent = clock.on ? "Saat açık. Hamle yaptıkça süre akar." : "Saat kapalı.";
+}
+function updateClockLine(){
+  if(!clock.on){ $("clockLine").textContent = "Kapalı"; return; }
+  $("clockLine").textContent = `Beyaz ${fmtMs(clock.w)} · Siyah ${fmtMs(clock.b)}`;
+}
+function tickClock(){
+  if(!clock.running || !clock.on) return;
+  const now = performance.now();
+  const dt = now - clock.lastTick;
+  clock.lastTick = now;
 
-  pc.oniceconnectionstatechange = ()=>{
-    setState(pc.iceConnectionState);
-    if(pc.iceConnectionState==="connected" || pc.iceConnectionState==="completed"){
-      setConn("Bağlı");
-    }
-    if(pc.iceConnectionState==="failed" || pc.iceConnectionState==="disconnected" || pc.iceConnectionState==="closed"){
-      setConn("Kapalı");
-    }
-  };
+  if(S.turn==="w") clock.w -= dt;
+  else clock.b -= dt;
 
-  pc.onconnectionstatechange = ()=>{
-    if(!pc) return;
-    log("connectionState: " + pc.connectionState);
-  };
+  updateClockLine();
 
-  pc.ondatachannel = (ev)=>{
-    dc = ev.channel;
-    hookDC();
-  };
+  if(clock.w<=0 || clock.b<=0){
+    clock.running=false;
+    clearInterval(clock.timer);
+    const loser = (clock.w<=0) ? "w" : "b";
+    S.result = (loser==="w") ? "0-1" : "1-0";
+    onGameFinished(S.result);
+    render();
+  }
+}
+function startClock(){
+  if(!clock.on) return;
+  if(clock.running) return;
+  clock.running = true;
+  clock.lastTick = performance.now();
+  clock.timer = setInterval(tickClock, 200);
+}
+function stopClock(){
+  clock.running=false;
+  if(clock.timer) clearInterval(clock.timer);
+  clock.timer=null;
+  updateClockLine();
+}
+function onClockMoveStart(){
+  if(!$("clockOn").checked) return;
+  if(!clock.on) initClockFromUI();
+  startClock();
+}
+function onClockMoveEnd(){
+  if(!clock.on) return;
+  const movedSide = (S.turn==="w") ? "b" : "w";
+  if(movedSide==="w") clock.w += clock.incMs;
+  else clock.b += clock.incMs;
+  updateClockLine();
+}
+$("clockOn").addEventListener("change", ()=>{
+  initClockFromUI();
+  if(!clock.on) stopClock();
+});
+$("clockMin").addEventListener("change", initClockFromUI);
+$("clockInc").addEventListener("change", initClockFromUI);
+$("clockReset").addEventListener("click", ()=>{
+  stopClock();
+  initClockFromUI();
+});
+
+/* =========================
+   Daily goal + stats
+========================= */
+const LS_GOAL = "toru_goal_v1";
+const LS_DAILY = "toru_daily_v1";
+
+function loadGoal(){
+  const g = parseInt(localStorage.getItem(LS_GOAL)||"5",10);
+  return clamp(isNaN(g)?5:g, 1, 10000);
+}
+function saveGoal(g){ localStorage.setItem(LS_GOAL, String(clamp(g,1,10000))); }
+
+function loadDaily(){
+  try{ return JSON.parse(localStorage.getItem(LS_DAILY) || "{}") || {}; }
+  catch{ return {}; }
+}
+function saveDaily(obj){ localStorage.setItem(LS_DAILY, JSON.stringify(obj)); }
+
+function getTodayObj(daily){
+  const key = nowDayKey();
+  daily[key] = daily[key] || { w:0, l:0, d:0, games:[] };
+  return daily[key];
+}
+function lastNDaysKeys(n=14){
+  const out=[];
+  const d=new Date();
+  for(let i=0;i<n;i++){
+    const dd=new Date(d);
+    dd.setDate(d.getDate()-i);
+    out.push(dd.toISOString().slice(0,10));
+  }
+  return out.reverse();
+}
+function winRate(w,l,d){
+  const total=w+l+d;
+  if(total<=0) return 0;
+  return (w + 0.5*d) / total;
 }
 
-function hookDC(){
-  if(!dc) return;
-  dc.onopen = ()=>{ log("✅ DataChannel açık"); setConn("Bağlı"); };
-  dc.onclose = ()=>{ log("⛔ DataChannel kapandı"); setConn("Kapalı"); };
-  dc.onerror = ()=>{ log("⚠️ DataChannel hata"); };
+function addResult(resChar){
+  const daily = loadDaily();
+  const t = getTodayObj(daily);
 
-  dc.onmessage = (ev)=>{
-    try{
-      const msg = JSON.parse(ev.data);
-      if(msg.type==="move"){
-        doMoveLocal(msg.from, msg.to, false);
-      }else if(msg.type==="new"){
-        newGameLocal();
-      }
-    }catch{
-      // boş
-    }
-  };
+  if(resChar==="W") t.w++;
+  else if(resChar==="L") t.l++;
+  else t.d++;
+
+  t.games.push({
+    t: new Date().toISOString(),
+    res: resChar,
+    side: mySide,
+    ai: $("aiLevel").value
+  });
+
+  saveDaily(daily);
+  updateStatsUI();
 }
 
-function waitIceGatheringComplete(){
-  return new Promise((resolve)=>{
-    if(!pc) return resolve();
-    if(pc.iceGatheringState==="complete") return resolve();
-    const onState = ()=>{
-      if(pc.iceGatheringState==="complete"){
-        pc.removeEventListener("icegatheringstatechange", onState);
-        resolve();
-      }
-    };
-    pc.addEventListener("icegatheringstatechange", onState);
+function undoLastResult(){
+  const daily = loadDaily();
+  const key = nowDayKey();
+  const t = daily[key];
+  if(!t || !t.games || !t.games.length) return;
+
+  const last = t.games.pop();
+  if(last.res==="W") t.w = Math.max(0, (t.w||0)-1);
+  if(last.res==="L") t.l = Math.max(0, (t.l||0)-1);
+  if(last.res==="D") t.d = Math.max(0, (t.d||0)-1);
+
+  saveDaily(daily);
+  updateStatsUI();
+}
+
+function clearToday(){
+  const daily = loadDaily();
+  const key = nowDayKey();
+  daily[key] = { w:0, l:0, d:0, games:[] };
+  saveDaily(daily);
+  updateStatsUI();
+}
+
+function updateStatsUI(){
+  const goal = loadGoal();
+  $("goalNum").textContent = goal;
+  $("goalSet").value = goal;
+
+  const daily = loadDaily();
+  const key = nowDayKey();
+  const t = daily[key] || {w:0,l:0,d:0,games:[]};
+
+  const total = (t.w||0)+(t.l||0)+(t.d||0);
+  const wr = winRate(t.w||0,t.l||0,t.d||0);
+
+  $("todayTotal").textContent = total;
+  $("todayW").textContent = t.w||0;
+  $("todayL").textContent = t.l||0;
+  $("todayD").textContent = t.d||0;
+  $("todayWR").textContent = (wr*100).toFixed(0) + "%";
+
+  const pct = Math.floor((total / goal) * 100);
+  $("goalPct").textContent = clamp(pct,0,999) + "%";
+
+  const done = total >= goal;
+  $("goalHint").textContent = done
+    ? "Bugünün hedefi tamam. Töre tamamlandı."
+    : \`Hedefe \${goal-total} oyun kaldı. Töre sabır ister.\`;
+
+  const completed = Math.min(total, goal);
+  const completedWins = Math.min(t.w||0, completed);
+  const completedWR = completed>0 ? (completedWins / completed) : 0;
+  $("analysisLine").textContent =
+    \`Hedef: \${goal} · Tamamlanan: \${completed} (\${clamp(pct,0,999)}%) · Hedef içi başarı: \${(completedWR*100).toFixed(0)}% · Bugün başarı: \${(wr*100).toFixed(0)}%\`;
+
+  const keys = lastNDaysKeys(14);
+  let lines = [];
+  for(const k of keys){
+    const x = daily[k];
+    if(!x){ lines.push(\`\${k}: 0 oyun\`); continue; }
+    const tt=(x.w||0)+(x.l||0)+(x.d||0);
+    const r = winRate(x.w||0,x.l||0,x.d||0);
+    lines.push(\`\${k}: \${tt} oyun · ✅\${x.w||0} ❌\${x.l||0} ➖\${x.d||0} · \${(r*100).toFixed(0)}%\`);
+  }
+  $("historyList").textContent = lines.join("\\n");
+
+  const first7 = keys.slice(0,7);
+  const last7  = keys.slice(7);
+
+  function sum(keysArr){
+    let w=0,l=0,d=0;
+    for(const k of keysArr){
+      const x = daily[k];
+      if(!x) continue;
+      w += x.w||0; l += x.l||0; d += x.d||0;
+    }
+    const t = w+l+d;
+    return {w,l,d,t, r: winRate(w,l,d)};
+  }
+  const a = sum(first7);
+  const b = sum(last7);
+  const delta = (b.r - a.r);
+
+  let verdict;
+  if(b.t < 3){
+    verdict = "Yeterli veri yok: Son 7 günde oyun az.";
+  }else if(delta > 0.08){
+    verdict = "GELİŞİM VAR: Başarı oranı anlamlı yükselmiş.";
+  }else if(delta < -0.08){
+    verdict = "DÜŞÜŞ VAR: Başarı oranı düşmüş.";
+  }else{
+    verdict = "DENGE: Benzer performans.";
+  }
+
+  $("progressAnalysis").textContent =
+    \`Önceki 7 gün: \${a.t} oyun · \${(a.r*100).toFixed(0)}%\\n\` +
+    \`Son 7 gün:   \${b.t} oyun · \${(b.r*100).toFixed(0)}%\\n\` +
+    \`Değişim: \${(delta*100).toFixed(0)} puan\\n\` +
+    \`\${verdict}\`;
+}
+
+$("goalMinus").addEventListener("click", ()=>{ saveGoal(loadGoal()-1); updateStatsUI(); });
+$("goalPlus").addEventListener("click", ()=>{ saveGoal(loadGoal()+1); updateStatsUI(); });
+$("goalApply").addEventListener("click", ()=>{
+  const v = parseInt($("goalSet").value,10);
+  if(!isNaN(v)) saveGoal(v);
+  updateStatsUI();
+});
+$("markWin").addEventListener("click", ()=> addResult("W"));
+$("markLoss").addEventListener("click", ()=> addResult("L"));
+$("markDraw").addEventListener("click", ()=> addResult("D"));
+$("undoLastStat").addEventListener("click", undoLastResult);
+$("clearToday").addEventListener("click", clearToday);
+
+/* =========================
+   YouTube locked list
+========================= */
+const LS_SONGS = "toru_songs_v1";
+let SONGS = [{ title: "Senin parça (m0fXYGf0bfw)", id: "m0fXYGf0bfw" }];
+
+function normalizeYouTubeId(urlOrId){
+  if(!urlOrId) return null;
+  const t = urlOrId.trim();
+  if(/^[a-zA-Z0-9_-]{11}$/.test(t)) return t;
+  try{
+    const u = new URL(t);
+    if(u.hostname.includes("youtu.be")){
+      const id = u.pathname.replace("/","").trim();
+      return (/^[a-zA-Z0-9_-]{11}$/.test(id)) ? id : null;
+    }
+    const v = u.searchParams.get("v");
+    if(v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
+    const m = u.pathname.match(/\\/(embed|shorts)\\/([a-zA-Z0-9_-]{11})/);
+    if(m) return m[2];
+    return null;
+  }catch{ return null; }
+}
+function loadSongs(){
+  try{
+    const raw = localStorage.getItem(LS_SONGS);
+    if(!raw) return;
+    const arr = JSON.parse(raw);
+    if(Array.isArray(arr) && arr.length) SONGS = arr.filter(x=>x && x.id && x.title);
+  }catch{}
+}
+function saveSongs(){ localStorage.setItem(LS_SONGS, JSON.stringify(SONGS)); }
+
+const songSelect = $("songSelect");
+function renderSongs(){
+  songSelect.innerHTML = "";
+  SONGS.forEach((s)=>{
+    const o=document.createElement("option");
+    o.value = s.id;
+    o.textContent = s.title;
+    songSelect.appendChild(o);
   });
 }
 
-async function hostCreateOffer(){
-  isHost = true;
-  makePC();
-
-  // host datachannel kurar
-  dc = pc.createDataChannel("tore");
-  hookDC();
-
-  const offer = await pc.createOffer();
-  await pc.setLocalDescription(offer);
-
-  setState("ICE toplanıyor...");
-  await waitIceGatheringComplete();
-
-  const fullOffer = pc.localDescription;
-  $("box").value = JSON.stringify(fullOffer);
-  setState("Offer hazır (kopyala gönder)");
-  log("✅ Offer oluşturuldu");
+let ytPlayer=null, ytReady=false, currentIndex=0;
+function setYtStatus(t){ $("ytStatus").textContent = "Durum: " + t; }
+function playByIndex(i){
+  if(!SONGS.length) return setYtStatus("Liste boş");
+  currentIndex = (i + SONGS.length) % SONGS.length;
+  const s = SONGS[currentIndex];
+  songSelect.value = s.id;
+  if(!ytReady) return setYtStatus("Player hazır değil");
+  ytPlayer.loadVideoById(s.id);
+  setYtStatus("Çalıyor: " + s.title);
 }
-
-async function joinWithOffer(offerText){
-  isHost = false;
-  makePC();
-
-  let offer;
-  try{ offer = JSON.parse(offerText); }
-  catch{ alert("Offer JSON okunamadı."); return; }
-
-  await pc.setRemoteDescription(offer);
-
-  const answer = await pc.createAnswer();
-  await pc.setLocalDescription(answer);
-
-  setState("ICE toplanıyor...");
-  await waitIceGatheringComplete();
-
-  const fullAnswer = pc.localDescription;
-  $("box").value = JSON.stringify(fullAnswer);
-  setState("Answer hazır (kopyala gönder)");
-  log("✅ Answer üretildi");
+function playSelected(){
+  const id = songSelect.value;
+  const idx = SONGS.findIndex(x=>x.id===id);
+  playByIndex(idx>=0 ? idx : 0);
 }
+function playNext(){ playByIndex(currentIndex + 1); }
+function pauseYt(){ if(ytReady) ytPlayer.pauseVideo(); }
 
-async function hostApplyAnswer(answerText){
-  if(!pc){ alert("Önce Kur (Host) yap."); return; }
-  let ans;
-  try{ ans = JSON.parse(answerText); }
-  catch{ alert("Answer JSON okunamadı."); return; }
+$("playBtn").addEventListener("click", playSelected);
+$("pauseBtn").addEventListener("click", pauseYt);
+$("nextBtn").addEventListener("click", playNext);
+songSelect.addEventListener("change", playSelected);
 
-  await pc.setRemoteDescription(ans);
-  setState("Bağlantı kuruluyor...");
-  log("✅ Answer uygulandı");
+$("addBtn").addEventListener("click", ()=>{
+  if(!$("songEditOn").checked){
+    setYtStatus("Liste düzenleme kapalı. (Sadece sen açarsan eklenir.)");
+    return;
+  }
+  const url = $("songUrl").value;
+  const id = normalizeYouTubeId(url);
+  if(!id){ setYtStatus("Link/ID okunamadı."); return; }
+  const title = prompt("Şarkı adı ne olsun?", "Yeni Parça");
+  if(!title) return;
+  if(SONGS.some(x=>x.id===id)){ setYtStatus("Bu parça zaten listede."); return; }
+  SONGS.push({title, id});
+  saveSongs();
+  renderSongs();
+  $("songUrl").value = "";
+  setYtStatus("Listeye eklendi: " + title);
+});
+
+function loadYouTubeAPI(){
+  const tag=document.createElement("script");
+  tag.src="https://www.youtube.com/iframe_api";
+  document.body.appendChild(tag);
 }
-
-function closeAll(){
-  try{ if(dc) dc.close(); }catch{}
-  try{ if(pc) pc.close(); }catch{}
-  dc = null; pc = null; isHost=false;
-  setState("-");
-  setConn("Kapalı");
-  log("Kapatıldı.");
-}
+window.onYouTubeIframeAPIReady = function(){
+  ytPlayer = new YT.Player("yt", {
+    height:"0", width:"0",
+    videoId: SONGS[0]?.id || "",
+    playerVars:{ autoplay:0, controls:0, rel:0, modestbranding:1, playsinline:1, origin: location.origin },
+    events:{
+      onReady: ()=>{ ytReady=true; setYtStatus("Hazır. İlk kez ÇAL’a dokun."); },
+      onStateChange: (ev)=>{
+        if(ev.data===YT.PlayerState.ENDED) playNext();
+        if(ev.data===YT.PlayerState.PLAYING) setYtStatus("Çalıyor");
+        if(ev.data===YT.PlayerState.PAUSED) setYtStatus("Duraklatıldı");
+      },
+      onError: (e)=>{
+        setYtStatus("Bu parça açılamadı (kod "+e.data+"). Sonraki parçaya geçiliyor…");
+        setTimeout(playNext, 700);
+      }
+    }
+  });
+};
+loadYouTubeAPI();
 
 /* =========================
-   3) Butonlar
+   P2P (same as before)
 ========================= */
-$("hostBtn").onclick = ()=> hostCreateOffer();
-$("joinBtn").onclick = ()=> joinWithOffer($("box").value.trim());
-$("applyAnswerBtn").onclick = ()=> hostApplyAnswer($("box").value.trim());
-$("closeBtn").onclick = ()=> closeAll();
+function setP2PHint(t){ $("p2pHint").textContent = t; }
+function setP2PState(t){ $("p2pState").textContent = t; }
 
-$("copyBtn").onclick = async ()=>{
-  const t = $("box").value;
-  if(!t.trim()) return;
-  try{
-    await navigator.clipboard.writeText(t);
-    log("📋 Kopyalandı");
-  }catch{
-    // clipboard izni yoksa fallback
-    $("box").select();
-    document.execCommand("copy");
-    log("📋 Kopyalandı (fallback)");
+async function makePeer(role){
+  const pc = new RTCPeerConnection({ iceServers: [{ urls: "stun:stun.l.google.com:19302" }] });
+
+  pc.onconnectionstatechange = ()=> setP2PState(pc.connectionState);
+
+  pc.ondatachannel = (e)=>{
+    p2p.dc = e.channel;
+    wireDC();
+  };
+
+  if(role==="host"){
+    p2p.dc = pc.createDataChannel("toru");
+    wireDC();
   }
-};
 
-/* Start */
-newGameLocal();
-setConn("Kapalı");
-setState("-");
-log("Hazır.");
+  p2p.pc = pc;
+  p2p.role = role;
+  return pc;
+}
+
+function wireDC(){
+  if(!p2p.dc) return;
+  p2p.dc.onopen = ()=>{ setP2PState("Açık"); setP2PHint("Bağlandı. Hamleler iki tarafa gider."); };
+  p2p.dc.onclose = ()=>{ setP2PState("Kapalı"); setP2PHint("Kanal kapandı."); };
+  p2p.dc.onmessage = (ev)=>{
+    try{
+      const msg = JSON.parse(ev.data);
+      if(msg.t==="move" && msg.mv) playMove(msg.mv, {sendP2P:false});
+    }catch{}
+  };
+}
+
+async function waitIceComplete(pc){
+  if(pc.iceGatheringState === "complete") return;
+  await new Promise(resolve=>{
+    const chk = ()=>{
+      if(pc.iceGatheringState === "complete"){
+        pc.removeEventListener("icegatheringstatechange", chk);
+        resolve();
+      }
+    };
+    pc.addEventListener("icegatheringstatechange", chk);
+  });
+}
+
+$("p2pHost").addEventListener("click", async ()=>{
+  try{
+    setP2PHint("Host hazırlanıyor…");
+    const pc = await makePeer("host");
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    await waitIceComplete(pc);
+    $("p2pBox").value = JSON.stringify(pc.localDescription);
+    setP2PHint("Offer hazır: kutuyu kopyala ve karşı tarafa gönder.");
+  }catch(e){
+    setP2PHint("Hata: " + (e?.message||e));
+  }
+});
+
+$("p2pJoin").addEventListener("click", async ()=>{
+  try{
+    const raw = $("p2pBox").value.trim();
+    if(!raw) return setP2PHint("Önce Host’tan gelen Offer’ı kutuya yapıştır.");
+    const offer = JSON.parse(raw);
+
+    setP2PHint("Join hazırlanıyor…");
+    const pc = await makePeer("join");
+    await pc.setRemoteDescription(offer);
+
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    await waitIceComplete(pc);
+
+    $("p2pBox").value = JSON.stringify(pc.localDescription);
+    setP2PHint("Answer hazır: kutuyu kopyala ve Host’a geri gönder.");
+  }catch(e){
+    setP2PHint("Hata: " + (e?.message||e));
+  }
+});
+
+$("p2pCopy").addEventListener("click", async ()=>{
+  try{
+    await navigator.clipboard.writeText($("p2pBox").value);
+    setP2PHint("Kopyalandı.");
+  }catch{
+    setP2PHint("Kopyalama başarısız. Elle seçip kopyala.");
+  }
+});
+
+$("p2pBox").addEventListener("blur", async ()=>{
+  if(p2p.role==="host" && p2p.pc){
+    const raw = $("p2pBox").value.trim();
+    if(!raw) return;
+    try{
+      const desc = JSON.parse(raw);
+      if(desc && desc.type==="answer"){
+        await p2p.pc.setRemoteDescription(desc);
+        setP2PHint("Host: Answer uygulandı. Bağlantı kuruluyor…");
+      }
+    }catch{}
+  }
+});
+
+$("p2pClose").addEventListener("click", ()=>{
+  try{ if(p2p.dc) p2p.dc.close(); if(p2p.pc) p2p.pc.close(); }catch{}
+  p2p = { pc:null, dc:null, role:null };
+  setP2PState("Kapalı");
+  setP2PHint("Kapandı.");
+});
+
+/* =========================
+   Start
+========================= */
+function applyDefaults(){
+  loadSongs();
+  renderSongs();
+  initClockFromUI();
+  updateStatsUI();
+  mySide = $("sidePick").value;
+  setStatus("Hazır");
+}
+applyDefaults();
+render();
 </script>
 </body>
 </html>
