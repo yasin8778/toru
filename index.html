@@ -1,402 +1,182 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>Törü — Oda Kur / Bağlan (Sunucusuz)</title>
-  <style>
-    :root{
-      --bg:#070b16; --stroke:rgba(255,255,255,.12);
-      --txt:rgba(255,255,255,.92); --muted:rgba(255,255,255,.68);
-      --good:#2ee59d; --bad:#ff5b7a; --acc:#4aa3ff;
-      --light:#f3d8b8; --dark:#b98563;
-      --sq: clamp(38px, 10vw, 62px);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      background: radial-gradient(1100px 600px at 50% 0%, #132351 0%, var(--bg) 55%, #050711 100%);
-      color:var(--txt); padding:14px 10px 40px; display:flex; justify-content:center;
-    }
-    .wrap{width:min(1100px,100%)}
-    .top{
-      border:1px solid var(--stroke); border-radius:16px; padding:14px;
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-    }
-    h1{margin:0; font-size:22px}
-    .sub{margin-top:6px; color:var(--muted); line-height:1.35}
-    .grid{display:grid; gap:12px; margin-top:12px}
-    @media(min-width:980px){ .grid{grid-template-columns: 560px 1fr;} }
-    .card{
-      border:1px solid var(--stroke); border-radius:16px; padding:12px;
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-    }
-    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
-    button, textarea{
-      border:1px solid var(--stroke); border-radius:12px;
-      background:rgba(255,255,255,.06); color:var(--txt);
-      padding:10px 12px; font-weight:800;
-    }
-    button{cursor:pointer}
-    button.good{background: rgba(46,229,157,.14); border-color: rgba(46,229,157,.40)}
-    button.bad{background: rgba(255,91,122,.14); border-color: rgba(255,91,122,.40)}
-    button.acc{background: rgba(74,163,255,.14); border-color: rgba(74,163,255,.40)}
-    textarea{width:100%; min-height:120px; resize:vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-weight:600; cursor:text}
-    .pill{
-      border:1px solid var(--stroke); background:rgba(0,0,0,.18);
-      color:var(--muted); padding:7px 10px; border-radius:999px; font-size:13px; white-space:nowrap;
-    }
-    .board{
-      width: calc(var(--sq) * 8); height: calc(var(--sq) * 8);
-      display:grid; grid-template-columns:repeat(8,1fr); grid-template-rows:repeat(8,1fr);
-      border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,.16);
-      box-shadow: 0 18px 40px rgba(0,0,0,.45); margin:auto;
-      user-select:none; touch-action:manipulation;
-    }
-    .sq{
-      display:flex; align-items:center; justify-content:center;
-      font-size: calc(var(--sq) * .70);
-      position:relative; cursor:pointer;
-    }
-    .light{background:var(--light)} .dark{background:var(--dark)}
-    .sq.sel{outline: 4px solid rgba(74,163,255,.9); outline-offset:-4px}
-    .note{color:var(--muted); font-size:13px; line-height:1.45}
-    .log{color:var(--muted); font-size:13px; line-height:1.45; white-space:pre-wrap}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Törü — Türk'ün Töresi</title>
+
+<style>
+
+body{
+background:#0a0f1f;
+color:white;
+font-family:Arial;
+text-align:center;
+}
+
+h1{
+margin-top:10px;
+}
+
+#board{
+width:480px;
+height:480px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(8,1fr);
+border:4px solid #333;
+}
+
+.square{
+width:60px;
+height:60px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:38px;
+cursor:pointer;
+}
+
+.light{background:#f0d9b5;}
+.dark{background:#b58863;}
+
+button{
+padding:10px 20px;
+margin:6px;
+border-radius:10px;
+border:none;
+font-weight:bold;
+cursor:pointer;
+}
+
+</style>
 </head>
+
+
 <body>
-<div class="wrap">
-  <div class="top">
-    <h1>Törü — Oda Kur / Bağlan (Sunucusuz)</h1>
-    <div class="sub">
-      Bu sayfa WebRTC ile <b>kopyala-yapıştır</b> üzerinden bağlanır. Sunucu yoktur.<br>
-      <span class="pill">Güvenlik</span> Karşı taraf <b>telefonuna/PC’ne erişemez</b>. Sadece bu sayfanın gönderdiği <b>hamle verileri</b> gider.
-    </div>
-  </div>
 
-  <div class="grid">
-    <div class="card">
-      <div class="row" style="justify-content:space-between">
-        <b>Tahta (Demo)</b>
-        <div class="row">
-          <button class="acc" id="newBtn">Yeni Oyun</button>
-          <button id="flipBtn">Tahtayı Çevir</button>
-        </div>
-      </div>
-      <div style="height:10px"></div>
-      <div class="board" id="board"></div>
-      <div style="height:10px"></div>
-      <div class="row">
-        <span class="pill">Sıra: <b id="turn">Beyaz</b></span>
-        <span class="pill">Bağlantı: <b id="conn">Kapalı</b></span>
-      </div>
-      <div class="note" style="margin-top:10px">
-        Not: Bu sürüm “oda kurma” için. (Hamle senkronu var.) Tam satranç kuralları/AI’yi istersen bir sonraki adımda bunu baz alıp ekleriz.
-      </div>
-    </div>
+<h1>Törü — Türk'ün Töresi</h1>
 
-    <div class="card">
-      <b>P2P Online (Sunucusuz)</b>
-      <div class="note" style="margin-top:6px">
-        <b>Host:</b> Kur → Offer’ı gönder → Answer gelince yapıştır → Answer’ı Uygula.<br>
-        <b>Join:</b> Offer’ı yapıştır → Bağlan → Answer’ı gönder.
-      </div>
+<button onclick="newGame()">Yeni Oyun</button>
+<button onclick="flipBoard()">Tahtayı Çevir</button>
 
-      <div style="height:10px"></div>
-      <div class="row">
-        <button class="good" id="hostBtn">Kur (Host)</button>
-        <button class="acc" id="joinBtn">Bağlan (Join)</button>
-        <button class="acc" id="applyAnswerBtn">Answer’ı Uygula (Host)</button>
-        <button class="bad" id="closeBtn">Kapat</button>
-      </div>
-
-      <div style="height:10px"></div>
-      <textarea id="box" placeholder="Offer veya Answer buraya..."></textarea>
-
-      <div class="row" style="margin-top:10px">
-        <button id="copyBtn">Kutuyu Kopyala</button>
-        <span class="pill">Durum: <b id="state">-</b></span>
-      </div>
-
-      <div style="height:10px"></div>
-      <div class="note"><b>Log:</b></div>
-      <div class="log" id="log"></div>
-    </div>
-  </div>
-</div>
+<div id="board"></div>
 
 <script>
-/* =========================
-   0) Mini yardımcılar
-========================= */
-const $ = (id)=>document.getElementById(id);
-const log = (t)=>{ $("log").textContent = (t + "\\n" + $("log").textContent).slice(0, 5000); };
-const setState = (t)=> $("state").textContent = t;
-const setConn = (t)=> $("conn").textContent = t;
 
-/* =========================
-   1) Satranç (Demo) - hamle senkronu
-========================= */
-const pieces = {
-  p:"♟", r:"♜", n:"♞", b:"♝", q:"♛", k:"♚",
-  P:"♙", R:"♖", N:"♘", B:"♗", Q:"♕", K:"♔"
-};
-let board = [];
-let turn = "w";          // w=beyaz, b=siyah
-let selected = null;
-let flipped = false;
-
-function newGameLocal(){
-  board = [
-    "r","n","b","q","k","b","n","r",
-    "p","p","p","p","p","p","p","p",
-    "","","","","","","","",
-    "","","","","","","","",
-    "","","","","","","","",
-    "","","","","","","","",
-    "P","P","P","P","P","P","P","P",
-    "R","N","B","Q","K","B","N","R"
-  ];
-  turn = "w";
-  selected = null;
-  render();
-}
-function render(){
-  $("turn").textContent = (turn==="w") ? "Beyaz" : "Siyah";
-  const b = $("board");
-  b.innerHTML = "";
-  for(let vr=0; vr<8; vr++){
-    for(let vc=0; vc<8; vc++){
-      const r = flipped ? (7-vr) : vr;
-      const c = flipped ? (7-vc) : vc;
-      const idx = r*8+c;
-
-      const sq = document.createElement("div");
-      sq.className = "sq " + (((vr+vc)%2===0) ? "light" : "dark");
-      if(selected===idx) sq.classList.add("sel");
-
-      sq.dataset.idx = idx;
-      sq.textContent = pieces[board[idx]] || "";
-      sq.onclick = onSquareClick;
-      b.appendChild(sq);
-    }
-  }
-}
-function isWhitePiece(p){ return p && p===p.toUpperCase(); }
-function isBlackPiece(p){ return p && p===p.toLowerCase(); }
-
-function onSquareClick(e){
-  const idx = parseInt(e.currentTarget.dataset.idx, 10);
-  const p = board[idx] || "";
-
-  // seçme
-  if(selected===null){
-    if(!p) return;
-    if(turn==="w" && !isWhitePiece(p)) return;
-    if(turn==="b" && !isBlackPiece(p)) return;
-    selected = idx;
-    render();
-    return;
-  }
-
-  // aynı kare
-  if(selected===idx){ selected=null; render(); return; }
-
-  // hedefte kendi taşı varsa yeniden seç
-  if(p){
-    if(turn==="w" && isWhitePiece(p)){ selected=idx; render(); return; }
-    if(turn==="b" && isBlackPiece(p)){ selected=idx; render(); return; }
-  }
-
-  // hamle yap (bu demo sürüm: tam kural kontrolü yok)
-  const from = selected, to = idx;
-  doMoveLocal(from, to, true);
-  selected = null;
-  render();
+const pieces={
+p:"♟",
+r:"♜",
+n:"♞",
+b:"♝",
+q:"♛",
+k:"♚",
+P:"♙",
+R:"♖",
+N:"♘",
+B:"♗",
+Q:"♕",
+K:"♔"
 }
 
-function doMoveLocal(from, to, broadcast){
-  board[to] = board[from];
-  board[from] = "";
+let board=[
+"r","n","b","q","k","b","n","r",
+"p","p","p","p","p","p","p","p",
+"","","","","","","","",
+"","","","","","","","",
+"","","","","","","","",
+"","","","","","","","",
+"P","P","P","P","P","P","P","P",
+"R","N","B","Q","K","B","N","R"
+]
 
-  // sıra değiş
-  turn = (turn==="w") ? "b" : "w";
-  render();
+let turn="white"
+let selected=null
+let flipped=false
 
-  // P2P'ye gönder
-  if(broadcast && dc && dc.readyState==="open"){
-    dc.send(JSON.stringify({type:"move", from, to}));
-  }
+function draw(){
+
+const b=document.getElementById("board")
+b.innerHTML=""
+
+for(let r=0;r<8;r++){
+for(let c=0;c<8;c++){
+
+let index=flipped?(7-r)*8+(7-c):r*8+c
+
+let sq=document.createElement("div")
+
+sq.className="square "+((r+c)%2==0?"light":"dark")
+
+sq.dataset.index=index
+
+sq.onclick=clickSquare
+
+sq.textContent=pieces[board[index]]||""
+
+b.appendChild(sq)
+
 }
 
-$("newBtn").onclick = ()=>{
-  newGameLocal();
-  if(dc && dc.readyState==="open") dc.send(JSON.stringify({type:"new"}));
-};
-$("flipBtn").onclick = ()=>{ flipped = !flipped; render(); };
-
-/* =========================
-   2) P2P WebRTC (Sunucusuz)
-   - trickle ICE kapalı gibi davranmak için
-     ICE tamamlanınca SDP'yi yazdırıyoruz
-========================= */
-let pc = null;
-let dc = null;
-let isHost = false;
-
-function makePC(){
-  const cfg = {
-    iceServers: [
-      { urls: "stun:stun.l.google.com:19302" },
-      { urls: "stun:stun1.l.google.com:19302" }
-    ]
-  };
-  pc = new RTCPeerConnection(cfg);
-
-  pc.oniceconnectionstatechange = ()=>{
-    setState(pc.iceConnectionState);
-    if(pc.iceConnectionState==="connected" || pc.iceConnectionState==="completed"){
-      setConn("Bağlı");
-    }
-    if(pc.iceConnectionState==="failed" || pc.iceConnectionState==="disconnected" || pc.iceConnectionState==="closed"){
-      setConn("Kapalı");
-    }
-  };
-
-  pc.onconnectionstatechange = ()=>{
-    if(!pc) return;
-    log("connectionState: " + pc.connectionState);
-  };
-
-  pc.ondatachannel = (ev)=>{
-    dc = ev.channel;
-    hookDC();
-  };
 }
 
-function hookDC(){
-  if(!dc) return;
-  dc.onopen = ()=>{ log("✅ DataChannel açık"); setConn("Bağlı"); };
-  dc.onclose = ()=>{ log("⛔ DataChannel kapandı"); setConn("Kapalı"); };
-  dc.onerror = ()=>{ log("⚠️ DataChannel hata"); };
-
-  dc.onmessage = (ev)=>{
-    try{
-      const msg = JSON.parse(ev.data);
-      if(msg.type==="move"){
-        doMoveLocal(msg.from, msg.to, false);
-      }else if(msg.type==="new"){
-        newGameLocal();
-      }
-    }catch{
-      // boş
-    }
-  };
 }
 
-function waitIceGatheringComplete(){
-  return new Promise((resolve)=>{
-    if(!pc) return resolve();
-    if(pc.iceGatheringState==="complete") return resolve();
-    const onState = ()=>{
-      if(pc.iceGatheringState==="complete"){
-        pc.removeEventListener("icegatheringstatechange", onState);
-        resolve();
-      }
-    };
-    pc.addEventListener("icegatheringstatechange", onState);
-  });
+function clickSquare(e){
+
+let i=parseInt(e.target.dataset.index)
+
+if(selected==null){
+
+if(board[i]!=""){
+selected=i
 }
 
-async function hostCreateOffer(){
-  isHost = true;
-  makePC();
+}else{
 
-  // host datachannel kurar
-  dc = pc.createDataChannel("tore");
-  hookDC();
+move(selected,i)
+selected=null
 
-  const offer = await pc.createOffer();
-  await pc.setLocalDescription(offer);
-
-  setState("ICE toplanıyor...");
-  await waitIceGatheringComplete();
-
-  const fullOffer = pc.localDescription;
-  $("box").value = JSON.stringify(fullOffer);
-  setState("Offer hazır (kopyala gönder)");
-  log("✅ Offer oluşturuldu");
 }
 
-async function joinWithOffer(offerText){
-  isHost = false;
-  makePC();
+draw()
 
-  let offer;
-  try{ offer = JSON.parse(offerText); }
-  catch{ alert("Offer JSON okunamadı."); return; }
-
-  await pc.setRemoteDescription(offer);
-
-  const answer = await pc.createAnswer();
-  await pc.setLocalDescription(answer);
-
-  setState("ICE toplanıyor...");
-  await waitIceGatheringComplete();
-
-  const fullAnswer = pc.localDescription;
-  $("box").value = JSON.stringify(fullAnswer);
-  setState("Answer hazır (kopyala gönder)");
-  log("✅ Answer üretildi");
 }
 
-async function hostApplyAnswer(answerText){
-  if(!pc){ alert("Önce Kur (Host) yap."); return; }
-  let ans;
-  try{ ans = JSON.parse(answerText); }
-  catch{ alert("Answer JSON okunamadı."); return; }
+function move(a,b){
 
-  await pc.setRemoteDescription(ans);
-  setState("Bağlantı kuruluyor...");
-  log("✅ Answer uygulandı");
+board[b]=board[a]
+board[a]=""
+
 }
 
-function closeAll(){
-  try{ if(dc) dc.close(); }catch{}
-  try{ if(pc) pc.close(); }catch{}
-  dc = null; pc = null; isHost=false;
-  setState("-");
-  setConn("Kapalı");
-  log("Kapatıldı.");
+function flipBoard(){
+
+flipped=!flipped
+draw()
+
 }
 
-/* =========================
-   3) Butonlar
-========================= */
-$("hostBtn").onclick = ()=> hostCreateOffer();
-$("joinBtn").onclick = ()=> joinWithOffer($("box").value.trim());
-$("applyAnswerBtn").onclick = ()=> hostApplyAnswer($("box").value.trim());
-$("closeBtn").onclick = ()=> closeAll();
+function newGame(){
 
-$("copyBtn").onclick = async ()=>{
-  const t = $("box").value;
-  if(!t.trim()) return;
-  try{
-    await navigator.clipboard.writeText(t);
-    log("📋 Kopyalandı");
-  }catch{
-    // clipboard izni yoksa fallback
-    $("box").select();
-    document.execCommand("copy");
-    log("📋 Kopyalandı (fallback)");
-  }
-};
+board=[
+"r","n","b","q","k","b","n","r",
+"p","p","p","p","p","p","p","p",
+"","","","","","","","",
+"","","","","","","","",
+"","","","","","","","",
+"","","","","","","","",
+"P","P","P","P","P","P","P","P",
+"R","N","B","Q","K","B","N","R"
+]
 
-/* Start */
-newGameLocal();
-setConn("Kapalı");
-setState("-");
-log("Hazır.");
+draw()
+
+}
+
+draw()
+
 </script>
+
 </body>
 </html>
